@@ -29,10 +29,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
 
-    TextView txt_btnRegister;
     EditText etxt_Email, etxt_Password;
     Button btn_Login;
-    boolean valid = false;
+    TextView txt_btnForgot, txt_btnRegister;
+
+    Boolean valid = false;
 
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
@@ -48,10 +49,11 @@ public class Login extends AppCompatActivity {
             return insets;
         });
 
-        txt_btnRegister = findViewById(R.id.TXT_btnRegister);
         etxt_Email = findViewById(R.id.ETXT_Email);
         etxt_Password = findViewById(R.id.ETXT_Password);
         btn_Login = findViewById(R.id.BTN_Login);
+        txt_btnForgot = findViewById(R.id.TXT_btnForgot);
+        txt_btnRegister = findViewById(R.id.TXT_btnRegister);
 
         fAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
@@ -59,8 +61,15 @@ public class Login extends AppCompatActivity {
         txt_btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent moveReg = new Intent(getApplicationContext(), Register.class);
+                Intent moveReg = new Intent(Login.this, Register.class);
                 startActivity(moveReg);
+            }
+        });
+        txt_btnForgot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent moveReset = new Intent(Login.this, VerifyPassword.class);
+                startActivity(moveReset);
             }
         });
 
@@ -84,6 +93,7 @@ public class Login extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            txt_btnForgot.setVisibility(View.VISIBLE);
                         }
                     });
                 }

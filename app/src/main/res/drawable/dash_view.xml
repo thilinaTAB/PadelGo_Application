@@ -7,7 +7,7 @@
     android:viewportHeight="150">
 
     <path
-        android:fillColor="@color/myThemeColor"
+        android:fillColor="@color/ThemeColor"
         android:pathData="
             M0,120
             C50,110 100,130 150,100

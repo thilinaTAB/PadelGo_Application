@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="Bicycle Type: "
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -63,7 +63,7 @@
                 android:text="classic"
                 android:padding="4dp"
                 android:textAlignment="center"
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="Location: "
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -85,7 +85,7 @@
                 android:drawablePadding="4dp"
                 android:padding="4dp"
                 android:textAlignment="center"
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -99,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:text="No. of  "
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="25sp"
                     android:textStyle="bold" />
 
@@ -117,7 +117,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:text=" ="
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="25sp"
                     android:textStyle="bold" />
 
@@ -129,7 +129,7 @@
                     android:inputType="number"
                     android:hint="_ _ _"
                     android:textColorHint="#333030"
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="25sp"
                     android:textStyle="bold" />
 
@@ -182,7 +182,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="Total Amount : "
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -202,7 +202,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="20dp"
-                android:backgroundTint="@color/myThemeColor"
+                android:backgroundTint="@color/ThemeColor"
                 android:text="Confirm Ride"
                 android:textSize="18sp"
                 android:textStyle="bold"

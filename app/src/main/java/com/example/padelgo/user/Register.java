@@ -30,18 +30,15 @@ import java.util.Map;
 
 public class Register extends AppCompatActivity {
 
+    EditText etxt_Name, etxt_NIC, etxt_Email, etxt_Mobile, etxt_Password, etxt_RePassword;
+    Button btn_Register;
     TextView txt_btnLogin;
 
-    EditText etxt_Name, etxt_Email, etxt_Password, etxt_RePassword;
-
-    boolean valid = false;
-
-    Button btn_Register;
+    Boolean valid = false;
 
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,21 +50,21 @@ public class Register extends AppCompatActivity {
             return insets;
         });
 
-        txt_btnLogin = findViewById(R.id.TXT_btnLogin);
-        btn_Register = findViewById(R.id.BTN_Register);
-
         etxt_Name = findViewById(R.id.ETXT_Name);
+        etxt_NIC = findViewById(R.id.ETXT_NIC);
         etxt_Email = findViewById(R.id.ETXT_Email);
+        etxt_Mobile = findViewById(R.id.ETXT_Mobile);
         etxt_Password = findViewById(R.id.ETXT_Password);
         etxt_RePassword = findViewById(R.id.ETXT_RePassword);
+        btn_Register = findViewById(R.id.BTN_Register);
+        txt_btnLogin = findViewById(R.id.TXT_btnLogin);
 
         fAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
 
-
         txt_btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 Intent moveLogin = new Intent(getApplicationContext(), Login.class);
                 startActivity(moveLogin);
             }
@@ -75,9 +72,11 @@ public class Register extends AppCompatActivity {
 
         btn_Register.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 checkField(etxt_Name);
+                checkField(etxt_NIC);
                 checkField(etxt_Email);
+                checkField(etxt_Mobile);
                 checkField(etxt_Password);
                 checkField(etxt_RePassword);
 
@@ -85,17 +84,33 @@ public class Register extends AppCompatActivity {
                 boolean emailValid = checkField(etxt_Email);
                 boolean passwordValid = checkField(etxt_Password);
                 boolean rePasswordValid = checkField(etxt_RePassword);
-                boolean allValid = false;
+                boolean nicValid = checkField(etxt_NIC);
+                boolean mobileValid = checkField(etxt_Mobile);
+                boolean allValid;
 
                 String name = etxt_Name.getText().toString();
                 String emailAddress = etxt_Email.getText().toString();
                 String password = etxt_Password.getText().toString();
                 String confirmPassword = etxt_RePassword.getText().toString();
+                String nic = etxt_NIC.getText().toString();
+                String mobile = etxt_Mobile.getText().toString();
 
-                if (allValid = nameValid && emailValid && passwordValid && rePasswordValid) {
+                if (allValid = nameValid && emailValid && passwordValid && rePasswordValid && nicValid && mobileValid) {
                     allValid = true;
                 } else {
                     Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                }
+
+                if (!nic.matches("^[0-9]{9}[Vv]$|^[0-9]{12}$")) {
+                    etxt_NIC.setError("Invalid NIC Number");
+                    Toast.makeText(Register.this, "Invalid NIC Number", Toast.LENGTH_SHORT).show();
+                    allValid = false;
+                }
+
+                if (!mobile.matches("[0-9]{10}")) {
+                    etxt_Mobile.setError("Invalid Mobile Number");
+                    Toast.makeText(Register.this, "Mobile number must have 10 digits", Toast.LENGTH_SHORT).show();
+                    allValid = false;
                 }
 
                 if (!password.equals(confirmPassword)) {
@@ -114,8 +129,9 @@ public class Register extends AppCompatActivity {
                             Map<String, Object> userInfo = new HashMap<>();
                             userInfo.put("Full Name", name);
                             userInfo.put("Email Address", emailAddress);
+                            userInfo.put("NIC Number", nic);
+                            userInfo.put("Mobile Number", mobile);
                             userInfo.put("Password", password);
-
 //                            userInfo.put("isAdmin", "1");
 
                             df.set(userInfo);

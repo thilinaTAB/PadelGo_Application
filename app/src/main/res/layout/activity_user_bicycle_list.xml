@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/myThemeColor"
+            android:background="@color/ThemeColor"
             android:fontFamily="@font/almendra_sc"
             android:padding="16dp"
             android:text="Bicycle Packages"

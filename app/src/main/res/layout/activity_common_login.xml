@@ -6,20 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:alpha="40"
-
-    android:background="@drawable/bg"
+    android:background="@color/white"
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".common.Login">
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="73dp"
+        android:layout_width="400dp"
+        android:layout_height="200dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="10dp"
         android:src="@drawable/logo" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/mainView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
@@ -29,8 +29,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:background="@drawable/reg_border"
-            android:backgroundTint="#f2faf6"
+            android:background="@drawable/login_border"
+            android:backgroundTint="#FFE0E0"
             android:orientation="vertical"
             android:padding="24dp">
 
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:text="User Login"
                 android:textAlignment="center"
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
@@ -48,8 +48,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/reg_border"
-                android:drawableLeft="@drawable/reg_email"
+                android:background="@drawable/login_border"
+                android:drawableLeft="@drawable/email_ico"
                 android:drawablePadding="8dp"
                 android:hint="Email Address"
                 android:textColorHint="#A3B4B2"
@@ -62,8 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/reg_border"
-                android:drawableLeft="@drawable/reg_key"
+                android:background="@drawable/login_border"
+                android:drawableLeft="@drawable/password_key_ico"
                 android:drawablePadding="8dp"
                 android:hint="Password"
                 android:inputType="textPassword"
@@ -71,18 +71,30 @@
                 android:textColorHint="#A3B4B2"
                 android:textColor="@color/black" />
 
+            <TextView
+                android:id="@+id/TXT_btnForgot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:text="Forgot your password? Verify now"
+                android:textAlignment="center"
+                android:textColor="#831111"
+                android:textStyle="bold"
+                android:textSize="15sp" />
+
             <Button
                 android:id="@+id/BTN_Login"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="30dp"
-                android:backgroundTint="@color/myThemeColor"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/ThemeColor"
                 android:text="Login"
                 android:textSize="18sp"
+                android:textColor="@color/white"
                 android:textStyle="bold"
-                android:visibility="visible"
-                app:cornerRadius="20dp"
-                tools:visibility="visible" />
+                app:cornerRadius="20dp" />
 
             <TextView
                 android:id="@+id/TXT_btnRegister"
@@ -92,7 +104,8 @@
                 android:padding="8dp"
                 android:text="Haven't an Account? Register"
                 android:textAlignment="center"
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
+                android:textStyle="bold"
                 android:textSize="15sp" />
 
         </LinearLayout>

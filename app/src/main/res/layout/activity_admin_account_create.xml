@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:text="Admin Registration"
                 android:textAlignment="center"
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/reg_border"
-                android:drawableLeft="@drawable/reg_email"
+                android:drawableLeft="@drawable/email_ico"
                 android:drawablePadding="8dp"
                 android:hint="Email Address"
                 android:textColorHint="#A3B4B2"
@@ -74,7 +74,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/reg_border"
-                android:drawableLeft="@drawable/reg_key"
+                android:drawableLeft="@drawable/password_key_ico"
                 android:drawablePadding="8dp"
                 android:hint="Password"
                 android:textColorHint="#A3B4B2"
@@ -88,7 +88,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/reg_border"
-                android:drawableLeft="@drawable/reg_key"
+                android:drawableLeft="@drawable/password_key_ico"
                 android:drawablePadding="8dp"
                 android:hint="Confirm Password"
                 android:textColorHint="#A3B4B2"
@@ -101,7 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="30dp"
-                android:backgroundTint="@color/myThemeColor"
+                android:backgroundTint="@color/ThemeColor"
                 android:text="Create Admin Account"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -116,7 +116,7 @@
                 android:padding="8dp"
                 android:text="Go Back to Admin Dashboard"
                 android:textAlignment="center"
-                android:textColor="@color/myThemeColor"
+                android:textColor="@color/ThemeColor"
                 android:textSize="15sp" />
 
         </LinearLayout>

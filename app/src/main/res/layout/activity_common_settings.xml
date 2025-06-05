@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="50dp"
         android:text="Change your Password"
-        android:textColor="@color/myThemeColor"
+        android:textColor="@color/ThemeColor"
         android:textSize="28sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
@@ -37,7 +37,7 @@
         android:layout_height="50dp"
         android:hint="New Password"
         android:textColorHint="#3E3838"
-        android:textColor="@color/myThemeColor"
+        android:textColor="@color/ThemeColor"
         android:background="#C1C8BD"
         android:inputType="textPassword"
         android:layout_marginBottom="16dp" />
@@ -48,7 +48,7 @@
         android:layout_height="50dp"
         android:hint="Re Enter New Password"
         android:textColorHint="#3E3838"
-        android:textColor="@color/myThemeColor"
+        android:textColor="@color/ThemeColor"
         android:background="#C1C8BD"
         android:inputType="textPassword"
         android:layout_marginBottom="16dp" />
