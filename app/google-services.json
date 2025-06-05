@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "368271697879",
+    "project_id": "citycyclerentals-71-10",
+    "storage_bucket": "citycyclerentals-71-10.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368271697879:android:6182c8bc0c737c8464cd92",
+        "android_client_info": {
+          "package_name": "com.example.citycyclerentals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRidobee_omXv5wh4H_j9b4KYPaOvw-IQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
