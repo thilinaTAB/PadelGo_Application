@@ -53,7 +53,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:text="Prifile"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="Packages"
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -128,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="Rent Now"
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -165,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="History"
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -202,7 +202,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="Settings"
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -239,7 +239,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="Sign Out"
-                    android:textColor="@color/myThemeColor"
+                    android:textColor="@color/ThemeColor"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
