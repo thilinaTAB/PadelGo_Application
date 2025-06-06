@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/logonew"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CityCycleRentals"
+        android:theme="@style/Theme.PadelGo"
         tools:targetApi="31">
         <activity
             android:name=".admin.AdminProfile"

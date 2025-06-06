@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "275599380861",
+    "firebase_url": "https://padelgo-app-default-rtdb.firebaseio.com",
+    "project_id": "padelgo-app",
+    "storage_bucket": "padelgo-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275599380861:android:ddb831d81a43f7624dfc14",
+        "android_client_info": {
+          "package_name": "com.example.padelgo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCr6IkjZf_bNBhkIqrhMI1dV90raT56KqA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
