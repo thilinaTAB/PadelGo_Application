@@ -15,10 +15,10 @@
         android:theme="@style/Theme.PadelGo"
         tools:targetApi="31">
         <activity
-            android:name=".admin.AdminProfile"
+            android:name=".stationOfficer.AdminProfile"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminRents"
+            android:name=".stationOfficer.AdminRents"
             android:exported="false" />
         <activity
             android:name=".common.Settings"
@@ -36,16 +36,16 @@
             android:name=".user.RideConfirmation"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminBicycleAvailabitily_Matale"
+            android:name=".stationOfficer.AdminBicycleAvailabitily_Matale"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminLocation"
+            android:name=".stationOfficer.AdminLocation"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminBicycleAvailabitily_Katugastota"
+            android:name=".stationOfficer.AdminBicycleAvailabitily_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminBicycleAvailabitily_Kandy"
+            android:name=".stationOfficer.AdminBicycleAvailabitily_Kandy"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Matale"
@@ -63,7 +63,7 @@
             android:name=".user.BicycleList"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminAccountCreate"
+            android:name=".stationOfficer.AdminAccountCreate"
             android:exported="false" />
         <activity
             android:name=".common.SplashActivityStart"
@@ -75,7 +75,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".admin.AdminDash"
+            android:name=".stationOfficer.AdminDash"
             android:exported="false" />
         <activity
             android:name=".user.Register"
