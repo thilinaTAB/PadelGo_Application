@@ -1,143 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
+    android:background="@color/white"
     tools:context=".common.SelectLocation">
 
-    <View
-        android:id="@+id/top_view"
-        android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:background="@drawable/dash_view"/>
-
-    <FrameLayout
-        android:layout_width="351dp"
-        android:layout_height="99dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="388dp"
-        android:background="@color/TransparentBG">
-
-        <ImageView
-            android:layout_width="58dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="-140dp"
-
-            android:src="@drawable/location_ico" />
-
-        <Button
-            android:id="@+id/BTN_Kandy"
-            android:layout_width="250dp"
-            android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="19.5dp"
-            android:backgroundTint="#E91E63"
-            android:text="Kandy"
-            android:textColor="@color/white"
-            android:textSize="28sp" />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="351dp"
-        android:layout_height="99dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="280dp"
-        android:background="@color/TransparentBG">
-
-        <ImageView
-            android:layout_width="58dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="-140dp"
-
-            android:src="@drawable/location_ico" />
-
-        <Button
-            android:id="@+id/BTN_Katugastota"
-            android:layout_width="250dp"
-            android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="19.5dp"
-            android:text="Katugastota"
-            android:textColor="@color/white"
-            android:backgroundTint="#00BCD4"
-            android:textSize="28sp" />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="351dp"
-        android:layout_height="99dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="172dp"
-        android:background="@color/TransparentBG">
-
-        <ImageView
-            android:layout_width="58dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="-140dp"
-
-            android:src="@drawable/location_ico" />
-
-        <Button
-            android:id="@+id/BTN_Matale"
-            android:layout_width="250dp"
-            android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="19.5dp"
-            android:text="Matale"
-            android:textColor="@color/white"
-            android:backgroundTint="#9C27B0"
-            android:textSize="28sp" />
-    </FrameLayout>
-
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/select_location_heading"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="60.5dp"
-        android:layout_marginTop="35dp"
-        android:layout_marginEnd="60.5dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/ThemeColor"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="Select Station"
         android:textAlignment="center"
-        android:text="Select Location"
         android:textColor="@color/white"
-        android:textSize="36sp"
+        android:textSize="28sp"
         android:textStyle="bold" />
 
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/mapArea"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/buttons_container"
+        android:layout_below="@id/select_location_heading" />
 
+    <ImageButton
+        android:id="@+id/IB_myLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="174dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="My Location"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_mylocation" />
+
+    <LinearLayout
+        android:id="@+id/buttons_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#80000000"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <FrameLayout
+            android:id="@+id/kandy_button_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/BTN_Kandy"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="#E91E63"
+                android:minHeight="48dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="Kandy"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/katugastota_button_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/BTN_Peradeniya"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="#00BCD4"
+                android:minHeight="48dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="Peradeniya"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/matale_button_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/BTN_Matale"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#9C27B0"
+                android:layout_gravity="center_horizontal"
+                android:minHeight="48dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="Matale"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </FrameLayout>
+    </LinearLayout>
 
 </RelativeLayout>
