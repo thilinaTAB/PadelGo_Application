@@ -16,7 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.R;
-import com.example.padelgo.admin.AdminDash;
+import com.example.padelgo.stationOfficer.AdminDash;
 import com.example.padelgo.user.Register;
 import com.example.padelgo.user.UserDashboard;
 import com.google.android.gms.tasks.OnFailureListener;
