@@ -139,6 +139,7 @@
                     android:layout_marginTop="30dp"
                     android:backgroundTint="@color/ThemeColor"
                     android:text="Register"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:cornerRadius="20dp" />

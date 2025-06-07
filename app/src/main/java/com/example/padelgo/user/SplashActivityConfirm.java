@@ -42,7 +42,7 @@ public class SplashActivityConfirm extends AppCompatActivity {
             public void run() {
                 saveRideInfo();
             }
-        }, 4000); // 4 seconds = 4000 milliseconds
+        }, 3000); // 4 seconds = 4000 milliseconds
     }
 
     private void saveRideInfo() {

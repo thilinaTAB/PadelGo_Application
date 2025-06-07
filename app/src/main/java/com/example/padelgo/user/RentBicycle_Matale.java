@@ -2,8 +2,10 @@ package com.example.padelgo.user;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -26,275 +28,156 @@ import java.util.Map;
 
 public class RentBicycle_Matale extends AppCompatActivity {
 
-    String Location = "Matale";
-    String Plan;
-    int Price;
+    String location = "Matale";
+    String plan;
+    int price;
 
-    CheckBox cb_BasicH, cb_BasicD, cb_BasicM,
-            cb_PlusH, cb_PlusD, cb_PlusM,
-            cb_ProH, cb_ProD, cb_ProM;
-
-    Switch sw_Basic, sw_Plus, sw_Pro;
-
+    CheckBox cb_BasicHour, cb_BasicDay;
     Button btn_classic, btn_cityBike, btn_cruiser, btn_folding;
-    Button btn_hybrid, btn_touring, btn_cruiser1, btn_folding1;
-    Button btn_bmx, btn_mountain, btn_roadBike, btn_electric;
-
     TextView txt_classic, txt_cityBike, txt_cruiser, txt_folding;
-    TextView txt_hybrid, txt_touring, txt_cruiser1, txt_folding1;
-    TextView txt_bmx, txt_mountain, txt_roadBike, txt_electric;
 
-    private DatabaseReference mDatabase;
+    private DatabaseReference liveDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_rent_bicycle_matale);
-
-        mDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_Matale");
+        liveDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_Matale");
 
         initializeViews();
-        setSwitchListeners();  // Initialize switch listeners before button listeners
-        setButtonOnClickListeners();
+        checkPlan();
         loadInitialData();
+        setRideValues();
     }
 
+
     private void initializeViews() {
+        cb_BasicHour = findViewById(R.id.CB_BasicHour);
+        cb_BasicDay = findViewById(R.id.CB_BasicDay);
+
         btn_classic = findViewById(R.id.BTN_classic);
         btn_cityBike = findViewById(R.id.BTN_cityBike);
         btn_cruiser = findViewById(R.id.BTN_cruiser);
         btn_folding = findViewById(R.id.BTN_folding);
-        btn_hybrid = findViewById(R.id.BTN_hybrid);
-        btn_touring = findViewById(R.id.BTN_touring);
-        btn_cruiser1 = findViewById(R.id.BTN_cruiser1);
-        btn_folding1 = findViewById(R.id.BTN_folding1);
-        btn_bmx = findViewById(R.id.BTN_bmx);
-        btn_mountain = findViewById(R.id.BTN_mountain);
-        btn_roadBike = findViewById(R.id.BTN_roadBike);
-        btn_electric = findViewById(R.id.BTN_electric);
 
         txt_classic = findViewById(R.id.TXT_classic);
         txt_cityBike = findViewById(R.id.TXT_cityBike);
         txt_cruiser = findViewById(R.id.TXT_cruiser);
         txt_folding = findViewById(R.id.TXT_folding);
-        txt_hybrid = findViewById(R.id.TXT_hybrid);
-        txt_touring = findViewById(R.id.TXT_touring);
-        txt_cruiser1 = findViewById(R.id.TXT_cruiser1);
-        txt_folding1 = findViewById(R.id.TXT_folding1);
-        txt_bmx = findViewById(R.id.TXT_bmx);
-        txt_mountain = findViewById(R.id.TXT_mountain);
-        txt_roadBike = findViewById(R.id.TXT_roadBike);
-        txt_electric = findViewById(R.id.TXT_electric);
 
-        cb_BasicH = findViewById(R.id.CB_BasicH);
-        cb_BasicD = findViewById(R.id.CB_BasicD);
-        cb_BasicM = findViewById(R.id.CB_BasicM);
-        cb_PlusH = findViewById(R.id.CB_PlusH);
-        cb_PlusD = findViewById(R.id.CB_PlusD);
-        cb_PlusM = findViewById(R.id.CB_PlusM);
-        cb_ProH = findViewById(R.id.CB_ProH);
-        cb_ProD = findViewById(R.id.CB_ProD);
-        cb_ProM = findViewById(R.id.CB_ProM);
+        txt_classic.setVisibility(View.GONE);
+        txt_cityBike.setVisibility(View.GONE);
+        txt_cruiser.setVisibility(View.GONE);
+        txt_folding.setVisibility(View.GONE);
 
-        sw_Basic = findViewById(R.id.SW_Basic);
-        sw_Plus = findViewById(R.id.SW_Plus);
-        sw_Pro = findViewById(R.id.SW_Pro);
+        btn_classic.setEnabled(false);
+        btn_cityBike.setEnabled(false);
+        btn_cruiser.setEnabled(false);
+        btn_folding.setEnabled(false);
+
+        cb_BasicHour.setOnClickListener(v -> checkPlan());
+        cb_BasicDay.setOnClickListener(v -> checkPlan());
+
+
     }
 
+    private void checkPlan() {
+        if (cb_BasicHour.isChecked()) {
+            plan = "Hourly";
+            price = 70;
 
-    private void setSwitchListeners() {
-        sw_Basic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    sw_Plus.setChecked(false);
-                    sw_Pro.setChecked(false);
-                    enableBasicCheckboxes();
-                    disablePlusCheckboxes();
-                    disableProCheckboxes();
+            cb_BasicDay.setEnabled(false);
 
-                    if (cb_BasicH.isChecked()) {
-                        Plan = "Hours";
-                        Price = 70;
-                    } else if (cb_BasicD.isChecked()) {
-                        Plan = "Days";
-                        Price = 1500;
-                    } else if (cb_BasicM.isChecked()) {
-                        Plan = "Months";
-                        Price = 40000;
-                    }
-                } else {
-                    disableBasicCheckboxes();
-                }
-            }
-        });
 
-        sw_Plus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    sw_Basic.setChecked(false);
-                    sw_Pro.setChecked(false);
-                    disableBasicCheckboxes();
-                    enablePlusCheckboxes();
-                    disableProCheckboxes();
+            btn_classic.setEnabled(true);
+            btn_classic.setBackgroundColor(Color.parseColor("#7E206E"));
+            btn_cityBike.setEnabled(true);
+            btn_cityBike.setBackgroundColor(Color.parseColor("#7E206E"));
+            btn_cruiser.setEnabled(true);
+            btn_cruiser.setBackgroundColor(Color.parseColor("#7E206E"));
+            btn_folding.setEnabled(true);
+            btn_folding.setBackgroundColor(Color.parseColor("#7E206E"));
 
-                    if (cb_PlusH.isChecked()) {
-                        Plan = "Hours";
-                        Price = 100;
-                    } else if (cb_PlusD.isChecked()) {
-                        Plan = "Days";
-                        Price = 2200;
-                    } else if (cb_PlusM.isChecked()) {
-                        Plan = "Months";
-                        Price = 60000;
-                    }
-                } else {
-                    disablePlusCheckboxes();
-                }
-            }
-        });
+            txt_classic.setVisibility(View.VISIBLE);
+            txt_cityBike.setVisibility(View.VISIBLE);
+            txt_cruiser.setVisibility(View.VISIBLE);
+            txt_folding.setVisibility(View.VISIBLE);
 
-        sw_Pro.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    sw_Basic.setChecked(false);
-                    sw_Plus.setChecked(false);
-                    disableBasicCheckboxes();
-                    disablePlusCheckboxes();
-                    enableProCheckboxes();
+        } else if (cb_BasicDay.isChecked()) {
+            plan = "Days";
+            price = 500;
 
-                    if (cb_ProH.isChecked()) {
-                        Plan = "Hours";
-                        Price = 120;
-                    } else if (cb_ProD.isChecked()) {
-                        Plan = "Days";
-                        Price = 2700;
-                    } else if (cb_ProM.isChecked()) {
-                        Plan = "Months";
-                        Price = 78000;
-                    }
-                } else {
-                    disableProCheckboxes();
-                }
-            }
-        });
+            cb_BasicHour.setEnabled(false);
+
+            btn_classic.setEnabled(true);
+            btn_classic.setBackgroundColor(Color.parseColor("#7E206E"));
+            btn_cityBike.setEnabled(true);
+            btn_cityBike.setBackgroundColor(Color.parseColor("#7E206E"));
+            btn_cruiser.setEnabled(true);
+            btn_cruiser.setBackgroundColor(Color.parseColor("#7E206E"));
+            btn_folding.setEnabled(true);
+            btn_folding.setBackgroundColor(Color.parseColor("#7E206E"));
+
+            txt_classic.setVisibility(View.VISIBLE);
+            txt_cityBike.setVisibility(View.VISIBLE);
+            txt_cruiser.setVisibility(View.VISIBLE);
+            txt_folding.setVisibility(View.VISIBLE);
+
+        } else {
+            plan = "";
+            price = 0;
+            btn_classic.setEnabled(false);
+            btn_classic.setBackgroundColor(Color.parseColor("#273F51B5"));
+            btn_cityBike.setEnabled(false);
+            btn_cityBike.setBackgroundColor(Color.parseColor("#273F51B5"));
+            btn_cruiser.setEnabled(false);
+            btn_cruiser.setBackgroundColor(Color.parseColor("#273F51B5"));
+            btn_folding.setEnabled(false);
+            btn_folding.setBackgroundColor(Color.parseColor("#273F51B5"));
+
+            cb_BasicDay.setEnabled(true);
+            cb_BasicHour.setEnabled(true);
+
+            txt_classic.setVisibility(View.GONE);
+            txt_cityBike.setVisibility(View.GONE);
+            txt_cruiser.setVisibility(View.GONE);
+            txt_folding.setVisibility(View.GONE);
+        }
     }
 
-    private void enableBasicCheckboxes() {
-        cb_BasicH.setEnabled(true);
-        cb_BasicD.setEnabled(true);
-        cb_BasicM.setEnabled(true);
+    private void setRideValues() {
+        rideConfirming(btn_classic, txt_classic, "Classic");
+        rideConfirming(btn_cityBike, txt_cityBike, "CityBike");
+        rideConfirming(btn_cruiser, txt_cruiser, "Cruiser");
+        rideConfirming(btn_folding, txt_folding, "Folding");
     }
 
-    private void disableBasicCheckboxes() {
-        cb_BasicH.setEnabled(false);
-        cb_BasicD.setEnabled(false);
-        cb_BasicM.setEnabled(false);
-        cb_BasicH.setChecked(false);
-        cb_BasicD.setChecked(false);
-        cb_BasicM.setChecked(false);
-    }
-
-    private void enablePlusCheckboxes() {
-        cb_PlusH.setEnabled(true);
-        cb_PlusD.setEnabled(true);
-        cb_PlusM.setEnabled(true);
-    }
-
-    private void disablePlusCheckboxes() {
-        cb_PlusH.setEnabled(false);
-        cb_PlusD.setEnabled(false);
-        cb_PlusM.setEnabled(false);
-        cb_PlusH.setChecked(false);
-        cb_PlusD.setChecked(false);
-        cb_PlusM.setChecked(false);
-    }
-
-    private void enableProCheckboxes() {
-        cb_ProH.setEnabled(true);
-        cb_ProD.setEnabled(true);
-        cb_ProM.setEnabled(true);
-    }
-
-    private void disableProCheckboxes() {
-        cb_ProH.setEnabled(false);
-        cb_ProD.setEnabled(false);
-        cb_ProM.setEnabled(false);
-        cb_ProH.setChecked(false);
-        cb_ProD.setChecked(false);
-        cb_ProM.setChecked(false);
-    }
-
-
-    private void setButtonOnClickListeners() {
-        setButtonOnClickListener(btn_classic, txt_classic, "classic");
-        setButtonOnClickListener(btn_cityBike, txt_cityBike, "cityBike");
-        setButtonOnClickListener(btn_cruiser, txt_cruiser, "cruiser");
-        setButtonOnClickListener(btn_folding, txt_folding, "folding");
-        setButtonOnClickListener(btn_hybrid, txt_hybrid, "hybrid");
-        setButtonOnClickListener(btn_touring, txt_touring, "touring");
-        setButtonOnClickListener(btn_cruiser1, txt_cruiser1, "cruiser1");
-        setButtonOnClickListener(btn_folding1, txt_folding1, "folding1");
-        setButtonOnClickListener(btn_bmx, txt_bmx, "bmx");
-        setButtonOnClickListener(btn_mountain, txt_mountain, "mountain");
-        setButtonOnClickListener(btn_roadBike, txt_roadBike, "roadBike");
-        setButtonOnClickListener(btn_electric, txt_electric, "electric");
-    }
-
-    private void setButtonOnClickListener(Button button, TextView textView, String bikeType) {
+    private void rideConfirming(Button button, TextView textView, String bikeType) {
         button.setOnClickListener(v -> {
             if (validateCheckboxSelection()) {
 
                 String currentPlan = null;
                 int currentPrice = -1;
 
-                if (sw_Basic.isChecked()) {
-                    if (cb_BasicH.isChecked()) {
-                        currentPlan = "Hours";
-                        currentPrice = 70;
-                    } else if (cb_BasicD.isChecked()) {
-                        currentPlan = "Days";
-                        currentPrice = 1500;
-                    } else if (cb_BasicM.isChecked()) {
-                        currentPlan = "Months";
-                        currentPrice = 40000;
-                    }
-                } else if (sw_Plus.isChecked()) {
-                    if (cb_PlusH.isChecked()) {
-                        currentPlan = "Hours";
-                        currentPrice = 100;
-                    } else if (cb_PlusD.isChecked()) {
-                        currentPlan = "Days";
-                        currentPrice = 2200;
-                    } else if (cb_PlusM.isChecked()) {
-                        currentPlan = "Months";
-                        currentPrice = 60000;
-                    }
-                } else if (sw_Pro.isChecked()) {
-                    if (cb_ProH.isChecked()) {
-                        currentPlan = "Hours";
-                        currentPrice = 120;
-                    } else if (cb_ProD.isChecked()) {
-                        currentPlan = "Days";
-                        currentPrice = 2700;
-                    } else if (cb_ProM.isChecked()) {
-                        currentPlan = "Months";
-                        currentPrice = 78000;
-                    }
+                if (cb_BasicHour.isChecked()) {
+                    currentPlan = "Hours";
+                    currentPrice = 70;
+                } else if (cb_BasicDay.isChecked()) {
+                    currentPlan = "Days";
+                    currentPrice = 500;
                 }
 
-                if (currentPlan != null && currentPrice != -1) {
+
+                if (currentPlan != null && currentPrice != -1) {  // Only proceed if a plan is selected.
                     try {
                         int currentValue = Integer.parseInt(textView.getText().toString());
                         if (currentValue > 0) {
                             int newValue = currentValue - 1;
                             textView.setText(String.valueOf(newValue));
-                            updateAvailability(bikeType, newValue);
+                            updateAvailability(bikeType, newValue); // Update Firebase
                             Intent gotoConfirm = new Intent(getApplicationContext(), RideConfirmation.class);
                             gotoConfirm.putExtra("bikeType", bikeType);
-                            gotoConfirm.putExtra("Location", Location);
+                            gotoConfirm.putExtra("Location", location);
                             gotoConfirm.putExtra("Plan", currentPlan);
                             gotoConfirm.putExtra("Price", currentPrice);
                             startActivity(gotoConfirm);
@@ -313,18 +196,11 @@ public class RentBicycle_Matale extends AppCompatActivity {
         });
     }
 
-
     private boolean validateCheckboxSelection() {
         int checkedCount = 0;
-        if (cb_BasicH.isChecked()) checkedCount++;
-        if (cb_BasicD.isChecked()) checkedCount++;
-        if (cb_BasicM.isChecked()) checkedCount++;
-        if (cb_PlusH.isChecked()) checkedCount++;
-        if (cb_PlusD.isChecked()) checkedCount++;
-        if (cb_PlusM.isChecked()) checkedCount++;
-        if (cb_ProH.isChecked()) checkedCount++;
-        if (cb_ProD.isChecked()) checkedCount++;
-        if (cb_ProM.isChecked()) checkedCount++;
+        if (cb_BasicHour.isChecked()) checkedCount++;
+        if (cb_BasicDay.isChecked()) checkedCount++;
+
 
         if (checkedCount == 1) {
             return true;
@@ -334,8 +210,22 @@ public class RentBicycle_Matale extends AppCompatActivity {
         }
     }
 
+    private void updateAvailability(String bikeType, int newValue) {
+        liveDatabase.child(bikeType).setValue(newValue)
+                .addOnFailureListener(e ->
+                        Log.e("Firebase", "Error updating availability for " + bikeType + ": " + e.getMessage()));
+    }
+
+    private void showNotAvailableDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Not Available")
+                .setMessage("This bicycle is currently not available.")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
     private void loadInitialData() {
-        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+        liveDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -358,44 +248,36 @@ public class RentBicycle_Matale extends AppCompatActivity {
         });
     }
 
+    private void initializeDefaultValues() {
+        Map<String, Object> defaultValues = new HashMap<>();
+        defaultValues.put("Classic", 0);
+        defaultValues.put("CityBike", 0);
+        defaultValues.put("Cruiser", 0);
+        defaultValues.put("Folding", 0);
+
+        liveDatabase.setValue(defaultValues)
+                .addOnSuccessListener(aVoid -> {
+                    for (Map.Entry<String, Object> entry : defaultValues.entrySet()) {
+                        updateTextView(entry.getKey(), (Integer) entry.getValue());
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firebase", "Error initializing data: " + e.getMessage()));
+    }
+
     private void updateTextView(String bikeType, int availability) {
         TextView textView = null;
         switch (bikeType) {
-            case "classic":
+            case "Classic":
                 textView = txt_classic;
                 break;
-            case "cityBike":
+            case "CityBike":
                 textView = txt_cityBike;
                 break;
-            case "cruiser":
+            case "Cruiser":
                 textView = txt_cruiser;
                 break;
-            case "folding":
+            case "Folding":
                 textView = txt_folding;
-                break;
-            case "hybrid":
-                textView = txt_hybrid;
-                break;
-            case "touring":
-                textView = txt_touring;
-                break;
-            case "cruiser1":
-                textView = txt_cruiser1;
-                break;
-            case "folding1":
-                textView = txt_folding1;
-                break;
-            case "bmx":
-                textView = txt_bmx;
-                break;
-            case "mountain":
-                textView = txt_mountain;
-                break;
-            case "roadBike":
-                textView = txt_roadBike;
-                break;
-            case "electric":
-                textView = txt_electric;
                 break;
         }
         if (textView != null) {
@@ -405,45 +287,5 @@ public class RentBicycle_Matale extends AppCompatActivity {
                 textView.setText("-");
             }
         }
-    }
-
-    private void initializeDefaultValues() {
-        Map<String, Object> defaultValues = new HashMap<>();
-        defaultValues.put("classic", 5);
-        defaultValues.put("cityBike", 5);
-        defaultValues.put("cruiser", 5);
-        defaultValues.put("folding", 5);
-        defaultValues.put("hybrid", 5);
-        defaultValues.put("touring", 5);
-        defaultValues.put("cruiser1", 5);
-        defaultValues.put("folding1", 5);
-        defaultValues.put("bmx", 5);
-        defaultValues.put("mountain", 5);
-        defaultValues.put("roadBike", 5);
-        defaultValues.put("electric", 5);
-
-        mDatabase.setValue(defaultValues)
-                .addOnSuccessListener(aVoid -> {
-                    for (Map.Entry<String, Object> entry : defaultValues.entrySet()) {
-                        updateTextView(entry.getKey(), (Integer) entry.getValue());
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("Firebase", "Error initializing data: " + e.getMessage()));
-    }
-
-
-    private void updateAvailability(String bikeType, int newValue) {
-        mDatabase.child(bikeType).setValue(newValue)
-                .addOnFailureListener(e ->
-                        Log.e("Firebase", "Error updating availability for " + bikeType + ": " + e.getMessage()));
-    }
-
-
-    private void showNotAvailableDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Not Available")
-                .setMessage("This bicycle is currently not available.")
-                .setPositiveButton("OK", null)
-                .show();
     }
 }
