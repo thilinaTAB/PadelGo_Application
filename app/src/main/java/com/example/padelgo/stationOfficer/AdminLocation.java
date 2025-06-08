@@ -27,7 +27,7 @@ public class AdminLocation extends AppCompatActivity {
         });
 
         BTN_Kandy = findViewById(R.id.BTN_Kandy);
-        BTN_Katugastota = findViewById(R.id.BTN_Katugastota);
+        BTN_Katugastota = findViewById(R.id.BTN_Peradeniya);
         BTN_Matale = findViewById(R.id.BTN_Matale);
 
         BTN_Kandy.setOnClickListener(v -> {

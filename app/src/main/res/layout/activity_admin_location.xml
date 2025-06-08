@@ -73,7 +73,7 @@
             android:src="@drawable/location_ico" />
 
         <Button
-            android:id="@+id/BTN_Katugastota"
+            android:id="@+id/BTN_Peradeniya"
             android:layout_width="250dp"
             android:layout_height="60dp"
             android:layout_alignParentEnd="true"

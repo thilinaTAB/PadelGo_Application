@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
 
     <application
         android:allowBackup="true"
@@ -14,6 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PadelGo"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDqR5FL8WK5YHTPAmjQZ1X_BXCQxWEock4" />
+
         <activity
             android:name=".stationOfficer.AdminProfile"
             android:exported="false" />
