@@ -58,7 +58,7 @@
         android:padding="8dp">
 
         <FrameLayout
-            android:id="@+id/kandy_button_layout"
+            android:id="@+id/Kandy_button_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
@@ -84,35 +84,35 @@
             android:layout_weight="1">
 
             <Button
-                android:id="@+id/BTN_Peradeniya"
-                android:layout_width="120dp"
+                android:id="@+id/BTN_Katugastota"
+                android:layout_width="130dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:backgroundTint="#00BCD4"
                 android:minHeight="48dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:text="Peradeniya"
+                android:text="Katugastota"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/matale_button_layout"
+            android:id="@+id/Peradeniya_button_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
 
             <Button
-                android:id="@+id/BTN_Matale"
-                android:layout_width="100dp"
+                android:id="@+id/BTN_Peradeniya"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#9C27B0"
                 android:layout_gravity="center_horizontal"
                 android:minHeight="48dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:text="Matale"
+                android:text="Peradeniya"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </FrameLayout>

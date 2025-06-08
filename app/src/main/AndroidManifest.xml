@@ -44,7 +44,7 @@
             android:name=".user.RideConfirmation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailabitily_Matale"
+            android:name=".stationOfficer.AdminBicycleAvailabitily_Peradeniya"
             android:exported="false" />
         <activity
             android:name=".stationOfficer.AdminLocation"
@@ -56,7 +56,7 @@
             android:name=".stationOfficer.AdminBicycleAvailabitily_Kandy"
             android:exported="false" />
         <activity
-            android:name=".user.RentBicycle_Matale"
+            android:name=".user.RentBicycle_Peradeniya"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Katugastota"

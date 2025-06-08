@@ -24,7 +24,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.padelgo.R;
 import com.example.padelgo.user.RentBicycle_Kandy;
 import com.example.padelgo.user.RentBicycle_Katugastota;
-import com.example.padelgo.user.RentBicycle_Matale;
+import com.example.padelgo.user.RentBicycle_Peradeniya;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,7 +38,7 @@ import com.google.android.gms.tasks.Task;
 
 public class SelectLocation extends AppCompatActivity implements OnMapReadyCallback {
 
-    Button btn_Kandy, btn_Peradeniya, btn_Matale;
+    Button btn_Kandy, btn_Katugastota, btn_Peradeniya;
     ImageButton ib_myLocation;
     private GoogleMap padelGoMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -104,21 +104,21 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
 
 
         btn_Kandy = findViewById(R.id.BTN_Kandy);
+        btn_Katugastota = findViewById(R.id.BTN_Katugastota);
         btn_Peradeniya = findViewById(R.id.BTN_Peradeniya);
-        btn_Matale = findViewById(R.id.BTN_Matale);
         ib_myLocation = findViewById(R.id.IB_myLocation);
 
         btn_Kandy.setOnClickListener(v -> {
             Intent moveToRent_Kandy = new Intent(SelectLocation.this, RentBicycle_Kandy.class);
             startActivity(moveToRent_Kandy);
         });
-        btn_Peradeniya.setOnClickListener(v -> {
-            Intent moveToRent_Peradeniya = new Intent(SelectLocation.this, RentBicycle_Katugastota.class);
-            startActivity(moveToRent_Peradeniya);
+        btn_Katugastota.setOnClickListener(v -> {
+            Intent moveToRent_Katugastota = new Intent(SelectLocation.this, RentBicycle_Katugastota.class);
+            startActivity(moveToRent_Katugastota);
         });
-        btn_Matale.setOnClickListener(v -> {
-            Intent moveToRent_Matale = new Intent(SelectLocation.this, RentBicycle_Matale.class);
-            startActivity(moveToRent_Matale);
+        btn_Peradeniya.setOnClickListener(v -> {
+            Intent moveToRent_Peradeniya = new Intent(SelectLocation.this, RentBicycle_Peradeniya.class);
+            startActivity(moveToRent_Peradeniya);
         });
 
         ib_myLocation.setOnClickListener(v -> {

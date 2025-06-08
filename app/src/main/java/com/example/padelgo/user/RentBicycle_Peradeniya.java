@@ -8,8 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,9 +24,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RentBicycle_Matale extends AppCompatActivity {
+public class RentBicycle_Peradeniya extends AppCompatActivity {
 
-    String location = "Matale";
+    String location = "Peradeniya";
     String plan;
     int price;
 
@@ -41,8 +39,8 @@ public class RentBicycle_Matale extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_rent_bicycle_matale);
-        liveDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_Matale");
+        setContentView(R.layout.activity_user_rent_bicycle_peradeniya);
+        liveDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_Peradeniya");
 
         initializeViews();
         checkPlan();
