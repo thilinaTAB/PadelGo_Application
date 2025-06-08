@@ -79,8 +79,8 @@ public class Login extends AppCompatActivity {
                 checkField(etxt_Email);
                 checkField(etxt_Password);
 
-                String emailVal = etxt_Email.getText().toString();
-                String passVal = etxt_Password.getText().toString();
+                String emailVal = etxt_Email.getText().toString().trim();
+                String passVal = etxt_Password.getText().toString().trim();
 
                 if (valid) {
                     fAuth.signInWithEmailAndPassword(emailVal, passVal).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
@@ -102,7 +102,7 @@ public class Login extends AppCompatActivity {
     }
 
     public boolean checkField(EditText ex) {
-        if (ex.getText().toString().isEmpty()) {
+        if (ex.getText().toString().trim().isEmpty()) {
             ex.setError("Fill This");
             valid = false;
         } else {
