@@ -20,11 +20,8 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAdYz-yvt8Cq7gJ9ZHtDs1nhoqClU0gkPM" />
+            android:value="AIzaSyDqR5FL8WK5YHTPAmjQZ1X_BXCQxWEock4" />
 
-        <activity
-            android:name=".common.Map"
-            android:exported="false" />
         <activity
             android:name=".stationOfficer.AdminProfile"
             android:exported="false" />
