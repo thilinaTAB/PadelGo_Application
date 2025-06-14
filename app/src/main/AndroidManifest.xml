@@ -62,7 +62,7 @@
             android:name=".user.RentBicycle_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".common.SelectLocation"
+            android:name=".user.SelectLocation"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Kandy"
@@ -93,12 +93,7 @@
             android:exported="false" />
         <activity
             android:name=".common.Login"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">
         </activity>
 
         <meta-data

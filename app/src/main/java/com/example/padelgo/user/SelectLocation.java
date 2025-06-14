@@ -1,4 +1,4 @@
-package com.example.padelgo.stationOfficer;
+package com.example.padelgo.user;
 
 import android.Manifest;
 import android.content.Intent;
@@ -38,7 +38,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
-public class AdminLocation extends AppCompatActivity implements OnMapReadyCallback {
+public class SelectLocation extends AppCompatActivity implements OnMapReadyCallback {
 
     Button btn_Kandy, btn_Katugastota, btn_Peradeniya;
     ImageButton ib_myLocation;
@@ -143,16 +143,14 @@ public class AdminLocation extends AppCompatActivity implements OnMapReadyCallba
 
         padelGoMap.setOnMarkerClickListener(marker -> {
             if (marker.equals(kandyMarker)) {
-                Intent moveToRent_Kandy = new Intent(getApplicationContext(), AdminBicycleAvailabitily_Kandy.class);
-                startActivity(moveToRent_Kandy);
+                startActivity(new Intent(this, RentBicycle_Kandy.class));
                 return true;
             } else if (marker.equals(katugastotaMarker)) {
-                Intent moveToRent_Katugastota = new Intent(getApplicationContext(), AdminBicycleAvailabitily_Katugastota.class);
-                startActivity(moveToRent_Katugastota);
+                startActivity(new Intent(this, RentBicycle_Katugastota.class));
                 return true;
             } else if (marker.equals(peradeniyaMarker)) {
-                Intent moveToRent_Peradeniya = new Intent(getApplicationContext(), AdminBicycleAvailabitily_Peradeniya.class);
-                startActivity(moveToRent_Peradeniya);
+                startActivity(new Intent(this, RentBicycle_Peradeniya.class));
+                return true;
             }
             return false;
         });
