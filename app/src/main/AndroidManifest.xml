@@ -44,16 +44,16 @@
             android:name=".user.RideConfirmation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailabitily_Peradeniya"
+            android:name=".stationOfficer.AdminBicycleAvailability_Peradeniya"
             android:exported="false" />
         <activity
             android:name=".stationOfficer.AdminLocation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailabitily_Katugastota"
+            android:name=".stationOfficer.AdminBicycleAvailability_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailabitily_Kandy"
+            android:name=".stationOfficer.AdminBicycleAvailability_Kandy"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Peradeniya"
@@ -62,7 +62,7 @@
             android:name=".user.RentBicycle_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".common.SelectLocation"
+            android:name=".user.SelectLocation"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Kandy"
@@ -93,12 +93,7 @@
             android:exported="false" />
         <activity
             android:name=".common.Login"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">
         </activity>
 
         <meta-data

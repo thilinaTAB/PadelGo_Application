@@ -8,7 +8,7 @@
     android:background="@drawable/bg"
     android:fillViewport="true"
     android:orientation="horizontal"
-    tools:context=".stationOfficer.AdminBicycleAvailabitily_Kandy">
+    tools:context=".stationOfficer.AdminBicycleAvailability_Kandy">
 
     <LinearLayout
         android:layout_width="match_parent"

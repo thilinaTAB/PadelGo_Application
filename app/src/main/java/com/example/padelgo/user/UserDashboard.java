@@ -16,7 +16,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
-import com.example.padelgo.common.SelectLocation;
 import com.example.padelgo.common.Settings;
 import com.example.padelgo.common.UserProfile;
 import com.google.firebase.auth.FirebaseAuth;
