@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -36,7 +35,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.Task;
 
 public class AdminLocation extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -143,15 +141,15 @@ public class AdminLocation extends AppCompatActivity implements OnMapReadyCallba
 
         padelGoMap.setOnMarkerClickListener(marker -> {
             if (marker.equals(kandyMarker)) {
-                Intent moveToRent_Kandy = new Intent(getApplicationContext(), AdminBicycleAvailabitily_Kandy.class);
+                Intent moveToRent_Kandy = new Intent(getApplicationContext(), AdminBicycleAvailability_Kandy.class);
                 startActivity(moveToRent_Kandy);
                 return true;
             } else if (marker.equals(katugastotaMarker)) {
-                Intent moveToRent_Katugastota = new Intent(getApplicationContext(), AdminBicycleAvailabitily_Katugastota.class);
+                Intent moveToRent_Katugastota = new Intent(getApplicationContext(), AdminBicycleAvailability_Katugastota.class);
                 startActivity(moveToRent_Katugastota);
                 return true;
             } else if (marker.equals(peradeniyaMarker)) {
-                Intent moveToRent_Peradeniya = new Intent(getApplicationContext(), AdminBicycleAvailabitily_Peradeniya.class);
+                Intent moveToRent_Peradeniya = new Intent(getApplicationContext(), AdminBicycleAvailability_Peradeniya.class);
                 startActivity(moveToRent_Peradeniya);
             }
             return false;

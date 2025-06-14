@@ -19,7 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class AdminBicycleAvailabitily_Katugastota extends AppCompatActivity {
+public class AdminBicycleAvailability_Kandy extends AppCompatActivity {
 
     Button btn_classicPlus, btn_classicMinus, btn_cityBikePlus, btn_cityBikeMinus, btn_cruiserPlus, btn_cruiserMinus, btn_foldingPlus, btn_foldingMinus;
     TextView txt_classic, txt_cityBike, txt_cruiser, txt_folding;
@@ -30,14 +30,14 @@ public class AdminBicycleAvailabitily_Katugastota extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_admin_bicycle_availabitily_katugastota);
+        setContentView(R.layout.activity_admin_bicycle_availabitily_kandy);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        liveDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_Katugastota");
+        liveDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_Kandy");
 
         btn_classicPlus = findViewById(R.id.BTN_classicPlus);
         btn_classicMinus = findViewById(R.id.BTN_classicMinus);
@@ -130,7 +130,7 @@ public class AdminBicycleAvailabitily_Katugastota extends AppCompatActivity {
     }
 
     private void updateFirebase(String bikeType, int value) {
-        String path = "bicycleAvailability_Katugastota/" + bikeType;
+        String path = "bicycleAvailability_Kandy/" + bikeType;
         liveDatabase.child(bikeType).setValue(value)
                 .addOnSuccessListener(aVoid -> {
                     Log.d("FirebaseUpdate", "Successfully updated " + path + " to " + value);

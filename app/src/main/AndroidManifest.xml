@@ -44,16 +44,16 @@
             android:name=".user.RideConfirmation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailabitily_Peradeniya"
+            android:name=".stationOfficer.AdminBicycleAvailability_Peradeniya"
             android:exported="false" />
         <activity
             android:name=".stationOfficer.AdminLocation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailabitily_Katugastota"
+            android:name=".stationOfficer.AdminBicycleAvailability_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailabitily_Kandy"
+            android:name=".stationOfficer.AdminBicycleAvailability_Kandy"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Peradeniya"
