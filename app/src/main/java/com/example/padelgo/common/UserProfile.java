@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.R;
 import com.example.padelgo.user.UserDashboard;
+import com.example.padelgo.user.VerifyNIC;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,10 +34,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class UserProfile extends AppCompatActivity {
     TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date;
 
-    Button btn_Cancel;
+    Button btn_Cancel, btn_VerifyAccount;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
-    private FirebaseAuth mAuth;
+    private FirebaseAuth fAuth;
     private FirebaseFirestore db;
     private static final String TAG = "UserProfile";
 
@@ -61,6 +62,7 @@ public class UserProfile extends AppCompatActivity {
         view_NoRideData = findViewById(R.id.View_NoRideData);
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
         btn_Cancel = findViewById(R.id.BTN_Cancel);
+        btn_VerifyAccount = findViewById(R.id.BTN_VerifyAccount);
 
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +80,15 @@ public class UserProfile extends AppCompatActivity {
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
+        btn_VerifyAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UserProfile.this, VerifyNIC.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         loadUserProfile();
@@ -86,7 +96,7 @@ public class UserProfile extends AppCompatActivity {
     }
 
     private void loadUserProfile() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             DocumentReference userRef = db.collection("Users").document(userId);
@@ -116,7 +126,7 @@ public class UserProfile extends AppCompatActivity {
     }
 
     private void loadRideInfo() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             db.collection("RideHistory")
@@ -183,7 +193,7 @@ public class UserProfile extends AppCompatActivity {
 
 
     private void deleteLastRide() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             db.collection("RideHistory")

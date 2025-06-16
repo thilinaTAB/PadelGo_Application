@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imageViewFrontNIC"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground"
+        android:contentDescription="Front NIC" />
+
+    <ImageView
+        android:id="@+id/imageViewBackNIC"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground"
+        android:contentDescription="Back NIC" />
+
+    <ProgressBar
+        android:id="@+id/progressBarUpload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_marginTop="12dp" />
+
+    <Button
+        android:id="@+id/buttonUploadNIC"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Upload Both NIC Images"
+        android:layout_marginTop="20dp" />
+
+
+</LinearLayout>

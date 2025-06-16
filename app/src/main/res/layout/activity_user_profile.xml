@@ -110,6 +110,12 @@
 
     </androidx.cardview.widget.CardView>
 
+        <Button
+            android:id="@+id/BTN_VerifyAccount"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Verify Account"/>
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/View_MyRide"

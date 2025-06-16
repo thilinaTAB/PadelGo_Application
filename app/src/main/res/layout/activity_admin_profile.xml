@@ -105,6 +105,12 @@
                     android:textSize="25sp"
                     android:textStyle="bold" />
 
+                <Button
+                    android:id="@+id/BTN_VerifyIDs"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Verify ID's"/>
+
             </LinearLayout>
 
 
