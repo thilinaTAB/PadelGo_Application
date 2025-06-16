@@ -16,7 +16,7 @@
         android:layout_height="200dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="10dp"
-        android:src="@drawable/logo" />
+        android:src="@drawable/padelgo_logo" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/mainView"
