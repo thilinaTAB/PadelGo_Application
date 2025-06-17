@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog; // Import AlertDialog
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
@@ -25,6 +25,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -92,6 +97,7 @@ public class UserProfile extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         loadUserProfile();
+        checkVerificationStatus();
         loadRideInfo();
     }
 
@@ -240,4 +246,50 @@ public class UserProfile extends AppCompatActivity {
                     });
         }
     }
+
+    private void checkVerificationStatus() {
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        TextView txt_AccountStatus = findViewById(R.id.TXT_AccountStatus);
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            DatabaseReference statusRef = FirebaseDatabase.getInstance()
+                    .getReference("user_verifications")
+                    .child(userId)
+                    .child("status");
+
+            statusRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String status = snapshot.getValue(String.class);
+
+                    if (status == null) {
+                        txt_AccountStatus.setText("Account Status: Not Verified");
+                        btn_VerifyAccount.setVisibility(View.VISIBLE);
+                    } else if (status.equals("pending")) {
+                        txt_AccountStatus.setText("Account Status: Pending");
+                        btn_VerifyAccount.setVisibility(View.GONE);
+                    } else if (status.equals("approved")) {
+                        txt_AccountStatus.setText("Account Status: Active");
+                        btn_VerifyAccount.setVisibility(View.GONE);
+                    } else if (status.equals("rejected")) {
+                        txt_AccountStatus.setText("Account Status: Rejected");
+                        btn_VerifyAccount.setVisibility(View.VISIBLE);
+                    } else {
+                        txt_AccountStatus.setText("Account Status: Not Verified");
+                        btn_VerifyAccount.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e(TAG, "Failed to read NIC status: " + error.getMessage());
+                    txt_AccountStatus.setText("Account Status: Unknown");
+                    btn_VerifyAccount.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+    }
+
 }

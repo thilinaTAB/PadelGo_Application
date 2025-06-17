@@ -3,18 +3,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:padding="8dp">
+
 
     <TextView
         android:id="@+id/titleAdminNIC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:gravity="center"
+        android:textColor="@color/ThemeColor"
         android:text="User NIC Verifications"
-        android:textSize="20sp"
+        android:textSize="30sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/TXT_NULL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No Pending Users"
+        android:textAlignment="center"
+        android:textColor="#9D009688"
+        android:visibility="gone"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerNIC"
@@ -22,8 +42,10 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="8dp"
+        android:outlineAmbientShadowColor="@color/ThemeColor"
         app:layout_constraintTop_toBottomOf="@id/titleAdminNIC"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

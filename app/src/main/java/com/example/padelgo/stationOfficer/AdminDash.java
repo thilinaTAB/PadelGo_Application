@@ -48,8 +48,8 @@ public class AdminDash extends AppCompatActivity {
         txtBTN_settings = findViewById(R.id.TXTBTN_settings);
         img_rents = findViewById(R.id.IMG_rents);
         txtBTN_rents = findViewById(R.id.TXTBTN_rents);
-        img_profile = findViewById(R.id.IMG_profile);
-        txtBTN_profile = findViewById(R.id.TXTBTN_profile);
+        img_profile = findViewById(R.id.IMG__VerifyUser);
+        txtBTN_profile = findViewById(R.id.TXTBTN_VerifyUser);
 
         View.OnClickListener signOutClickListener = v -> showSignOutConfirmationDialog();
         img_signOut.setOnClickListener(signOutClickListener);
@@ -89,11 +89,11 @@ public class AdminDash extends AppCompatActivity {
             startActivity(moveToRents);
         });
         txtBTN_profile.setOnClickListener(v -> {
-            Intent moveToProfile = new Intent(getApplicationContext(), AdminProfile.class);
+            Intent moveToProfile = new Intent(getApplicationContext(), AdminVerifyNIC.class);
             startActivity(moveToProfile);
         });
         img_profile.setOnClickListener(v -> {
-            Intent moveToProfile = new Intent(getApplicationContext(), AdminProfile.class);
+            Intent moveToProfile = new Intent(getApplicationContext(), AdminVerifyNIC.class);
             startActivity(moveToProfile);
         });
 

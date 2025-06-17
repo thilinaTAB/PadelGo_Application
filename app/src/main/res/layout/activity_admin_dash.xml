@@ -52,6 +52,7 @@
                     android:id="@+id/TXTBTN_rents"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
                     android:layout_gravity="center_horizontal"
                     android:text="Rents"
                     android:textSize="24sp"
@@ -89,6 +90,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:textColor="@color/black"
                     android:text="Add Admin"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -126,6 +128,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="Availability"
+                    android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -149,7 +152,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/IMG_profile"
+                    android:id="@+id/IMG__VerifyUser"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:layout_gravity="center_horizontal"
@@ -157,12 +160,13 @@
                     android:src="@drawable/reg_name" />
 
                 <TextView
-                    android:id="@+id/TXTBTN_profile"
+                    android:id="@+id/TXTBTN_VerifyUser"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Profile"
-                    android:textSize="24sp"
+                    android:text="Verify users"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -197,6 +201,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:textColor="@color/black"
                     android:text="Settings"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -233,6 +238,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:textColor="@color/black"
                     android:text="Sign Out"
                     android:textSize="24sp"
                     android:textStyle="bold" />

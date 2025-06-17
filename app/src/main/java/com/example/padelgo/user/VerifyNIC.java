@@ -29,6 +29,7 @@ import com.example.padelgo.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -41,8 +42,8 @@ import java.util.Map;
 
 public class VerifyNIC extends AppCompatActivity {
 
-    private ImageView imageViewFront, imageViewBack;
-    private Button buttonUpload;
+    private ImageView img_ViewFront, img_ViewBack;
+    private Button btn_Upload;
     private ProgressBar progressBar;
 
     private Uri frontUri, backUri;
@@ -59,26 +60,26 @@ public class VerifyNIC extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_verify_nic);
 
-        imageViewFront = findViewById(R.id.imageViewFrontNIC);
-        imageViewBack = findViewById(R.id.imageViewBackNIC);
-        buttonUpload = findViewById(R.id.buttonUploadNIC);
+        img_ViewFront = findViewById(R.id.imageViewFrontNIC);
+        img_ViewBack = findViewById(R.id.imageViewBackNIC);
+        btn_Upload = findViewById(R.id.buttonUploadNIC);
         progressBar = findViewById(R.id.progressBarUpload);
 
         requestPermissionsIfNeeded();
         initCloudinary();
         setupLaunchers();
 
-        imageViewFront.setOnClickListener(v -> {
+        img_ViewFront.setOnClickListener(v -> {
             selectingFront = true;
             showImageOptions();
         });
 
-        imageViewBack.setOnClickListener(v -> {
+        img_ViewBack.setOnClickListener(v -> {
             selectingFront = false;
             showImageOptions();
         });
 
-        buttonUpload.setOnClickListener(v -> {
+        btn_Upload.setOnClickListener(v -> {
             if (frontUri == null || backUri == null) {
                 Toast.makeText(this, "Upload both front and back images", Toast.LENGTH_SHORT).show();
                 return;
@@ -142,10 +143,10 @@ public class VerifyNIC extends AppCompatActivity {
                         Uri uri = result.getData().getData();
                         if (selectingFront) {
                             frontUri = uri;
-                            Picasso.get().load(uri).into(imageViewFront);
+                            Picasso.get().load(uri).into(img_ViewFront);
                         } else {
                             backUri = uri;
-                            Picasso.get().load(uri).into(imageViewBack);
+                            Picasso.get().load(uri).into(img_ViewBack);
                         }
                     }
                 });
@@ -154,9 +155,9 @@ public class VerifyNIC extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
                         if (selectingFront) {
-                            Picasso.get().load(frontUri).into(imageViewFront);
+                            Picasso.get().load(frontUri).into(img_ViewFront);
                         } else {
-                            Picasso.get().load(backUri).into(imageViewBack);
+                            Picasso.get().load(backUri).into(img_ViewBack);
                         }
                     }
                 });
@@ -202,12 +203,28 @@ public class VerifyNIC extends AppCompatActivity {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user_verifications").child(uid);
 
-        if (frontUrl != null) ref.child("nic_front_url").setValue(frontUrl);
+        if (frontUrl != null) {
+            ref.child("nic_front_url").setValue(frontUrl);
+        }
+
         if (backUrl != null) {
             ref.child("nic_back_url").setValue(backUrl);
             ref.child("status").setValue("pending");
+
+            // 🔥 Firestore verificationStatus update
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            Map<String, Object> update = new HashMap<>();
+            update.put("verificationStatus", "pending");
+
+            db.collection("Users").document(uid)
+                    .update(update)
+                    .addOnSuccessListener(aVoid -> Log.d("VerifyNIC", "Firestore status set to pending"))
+                    .addOnFailureListener(e -> Log.e("VerifyNIC", "Failed to update Firestore status", e));
+
             progressBar.setVisibility(View.GONE);
             Toast.makeText(this, "NIC Images Uploaded Successfully!", Toast.LENGTH_SHORT).show();
+            finish();
+            startActivity(new Intent(this, UserDashboard.class));
         }
     }
 }
