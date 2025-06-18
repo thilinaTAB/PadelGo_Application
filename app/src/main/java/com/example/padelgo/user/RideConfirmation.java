@@ -138,8 +138,6 @@ public class RideConfirmation extends AppCompatActivity {
                 (view, year, monthOfYear, dayOfMonth) -> {
                     Calendar selectedDate = Calendar.getInstance();
                     selectedDate.set(year, monthOfYear, dayOfMonth);
-
-                    // Clear time fields of selectedDate and now for accurate date-only comparison
                     selectedDate.set(Calendar.HOUR_OF_DAY, 0);
                     selectedDate.set(Calendar.MINUTE, 0);
                     selectedDate.set(Calendar.SECOND, 0);
