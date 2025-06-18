@@ -22,6 +22,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PadelGo"
         tools:replace="android:fullBackupContent">
+
+        <activity
+            android:name=".common.VerifyPassword"
+            android:exported="false" />
         <activity
             android:name=".stationOfficer.AdminVerifyNIC"
             android:exported="false" />
@@ -46,7 +50,7 @@
             android:name=".user.RideHistory"
             android:exported="false" />
         <activity
-            android:name=".common.UserProfile"
+            android:name=".user.UserProfile"
             android:exported="false" />
         <activity
             android:name=".user.SplashActivityConfirm"
