@@ -92,7 +92,7 @@ public class Login extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Login.this, "Email or Password incorrect. Please try again", Toast.LENGTH_SHORT).show();
                             txt_btnForgot.setVisibility(View.VISIBLE);
                         }
                     });
