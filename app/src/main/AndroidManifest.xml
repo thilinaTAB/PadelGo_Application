@@ -46,7 +46,7 @@
             android:name=".user.RideHistory"
             android:exported="false" />
         <activity
-            android:name=".common.UserProfile"
+            android:name=".user.UserProfile"
             android:exported="false" />
         <activity
             android:name=".user.SplashActivityConfirm"

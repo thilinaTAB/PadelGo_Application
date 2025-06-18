@@ -13,15 +13,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.padelgo.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -39,11 +42,28 @@ public class RideConfirmation extends AppCompatActivity {
     Calendar calendar = Calendar.getInstance();
     private FirebaseFirestore db;
     private FirebaseAuth fAuth;
+    private DatabaseReference liveDatabase; // For Realtime Database
+    private String bikeTypeToUpdate; // To store bikeType for cancellation
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_ride_confirmation);
+        String location = getIntent().getStringExtra("Location");
+        if (location != null && !location.isEmpty()) {
+            liveDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_" + location);
+        } else {
+            Log.e("RideConfirmation", "Location not provided");
+        }
+
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                showBackConfirmationDialog();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
 
         txt_bikeType = findViewById(R.id.TXT_Bicycle);
         txt_location = findViewById(R.id.TXT_Location);
@@ -58,7 +78,6 @@ public class RideConfirmation extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         fAuth = FirebaseAuth.getInstance();
 
-        // Make EditText non-editable and clickable
         etxt_date.setFocusable(false);
         etxt_date.setClickable(true);
         etxt_date.setOnClickListener(v -> showDatePickerDialog());
@@ -67,21 +86,16 @@ public class RideConfirmation extends AppCompatActivity {
         etxt_time.setClickable(true);
         etxt_time.setOnClickListener(v -> showTimePickerDialog());
 
-        // Get the bike type here, inside onCreate
-        String BikeType = getIntent().getStringExtra("bikeType");
-        txt_bikeType.setText(BikeType + " bicycle");
+        String bikeTypeFromIntent = getIntent().getStringExtra("bikeType");
+        bikeTypeToUpdate = bikeTypeFromIntent;
+        txt_bikeType.setText(bikeTypeFromIntent + " bicycle");
 
-        // Get the location here, inside onCreate
-        String Location = getIntent().getStringExtra("Location");
-        txt_location.setText(Location);
+        txt_location.setText(location);
 
-        // Get the plan here, inside onCreate
         String Plan = getIntent().getStringExtra("Plan");
         txt_plan.setText(Plan);
 
-        // Get the price here, inside onCreate
         int basePrice = getIntent().getIntExtra("Price", -1);
-
         calculateAndUpdateTotalPrice(basePrice);
 
         etxt_numPlan.addTextChangedListener(new TextWatcher() {
@@ -95,22 +109,21 @@ public class RideConfirmation extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                calculateAndUpdateTotalPrice(basePrice); // Recalculate on text change
+                calculateAndUpdateTotalPrice(basePrice);
             }
         });
 
         btn_confirm.setOnClickListener(v -> {
-            if (validateFields()) {  // Check if all fields are filled
-                saveRideDetailsToFirestore(); // Call the new method here
+            if (validateFields()) {
+                saveRideDetailsToFirestore();
             } else {
                 Toast.makeText(RideConfirmation.this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             }
         });
 
-        btn_cancel.setOnClickListener(v -> showCancelConfirmationDialog());
+        btn_cancel.setOnClickListener(v -> showCancelConfirmation());
     }
 
-    // Validation Function
     private boolean validateFields() {
         return !etxt_date.getText().toString().trim().isEmpty() &&
                 !etxt_time.getText().toString().trim().isEmpty() &&
@@ -141,19 +154,19 @@ public class RideConfirmation extends AppCompatActivity {
                 },
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
-                true // is24HourView:  true for 24-hour format, false for 12-hour with AM/PM
+                true
         );
         timePickerDialog.show();
     }
 
     private void updateTimeInView() {
-        String myFormat = "HH:mm"; // Include HH:mm in the format
+        String myFormat = "HH:mm";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         etxt_time.setText(sdf.format(calendar.getTime()));
     }
 
     private void updateDateInView() {
-        String myFormat = "dd/MM/yyyy"; // Choose your desired format
+        String myFormat = "dd/MM/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         etxt_date.setText(sdf.format(calendar.getTime()));
     }
@@ -166,13 +179,13 @@ public class RideConfirmation extends AppCompatActivity {
                 multiplier = Integer.parseInt(numPlanText);
             }
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid number of plans. Using default value (1).", Toast.LENGTH_SHORT).show();
+            // User might be typing, so don't show toast immediately, or handle it more gracefully
         }
 
         int totalPrice = basePrice * multiplier;
 
         if (basePrice != -1) {
-            txt_amount.setText("LKR " + String.valueOf(totalPrice) + ".00");
+            txt_amount.setText("LKR " + totalPrice + ".00");
         } else {
             txt_amount.setText("-");
         }
@@ -184,17 +197,68 @@ public class RideConfirmation extends AppCompatActivity {
         finish();
     }
 
-    // New method to save data to Firestore
+    private void incrementBikeCountAndGoToMain() {
+        if (bikeTypeToUpdate != null && !bikeTypeToUpdate.isEmpty() && liveDatabase != null) {
+            liveDatabase.child(bikeTypeToUpdate).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Integer currentValue = dataSnapshot.getValue(Integer.class);
+                    if (currentValue != null) {
+                        int newValue = currentValue + 1;
+                        liveDatabase.child(bikeTypeToUpdate).setValue(newValue)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("Firebase", "Bike count incremented for " + bikeTypeToUpdate);
+                                    mainMenu();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Firebase", "Error incrementing bike count: " + e.getMessage());
+                                    Toast.makeText(RideConfirmation.this, "Error updating bike count. Please try again.", Toast.LENGTH_SHORT).show();
+                                    mainMenu();
+                                });
+                    } else {
+                        Log.e("Firebase", "Could not read current bike count for " + bikeTypeToUpdate);
+                        mainMenu();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("Firebase", "Error fetching bike count for increment: " + databaseError.getMessage());
+                    Toast.makeText(RideConfirmation.this, "Error fetching bike data. Please try again.", Toast.LENGTH_SHORT).show();
+                    mainMenu();
+                }
+            });
+        } else {
+            Log.e("RideConfirmation", "Cannot increment bike count: bikeType or database reference is null.");
+            mainMenu();
+        }
+    }
+
+    private void showBackConfirmationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Go Back?")
+                .setMessage("Are you sure you want to go back to the main menu? This will cancel your current selection.")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    incrementBikeCountAndGoToMain();
+                })
+                .setNegativeButton("No", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
     private void saveRideDetailsToFirestore() {
-        String userId = fAuth.getCurrentUser().getUid(); // Get the current user's ID
-        String userName = fAuth.getCurrentUser().getDisplayName(); // Get the current user's name
+        if (fAuth.getCurrentUser() == null) {
+            Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String userId = fAuth.getCurrentUser().getUid();
+        String userName = fAuth.getCurrentUser().getDisplayName();
         String bikeType = txt_bikeType.getText().toString();
         String location = txt_location.getText().toString();
         String plan = etxt_numPlan.getText().toString() + " " + txt_plan.getText().toString();
         String amount = txt_amount.getText().toString();
         String dateAndTime = etxt_date.getText().toString() + " " + etxt_time.getText().toString();
 
-        // Create a map to store the ride details
         Map<String, Object> rideDetails = new HashMap<>();
         rideDetails.put("userId", userId);
         rideDetails.put("Full Name", userName);
@@ -203,43 +267,36 @@ public class RideConfirmation extends AppCompatActivity {
         rideDetails.put("plan", plan);
         rideDetails.put("amount", amount);
         rideDetails.put("dateAndTime", dateAndTime);
-        rideDetails.put("timestamp", FieldValue.serverTimestamp()); // Add a timestamp
+        rideDetails.put("timestamp", FieldValue.serverTimestamp());
 
-        // Get a reference to the "AllHistory" collection
         CollectionReference allHistoryRef = db.collection("AllHistory");
 
-        // Add a new document with the ride details to the "AllHistory" collection
         allHistoryRef.add(rideDetails)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("Firestore", "Ride details added to AllHistory with ID: " + documentReference.getId());
-                        Toast.makeText(RideConfirmation.this, "Ride confirmed and details saved!", Toast.LENGTH_SHORT).show();
-                        Intent goConfirm = new Intent(RideConfirmation.this, SplashActivityConfirm.class);
-                        goConfirm.putExtra("BicycleType", bikeType);
-                        goConfirm.putExtra("Location", location);
-                        goConfirm.putExtra("Plan", plan);
-                        goConfirm.putExtra("Amount", amount);
-                        goConfirm.putExtra("Date", dateAndTime);
-                        startActivity(goConfirm);
-                        finish();
-                    }
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Firestore", "Ride details added to AllHistory with ID: " + documentReference.getId());
+                    Toast.makeText(RideConfirmation.this, "Ride confirmed and details saved!", Toast.LENGTH_SHORT).show();
+                    Intent goConfirm = new Intent(RideConfirmation.this, SplashActivityConfirm.class); // Assuming SplashActivityConfirm exists
+                    goConfirm.putExtra("BicycleType", bikeType);
+                    goConfirm.putExtra("Location", location);
+                    goConfirm.putExtra("Plan", plan);
+                    goConfirm.putExtra("Amount", amount);
+                    goConfirm.putExtra("Date", dateAndTime);
+                    startActivity(goConfirm);
+                    finish();
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Firestore", "Error adding ride details to AllHistory: ", e);
-                        Toast.makeText(RideConfirmation.this, "Error confirming ride. Please try again.", Toast.LENGTH_SHORT).show();
-                    }
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error adding ride details to AllHistory: ", e);
+                    Toast.makeText(RideConfirmation.this, "Error confirming ride. Please try again.", Toast.LENGTH_SHORT).show();
+                    incrementBikeCountAndGoToMain();
                 });
     }
 
-    private void showCancelConfirmationDialog() {
+    private void showCancelConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle("Cancel Ride?")
                 .setMessage("Are you sure you want to cancel?")
-                .setPositiveButton("Yes", (dialog, which) -> mainMenu()) // Go to main menu if Yes
-                .setNegativeButton("No", null) // Dismiss dialog if No
+                .setPositiveButton("Yes", (dialog, which) -> incrementBikeCountAndGoToMain())
+                .setNegativeButton("No", null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }

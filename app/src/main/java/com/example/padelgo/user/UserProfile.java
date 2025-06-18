@@ -1,4 +1,4 @@
-package com.example.padelgo.common;
+package com.example.padelgo.user;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +20,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.R;
-import com.example.padelgo.user.UserDashboard;
-import com.example.padelgo.user.VerifyNIC;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,6 +76,15 @@ public class UserProfile extends AppCompatActivity {
                 finish();
             }
         });
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                mainMenu();
+            }
+        };
+
+        getOnBackPressedDispatcher().addCallback(this, callback);
 
         btn_Cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -290,6 +298,12 @@ public class UserProfile extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void mainMenu() {
+        Intent goDash = new Intent(this, UserDashboard.class);
+        startActivity(goDash);
+        finish();
     }
 
 }
