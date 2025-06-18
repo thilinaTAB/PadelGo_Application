@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -149,7 +150,13 @@ public class Register extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                            if (e instanceof FirebaseAuthUserCollisionException) {
+                                // This specific exception means the email already exists
+                                etxt_Email.setError("Email address already in use.");
+                                Toast.makeText(Register.this, "This email address is already registered. Please login or use a different email.", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                 }
