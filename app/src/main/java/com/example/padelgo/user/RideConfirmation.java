@@ -42,8 +42,9 @@ public class RideConfirmation extends AppCompatActivity {
     Calendar calendar = Calendar.getInstance();
     private FirebaseFirestore db;
     private FirebaseAuth fAuth;
-    private DatabaseReference liveDatabase; // For Realtime Database
-    private String bikeTypeToUpdate; // To store bikeType for cancellation
+    private DatabaseReference liveDatabase;
+    private String bikeTypeToUpdate;
+    private static final String TAG = "RideConfirmation";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class RideConfirmation extends AppCompatActivity {
         if (location != null && !location.isEmpty()) {
             liveDatabase = FirebaseDatabase.getInstance().getReference("bicycleAvailability_" + location);
         } else {
-            Log.e("RideConfirmation", "Location not provided");
+            Log.e(TAG, "Location not provided");
         }
 
 
@@ -114,9 +115,9 @@ public class RideConfirmation extends AppCompatActivity {
         });
 
         btn_confirm.setOnClickListener(v -> {
-            if (validateFields()) {
+            if (validateFields() && isSelectedDateTimeValid()) {
                 saveRideDetailsToFirestore();
-            } else {
+            } else if (!validateFields()) {
                 Toast.makeText(RideConfirmation.this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             }
         });
@@ -131,33 +132,81 @@ public class RideConfirmation extends AppCompatActivity {
     }
 
     private void showDatePickerDialog() {
+        Calendar now = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 (view, year, monthOfYear, dayOfMonth) -> {
+                    Calendar selectedDate = Calendar.getInstance();
+                    selectedDate.set(year, monthOfYear, dayOfMonth);
+
+                    // Clear time fields of selectedDate and now for accurate date-only comparison
+                    selectedDate.set(Calendar.HOUR_OF_DAY, 0);
+                    selectedDate.set(Calendar.MINUTE, 0);
+                    selectedDate.set(Calendar.SECOND, 0);
+                    selectedDate.set(Calendar.MILLISECOND, 0);
+
+                    Calendar today = Calendar.getInstance();
+                    today.set(Calendar.HOUR_OF_DAY, 0);
+                    today.set(Calendar.MINUTE, 0);
+                    today.set(Calendar.SECOND, 0);
+                    today.set(Calendar.MILLISECOND, 0);
+
+                    if (selectedDate.before(today)) {
+                        Toast.makeText(this, "Cannot select a past date.", Toast.LENGTH_SHORT).show();
+                        etxt_date.setText("");
+                        etxt_time.setText("");
+                        return;
+                    }
                     calendar.set(year, monthOfYear, dayOfMonth);
                     updateDateInView();
+                    etxt_time.setText("");
+                    Toast.makeText(this, "Please select a time for the chosen date.", Toast.LENGTH_SHORT).show();
+
                 },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
         );
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
     }
 
     private void showTimePickerDialog() {
+        if (etxt_date.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Please select a date first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Calendar now = Calendar.getInstance();
+        int currentHour = now.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = now.get(Calendar.MINUTE);
+
+        boolean isToday = calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+                calendar.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR);
+
         TimePickerDialog timePickerDialog = new TimePickerDialog(
                 this,
                 (view, hourOfDay, minute) -> {
+                    if (isToday) {
+                        if (hourOfDay < currentHour || (hourOfDay == currentHour && minute < currentMinute)) {
+                            Toast.makeText(this, "Cannot select a past time for today.", Toast.LENGTH_SHORT).show();
+                            etxt_time.setText("");
+                            return;
+                        }
+                    }
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     calendar.set(Calendar.MINUTE, minute);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
                     updateTimeInView();
                 },
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE),
-                true
+                isToday ? currentHour : 0,
+                isToday ? currentMinute : 0,
+                true // is24HourView
         );
         timePickerDialog.show();
     }
+
 
     private void updateTimeInView() {
         String myFormat = "HH:mm";
@@ -171,6 +220,25 @@ public class RideConfirmation extends AppCompatActivity {
         etxt_date.setText(sdf.format(calendar.getTime()));
     }
 
+    private boolean isSelectedDateTimeValid() {
+        if (etxt_date.getText().toString().isEmpty() || etxt_time.getText().toString().isEmpty()) {
+            Toast.makeText(this, "Please select both date and time.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        Calendar now = Calendar.getInstance();
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MILLISECOND, 0);
+
+
+        if (calendar.before(now)) {
+            Toast.makeText(this, "Selected date and time cannot be in the past.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+
     private void calculateAndUpdateTotalPrice(int basePrice) {
         int multiplier = 0;
         try {
@@ -179,7 +247,6 @@ public class RideConfirmation extends AppCompatActivity {
                 multiplier = Integer.parseInt(numPlanText);
             }
         } catch (NumberFormatException e) {
-            // User might be typing, so don't show toast immediately, or handle it more gracefully
         }
 
         int totalPrice = basePrice * multiplier;
@@ -207,29 +274,29 @@ public class RideConfirmation extends AppCompatActivity {
                         int newValue = currentValue + 1;
                         liveDatabase.child(bikeTypeToUpdate).setValue(newValue)
                                 .addOnSuccessListener(aVoid -> {
-                                    Log.d("Firebase", "Bike count incremented for " + bikeTypeToUpdate);
+                                    Log.d(TAG, "Bike count incremented for " + bikeTypeToUpdate);
                                     mainMenu();
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e("Firebase", "Error incrementing bike count: " + e.getMessage());
+                                    Log.e(TAG, "Error incrementing bike count: " + e.getMessage());
                                     Toast.makeText(RideConfirmation.this, "Error updating bike count. Please try again.", Toast.LENGTH_SHORT).show();
                                     mainMenu();
                                 });
                     } else {
-                        Log.e("Firebase", "Could not read current bike count for " + bikeTypeToUpdate);
+                        Log.e(TAG, "Could not read current bike count for " + bikeTypeToUpdate + ". Assuming it's 0 and trying to set to 1 or handle appropriately.");
                         mainMenu();
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e("Firebase", "Error fetching bike count for increment: " + databaseError.getMessage());
+                    Log.e(TAG, "Error fetching bike count for increment: " + databaseError.getMessage());
                     Toast.makeText(RideConfirmation.this, "Error fetching bike data. Please try again.", Toast.LENGTH_SHORT).show();
                     mainMenu();
                 }
             });
         } else {
-            Log.e("RideConfirmation", "Cannot increment bike count: bikeType or database reference is null.");
+            Log.e(TAG, "Cannot increment bike count: bikeType (" + bikeTypeToUpdate + ") or database reference is null (" + (liveDatabase == null) + ").");
             mainMenu();
         }
     }
@@ -251,8 +318,16 @@ public class RideConfirmation extends AppCompatActivity {
             Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        if (!isSelectedDateTimeValid()) {
+            return;
+        }
+
         String userId = fAuth.getCurrentUser().getUid();
         String userName = fAuth.getCurrentUser().getDisplayName();
+        if (userName == null || userName.isEmpty()) {
+            userName = "N/A";
+        }
         String bikeType = txt_bikeType.getText().toString();
         String location = txt_location.getText().toString();
         String plan = etxt_numPlan.getText().toString() + " " + txt_plan.getText().toString();
@@ -267,15 +342,18 @@ public class RideConfirmation extends AppCompatActivity {
         rideDetails.put("plan", plan);
         rideDetails.put("amount", amount);
         rideDetails.put("dateAndTime", dateAndTime);
-        rideDetails.put("timestamp", FieldValue.serverTimestamp());
+        // Store the selected calendar timestamp for easier querying/sorting if needed
+        rideDetails.put("bookingTimestamp", calendar.getTimeInMillis());
+        rideDetails.put("serverTimestamp", FieldValue.serverTimestamp());
+
 
         CollectionReference allHistoryRef = db.collection("AllHistory");
 
         allHistoryRef.add(rideDetails)
                 .addOnSuccessListener(documentReference -> {
-                    Log.d("Firestore", "Ride details added to AllHistory with ID: " + documentReference.getId());
+                    Log.d(TAG, "Ride details added to AllHistory with ID: " + documentReference.getId());
                     Toast.makeText(RideConfirmation.this, "Ride confirmed and details saved!", Toast.LENGTH_SHORT).show();
-                    Intent goConfirm = new Intent(RideConfirmation.this, SplashActivityConfirm.class); // Assuming SplashActivityConfirm exists
+                    Intent goConfirm = new Intent(RideConfirmation.this, SplashActivityConfirm.class);
                     goConfirm.putExtra("BicycleType", bikeType);
                     goConfirm.putExtra("Location", location);
                     goConfirm.putExtra("Plan", plan);
@@ -285,7 +363,7 @@ public class RideConfirmation extends AppCompatActivity {
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Firestore", "Error adding ride details to AllHistory: ", e);
+                    Log.e(TAG, "Error adding ride details to AllHistory: ", e);
                     Toast.makeText(RideConfirmation.this, "Error confirming ride. Please try again.", Toast.LENGTH_SHORT).show();
                     incrementBikeCountAndGoToMain();
                 });
