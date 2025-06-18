@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +16,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -24,6 +24,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.R;
+import com.example.padelgo.common.UserProfile;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,7 +37,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.Task;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class SelectLocation extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -51,6 +59,9 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
     private static final LatLng PERADENIYA_LOCATION = new LatLng(7.264971, 80.592928);
 
     private Marker kandyMarker, katugastotaMarker, peradeniyaMarker;
+
+    private FirebaseAuth fAuth;
+    private DatabaseReference userVerificationRef;
 
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), permissions -> {
@@ -87,6 +98,12 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        fAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        if (currentUser != null) {
+            userVerificationRef = FirebaseDatabase.getInstance().getReference("user_verifications").child(currentUser.getUid());
+        }
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -142,17 +159,76 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
         padelGoMap.getUiSettings().setZoomControlsEnabled(true);
 
         padelGoMap.setOnMarkerClickListener(marker -> {
+            FirebaseUser currentUser = fAuth.getCurrentUser();
+            if (currentUser == null) {
+                Toast.makeText(this, "Please log in to proceed.", Toast.LENGTH_SHORT).show();
+                return true; // Consume the click
+            }
+
             if (marker.equals(kandyMarker)) {
-                startActivity(new Intent(this, RentBicycle_Kandy.class));
+                checkUserVerificationStatus(currentUser.getUid(), () -> {
+                    startActivity(new Intent(this, RentBicycle_Kandy.class));
+                });
                 return true;
             } else if (marker.equals(katugastotaMarker)) {
-                startActivity(new Intent(this, RentBicycle_Katugastota.class));
+                checkUserVerificationStatus(currentUser.getUid(), () -> {
+                    startActivity(new Intent(this, RentBicycle_Katugastota.class));
+                });
                 return true;
             } else if (marker.equals(peradeniyaMarker)) {
-                startActivity(new Intent(this, RentBicycle_Peradeniya.class));
+                checkUserVerificationStatus(currentUser.getUid(), () -> {
+                    startActivity(new Intent(this, RentBicycle_Peradeniya.class));
+                });
                 return true;
             }
             return false;
+        });
+    }
+
+
+    private void checkUserVerificationStatus(String userId, Runnable onSuccess) {
+        if (userVerificationRef == null) {
+            Toast.makeText(this, "Could not check verification status. Please try again.", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "userVerificationRef is null in checkUserVerificationStatus. User ID: " + userId);
+            if (userId != null && !userId.isEmpty()) {
+                userVerificationRef = FirebaseDatabase.getInstance().getReference("user_verifications").child(userId);
+            } else {
+                return;
+            }
+        }
+
+        userVerificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String status = dataSnapshot.child("status").getValue(String.class);
+                    if ("approved".equalsIgnoreCase(status)) {
+                        onSuccess.run();
+                    } else {
+                        Toast.makeText(SelectLocation.this, "Your account needs to be verified.", Toast.LENGTH_LONG).show();
+                        new AlertDialog.Builder(SelectLocation.this)
+                                .setTitle("Sorry! Can't proceed")
+                                .setMessage("Your account needs to be verified.")
+                                .setNegativeButton("OK", (dialog, which) -> GotoAccount())
+                                .show();
+                    }
+                } else {
+                    // database problem triger this
+                    Toast.makeText(SelectLocation.this, "Verification status not found. Please contact support.", Toast.LENGTH_LONG).show();
+                    new AlertDialog.Builder(SelectLocation.this)
+                            .setTitle("Sorry! Can't proceed")
+                            .setMessage("Verification status not found. Please contact support.")
+                            .setNegativeButton("OK", (dialog, which) -> GotoAccount())
+                            .show();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e(TAG, "Failed to read user verification status.", databaseError.toException());
+                Toast.makeText(SelectLocation.this, "Failed to check verification status.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -238,5 +314,11 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
         } catch (SecurityException e) {
             Log.e(TAG, "SecurityException in getDeviceLocationAndCenterMap: " + e.getMessage());
         }
+    }
+
+    private void GotoAccount()
+    {
+        Intent moveToAccount = new Intent(getApplicationContext(), UserProfile.class);
+        startActivity(moveToAccount);
     }
 }

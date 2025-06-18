@@ -49,6 +49,10 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.play.services.maps
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation ('com.cloudinary:cloudinary-android:1.29.0') {
+        exclude group: 'com.cloudinary', module: 'cloudinary-android-preprocess'
+    }
 
 }
 

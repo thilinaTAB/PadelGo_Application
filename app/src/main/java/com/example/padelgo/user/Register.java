@@ -1,6 +1,5 @@
 package com.example.padelgo.user;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -16,8 +15,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
+import com.example.padelgo.common.Login;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
@@ -137,6 +136,7 @@ public class Register extends AppCompatActivity {
                             userInfo.put("Email Address", emailAddress);
                             userInfo.put("NIC Number", nic);
                             userInfo.put("Mobile Number", mobile);
+                            userInfo.put("verificationStatus", "not_verified");
                             userInfo.put("Password", password);
 //                            userInfo.put("isAdmin", "1");
 
