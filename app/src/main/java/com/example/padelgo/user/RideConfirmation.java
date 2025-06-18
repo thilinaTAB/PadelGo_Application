@@ -340,7 +340,6 @@ public class RideConfirmation extends AppCompatActivity {
         rideDetails.put("plan", plan);
         rideDetails.put("amount", amount);
         rideDetails.put("dateAndTime", dateAndTime);
-        // Store the selected calendar timestamp for easier querying/sorting if needed
         rideDetails.put("bookingTimestamp", calendar.getTimeInMillis());
         rideDetails.put("serverTimestamp", FieldValue.serverTimestamp());
 
