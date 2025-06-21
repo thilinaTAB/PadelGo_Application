@@ -38,7 +38,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class UserProfile extends AppCompatActivity {
     TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date;
 
-    Button btn_Cancel, btn_VerifyAccount;
+    Button btn_Cancel, btn_VerifyAccount, btn_Pay;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
     private FirebaseAuth fAuth;
@@ -67,6 +67,7 @@ public class UserProfile extends AppCompatActivity {
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
         btn_Cancel = findViewById(R.id.BTN_Cancel);
         btn_VerifyAccount = findViewById(R.id.BTN_VerifyAccount);
+        btn_Pay = findViewById(R.id.BTN_Pay);
 
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +102,14 @@ public class UserProfile extends AppCompatActivity {
                 finish();
             }
         });
+        btn_Pay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UserProfile.this, PaymentGateway.class);
+                startActivity(intent);
+            }
+        });
+
         fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 

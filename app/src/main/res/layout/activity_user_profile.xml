@@ -127,6 +127,13 @@
             android:layout_gravity="center"
             android:text="Verify Account"/>
 
+        <Button
+            android:id="@+id/BTN_Pay"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:text="Pay Now"/>
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/View_MyRide"
