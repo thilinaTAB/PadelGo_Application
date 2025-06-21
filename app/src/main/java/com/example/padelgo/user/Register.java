@@ -124,6 +124,13 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
+                if (password.length() < 6) {
+                    etxt_Password.setError("Password too short");
+                    etxt_RePassword.setError("Password too short");
+                    Toast.makeText(Register.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (allValid) {
                     fAuth.createUserWithEmailAndPassword(emailAddress, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                         @Override
