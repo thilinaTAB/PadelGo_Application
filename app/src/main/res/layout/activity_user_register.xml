@@ -1,48 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    android:id="@+id/main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_login"
     tools:context=".user.Register">
 
-    <!-- Dark Overlay -->
-    <RelativeLayout
+    <!-- Background Image -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_login"
+        android:contentDescription="Background" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#80000000" />
+    <!-- Dark Overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000" />
+
+    <!-- Main Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
+            <!-- Logo -->
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:src="@drawable/logo_new" />
+                android:src="@drawable/logo_new"
+                android:layout_marginBottom="16dp" />
 
+            <!-- Registration Form Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
                 android:layout_marginBottom="30dp"
-                app:cardBackgroundColor="#66FFFFFF  "
+                android:layout_marginHorizontal="16dp"
+                app:cardBackgroundColor="#66FFFFFF"
                 app:cardCornerRadius="30dp"
-                app:cardElevation="1000dp">  <!-- Semi-transparent white -->
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
                     android:orientation="vertical"
                     android:padding="24dp">
 
@@ -53,13 +65,13 @@
                         android:textAlignment="center"
                         android:textColor="@android:color/black"
                         android:textSize="30sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
 
                     <EditText
                         android:id="@+id/ETXT_Name"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
                         android:background="@drawable/edit_text_bg"
                         android:drawableLeft="@drawable/reg_name"
                         android:drawablePadding="8dp"
@@ -67,13 +79,13 @@
                         android:inputType="text"
                         android:padding="8dp"
                         android:textColor="@android:color/black"
-                        android:textColorHint="#000000" />
+                        android:textColorHint="#000000"
+                        android:layout_marginBottom="16dp" />
 
                     <EditText
                         android:id="@+id/ETXT_NIC"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
                         android:background="@drawable/edit_text_bg"
                         android:drawableLeft="@drawable/nic"
                         android:drawablePadding="8dp"
@@ -81,13 +93,13 @@
                         android:inputType="text"
                         android:padding="8dp"
                         android:textColor="@android:color/black"
-                        android:textColorHint="#000000" />
+                        android:textColorHint="#000000"
+                        android:layout_marginBottom="16dp" />
 
                     <EditText
                         android:id="@+id/ETXT_Email"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
                         android:background="@drawable/edit_text_bg"
                         android:drawableLeft="@drawable/email_ico"
                         android:drawablePadding="8dp"
@@ -95,27 +107,27 @@
                         android:inputType="textEmailAddress"
                         android:padding="8dp"
                         android:textColor="@android:color/black"
-                        android:textColorHint="#000000" />
+                        android:textColorHint="#000000"
+                        android:layout_marginBottom="16dp" />
 
                     <EditText
                         android:id="@+id/ETXT_Mobile"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
                         android:background="@drawable/edit_text_bg"
                         android:drawableLeft="@drawable/reg_mobile"
                         android:drawablePadding="8dp"
                         android:hint="Mobile Number"
-                        android:inputType="text|phone"
+                        android:inputType="phone"
                         android:padding="8dp"
                         android:textColor="@android:color/black"
-                        android:textColorHint="#000000" />
+                        android:textColorHint="#000000"
+                        android:layout_marginBottom="16dp" />
 
                     <EditText
                         android:id="@+id/ETXT_Password"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
                         android:background="@drawable/edit_text_bg"
                         android:drawableLeft="@drawable/password_key_ico"
                         android:drawablePadding="8dp"
@@ -123,13 +135,13 @@
                         android:inputType="textPassword"
                         android:padding="8dp"
                         android:textColor="@android:color/black"
-                        android:textColorHint="#000000" />
+                        android:textColorHint="#000000"
+                        android:layout_marginBottom="16dp" />
 
                     <EditText
                         android:id="@+id/ETXT_RePassword"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
                         android:background="@drawable/edit_text_bg"
                         android:drawableLeft="@drawable/password_key_ico"
                         android:drawablePadding="8dp"
@@ -137,34 +149,32 @@
                         android:inputType="textPassword"
                         android:padding="8dp"
                         android:textColor="@android:color/black"
-                        android:textColorHint="#000000" />
+                        android:textColorHint="#000000"
+                        android:layout_marginBottom="24dp" />
 
                     <Button
                         android:id="@+id/BTN_Register"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
-                        android:layout_marginTop="30dp"
                         android:backgroundTint="@android:color/holo_blue_dark"
                         android:text="Register"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        app:cornerRadius="20dp" />
+                        app:cornerRadius="20dp"
+                        android:layout_marginBottom="16dp" />
 
                     <TextView
                         android:id="@+id/TXT_btnLogin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:padding="8dp"
                         android:text="Already have an account? Log In"
                         android:textAlignment="center"
                         android:textColor="@color/ThemeColor"
                         android:textSize="15sp"
                         android:textStyle="bold" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
-    </RelativeLayout>
-</ScrollView>
+    </ScrollView>
+</RelativeLayout>
