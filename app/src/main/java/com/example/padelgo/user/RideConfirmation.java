@@ -250,7 +250,7 @@ public class RideConfirmation extends AppCompatActivity {
         int totalPrice = basePrice * multiplier;
 
         if (basePrice != -1) {
-            txt_amount.setText("LKR " + totalPrice + ".00");
+            txt_amount.setText(totalPrice);
         } else {
             txt_amount.setText("-");
         }
@@ -342,6 +342,7 @@ public class RideConfirmation extends AppCompatActivity {
         rideDetails.put("dateAndTime", dateAndTime);
         rideDetails.put("bookingTimestamp", calendar.getTimeInMillis());
         rideDetails.put("serverTimestamp", FieldValue.serverTimestamp());
+        rideDetails.put("payment", "pending");
 
 
         CollectionReference allHistoryRef = db.collection("AllHistory");

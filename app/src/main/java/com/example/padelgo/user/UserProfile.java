@@ -36,7 +36,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 public class UserProfile extends AppCompatActivity {
-    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date;
+    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid;
 
     Button btn_Cancel, btn_VerifyAccount, btn_Pay;
     ImageView imgbtn_Back;
@@ -68,6 +68,7 @@ public class UserProfile extends AppCompatActivity {
         btn_Cancel = findViewById(R.id.BTN_Cancel);
         btn_VerifyAccount = findViewById(R.id.BTN_VerifyAccount);
         btn_Pay = findViewById(R.id.BTN_Pay);
+        txt_Paid = findViewById(R.id.TXT_Paid);
 
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,12 +170,23 @@ public class UserProfile extends AppCompatActivity {
                                     String plan = document.getString("plan");
                                     String amount = document.getString("amount");
                                     String date = document.getString("date");
+                                    String paymentStatus = document.getString("payment");
 
                                     txt_Bicycle.setText(bicycleType);
                                     txt_Location.setText(location);
                                     txt_Plan.setText(plan);
                                     txt_Amount.setText(amount);
                                     txt_Date.setText(date);
+
+                                    // 🔒 If already paid, hide Pay and Cancel buttons
+                                    if (paymentStatus != null && paymentStatus.equalsIgnoreCase("Paid")) {
+                                        btn_Pay.setVisibility(View.GONE);
+                                        btn_Cancel.setVisibility(View.GONE);
+                                        txt_Paid.setVisibility(View.VISIBLE);
+                                    } else {
+                                        btn_Pay.setVisibility(View.VISIBLE);
+                                        btn_Cancel.setVisibility(View.VISIBLE);
+                                    }
 
                                     if (bicycleType != null && !bicycleType.isEmpty()) {
                                         view_MyRide.setVisibility(View.VISIBLE);
@@ -184,7 +196,6 @@ public class UserProfile extends AppCompatActivity {
                                         view_NoRideData.setVisibility(View.VISIBLE);
                                     }
                                 } else {
-                                    // Handle case where document is null. Maybe log a warning
                                     Log.w(TAG, "Most recent ride document is null.");
                                     view_MyRide.setVisibility(View.GONE);
                                     view_NoRideData.setVisibility(View.VISIBLE);
