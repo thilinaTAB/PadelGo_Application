@@ -32,7 +32,7 @@ public class PaymentGateway extends AppCompatActivity {
     private PaymentSheet paymentSheet;
     private String paymentIntentClientSecret;
 
-    private final String backendUrl = "https://f727997214897d.lhr.life"; // Replace with your current tunnel
+    private final String backendUrl = "https://9985db922b10ba.lhr.life"; // Replace with your current tunnel
     private final String publishableKey = "pk_test_51RbjciR9H2dk7jjUA7WKgDP1rQe0xCffEPLBBeoS2Bna0MYPBaqfeG8m5HFVnJs2bZBM81HepLvKJQIAHEEJWOcN00FBwPERRW";
 
     private Button btn_Pay;

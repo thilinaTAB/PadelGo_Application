@@ -46,6 +46,8 @@ public class RideConfirmation extends AppCompatActivity {
     private String bikeTypeToUpdate;
     private static final String TAG = "RideConfirmation";
 
+    String totalPayment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -250,7 +252,8 @@ public class RideConfirmation extends AppCompatActivity {
         int totalPrice = basePrice * multiplier;
 
         if (basePrice != -1) {
-            txt_amount.setText(totalPrice);
+            totalPayment = ""+totalPrice;
+            txt_amount.setText("LKR"+ totalPrice+".00");
         } else {
             txt_amount.setText("-");
         }
@@ -329,7 +332,7 @@ public class RideConfirmation extends AppCompatActivity {
         String bikeType = txt_bikeType.getText().toString();
         String location = txt_location.getText().toString();
         String plan = etxt_numPlan.getText().toString() + " " + txt_plan.getText().toString();
-        String amount = txt_amount.getText().toString();
+        String amount = totalPayment;
         String dateAndTime = etxt_date.getText().toString() + " " + etxt_time.getText().toString();
 
         Map<String, Object> rideDetails = new HashMap<>();

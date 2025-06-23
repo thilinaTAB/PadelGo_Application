@@ -35,15 +35,21 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class UserProfile extends AppCompatActivity {
-    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid;
+import android.os.Handler;
+import java.util.Locale;
 
-    Button btn_Cancel, btn_VerifyAccount, btn_Pay;
+public class UserProfile extends AppCompatActivity {
+    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer;
+
+    Button btn_Cancel, btn_VerifyAccount, btn_Pay, btn_Start;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
     private FirebaseAuth fAuth;
     private FirebaseFirestore db;
     private static final String TAG = "UserProfile";
+    private Handler timerHandler = new Handler();
+    private int elapsedTimeInSeconds = 0;
+    private boolean isTimerRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,8 @@ public class UserProfile extends AppCompatActivity {
         btn_VerifyAccount = findViewById(R.id.BTN_VerifyAccount);
         btn_Pay = findViewById(R.id.BTN_Pay);
         txt_Paid = findViewById(R.id.TXT_Paid);
+        btn_Start = findViewById(R.id.BTN_Start);
+        txt_Timer = findViewById(R.id.TXT_Timer);
 
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,6 +116,19 @@ public class UserProfile extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(UserProfile.this, PaymentGateway.class);
                 startActivity(intent);
+            }
+        });
+
+        btn_Start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isTimerRunning) {
+                    txt_Timer.setVisibility(View.VISIBLE);
+                    elapsedTimeInSeconds = 0;
+                    isTimerRunning = true;
+                    startTimer();
+                    Toast.makeText(UserProfile.this, "Ride Started", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -175,7 +196,7 @@ public class UserProfile extends AppCompatActivity {
                                     txt_Bicycle.setText(bicycleType);
                                     txt_Location.setText(location);
                                     txt_Plan.setText(plan);
-                                    txt_Amount.setText(amount);
+                                    txt_Amount.setText("LKR "+amount+".00");
                                     txt_Date.setText(date);
 
                                     // 🔒 If already paid, hide Pay and Cancel buttons
@@ -183,6 +204,7 @@ public class UserProfile extends AppCompatActivity {
                                         btn_Pay.setVisibility(View.GONE);
                                         btn_Cancel.setVisibility(View.GONE);
                                         txt_Paid.setVisibility(View.VISIBLE);
+                                        btn_Start.setVisibility(View.VISIBLE);
                                     } else {
                                         btn_Pay.setVisibility(View.VISIBLE);
                                         btn_Cancel.setVisibility(View.VISIBLE);
@@ -325,5 +347,27 @@ public class UserProfile extends AppCompatActivity {
         startActivity(goDash);
         finish();
     }
+
+    private void startTimer() {
+        timerHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isTimerRunning) {
+                    int days = elapsedTimeInSeconds / 86400;
+                    int hours = (elapsedTimeInSeconds % 86400) / 3600;
+                    int minutes = (elapsedTimeInSeconds % 3600) / 60;
+                    int seconds = elapsedTimeInSeconds % 60;
+
+                    String timeFormatted = String.format(Locale.getDefault(),
+                            "%02d day %02d hrs %02d min %02d sec", days, hours, minutes, seconds);
+                    txt_Timer.setText("Ride Time: " + timeFormatted);
+
+                    elapsedTimeInSeconds++;
+                    timerHandler.postDelayed(this, 1000);
+                }
+            }
+        }, 1000);
+    }
+
 
 }
