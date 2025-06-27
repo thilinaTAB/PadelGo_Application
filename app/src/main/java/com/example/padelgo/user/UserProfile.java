@@ -2,6 +2,7 @@ package com.example.padelgo.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,7 +48,8 @@ public class UserProfile extends AppCompatActivity {
     private FirebaseAuth fAuth;
     private FirebaseFirestore db;
     private static final String TAG = "UserProfile";
-    private Handler timerHandler = new Handler();
+    private Handler timerHandler = new Handler(Looper.getMainLooper());
+
     private int elapsedTimeInSeconds = 0;
     private boolean isTimerRunning = false;
 

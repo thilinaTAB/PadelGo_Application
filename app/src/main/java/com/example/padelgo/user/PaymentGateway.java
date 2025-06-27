@@ -33,7 +33,7 @@ public class PaymentGateway extends AppCompatActivity {
     private String paymentIntentClientSecret;
 
     //TEAM:  Replace with your current ngrok url here
-    private final String backendUrl = "https://8b43-2402-d000-8120-b43f-99db-3ca5-b5b8-d021.ngrok-free.app";
+    private final String backendUrl = "https://16d8-2402-d000-8120-d0e7-e0f0-a0d7-8c3-d8a2.ngrok-free.app";
     private final String publishableKey = "pk_test_51RbjciR9H2dk7jjUA7WKgDP1rQe0xCffEPLBBeoS2Bna0MYPBaqfeG8m5HFVnJs2bZBM81HepLvKJQIAHEEJWOcN00FBwPERRW";
 
     private Button btn_Pay;
