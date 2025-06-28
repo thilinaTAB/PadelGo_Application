@@ -1,4 +1,4 @@
-package com.example.padelgo.admin;
+package com.example.padelgo.stationOfficer;
 
 import android.os.Bundle;
 import android.util.Log;

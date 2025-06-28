@@ -44,7 +44,16 @@ dependencies {
     implementation libs.firebase.auth
     implementation libs.firebase.database
     implementation libs.firebase.firestore
+    implementation libs.play.services.location
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    implementation libs.play.services.maps
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation ('com.cloudinary:cloudinary-android:1.29.0') {
+        exclude group: 'com.cloudinary', module: 'cloudinary-android-preprocess'
+    }
+    implementation 'com.stripe:stripe-android:21.17.0'
+    implementation 'com.android.volley:volley:1.2.1'
 }
+

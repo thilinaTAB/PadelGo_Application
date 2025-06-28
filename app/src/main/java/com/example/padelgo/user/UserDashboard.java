@@ -16,9 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
-import com.example.padelgo.common.SelectLocation;
 import com.example.padelgo.common.Settings;
-import com.example.padelgo.common.UserProfile;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class UserDashboard extends AppCompatActivity {
@@ -47,8 +45,8 @@ public class UserDashboard extends AppCompatActivity {
         txtBTN_bicycleCategory = findViewById(R.id.TXTBTN_bicycleCategory);
         img_rent = findViewById(R.id.IMG_rent);
         txtBTN_rent = findViewById(R.id.TXTBTN_rent);
-        img_profile = findViewById(R.id.IMG_profile);
-        txtBTN_profile = findViewById(R.id.TXTBTN_profile);
+        img_profile = findViewById(R.id.IMG__VerifyUser);
+        txtBTN_profile = findViewById(R.id.TXTBTN_VerifyUser);
         img_history = findViewById(R.id.IMGBTN_History);
         txtBTN_history = findViewById(R.id.TXTBTN_History);
         img_settings = findViewById(R.id.IMG_settings);

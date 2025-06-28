@@ -1,7 +1,8 @@
-package com.example.padelgo.common;
+package com.example.padelgo.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,8 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog; // Import AlertDialog
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
@@ -19,26 +21,37 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.R;
-import com.example.padelgo.user.UserDashboard;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class UserProfile extends AppCompatActivity {
-    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date;
+import android.os.Handler;
+import java.util.Locale;
 
-    Button btn_Cancel;
+public class UserProfile extends AppCompatActivity {
+    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer;
+
+    Button btn_Cancel, btn_VerifyAccount, btn_Pay, btn_Start;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
-    private FirebaseAuth mAuth;
+    private FirebaseAuth fAuth;
     private FirebaseFirestore db;
     private static final String TAG = "UserProfile";
+    private Handler timerHandler = new Handler(Looper.getMainLooper());
+
+    private int elapsedTimeInSeconds = 0;
+    private boolean isTimerRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +74,11 @@ public class UserProfile extends AppCompatActivity {
         view_NoRideData = findViewById(R.id.View_NoRideData);
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
         btn_Cancel = findViewById(R.id.BTN_Cancel);
+        btn_VerifyAccount = findViewById(R.id.BTN_VerifyAccount);
+        btn_Pay = findViewById(R.id.BTN_Pay);
+        txt_Paid = findViewById(R.id.TXT_Paid);
+        btn_Start = findViewById(R.id.BTN_Start);
+        txt_Timer = findViewById(R.id.TXT_Timer);
 
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +89,15 @@ public class UserProfile extends AppCompatActivity {
             }
         });
 
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                mainMenu();
+            }
+        };
+
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
         btn_Cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,15 +105,45 @@ public class UserProfile extends AppCompatActivity {
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
+        btn_VerifyAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UserProfile.this, VerifyNIC.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        btn_Pay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UserProfile.this, PaymentGateway.class);
+                startActivity(intent);
+            }
+        });
+
+        btn_Start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isTimerRunning) {
+                    txt_Timer.setVisibility(View.VISIBLE);
+                    elapsedTimeInSeconds = 0;
+                    isTimerRunning = true;
+                    startTimer();
+                    Toast.makeText(UserProfile.this, "Ride Started", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         loadUserProfile();
+        checkVerificationStatus();
         loadRideInfo();
     }
 
     private void loadUserProfile() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             DocumentReference userRef = db.collection("Users").document(userId);
@@ -116,7 +173,7 @@ public class UserProfile extends AppCompatActivity {
     }
 
     private void loadRideInfo() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             db.collection("RideHistory")
@@ -136,12 +193,24 @@ public class UserProfile extends AppCompatActivity {
                                     String plan = document.getString("plan");
                                     String amount = document.getString("amount");
                                     String date = document.getString("date");
+                                    String paymentStatus = document.getString("payment");
 
                                     txt_Bicycle.setText(bicycleType);
                                     txt_Location.setText(location);
                                     txt_Plan.setText(plan);
-                                    txt_Amount.setText(amount);
+                                    txt_Amount.setText("LKR "+amount+".00");
                                     txt_Date.setText(date);
+
+                                    // 🔒 If already paid, hide Pay and Cancel buttons
+                                    if (paymentStatus != null && paymentStatus.equalsIgnoreCase("Paid")) {
+                                        btn_Pay.setVisibility(View.GONE);
+                                        btn_Cancel.setVisibility(View.GONE);
+                                        txt_Paid.setVisibility(View.VISIBLE);
+                                        btn_Start.setVisibility(View.VISIBLE);
+                                    } else {
+                                        btn_Pay.setVisibility(View.VISIBLE);
+                                        btn_Cancel.setVisibility(View.VISIBLE);
+                                    }
 
                                     if (bicycleType != null && !bicycleType.isEmpty()) {
                                         view_MyRide.setVisibility(View.VISIBLE);
@@ -151,7 +220,6 @@ public class UserProfile extends AppCompatActivity {
                                         view_NoRideData.setVisibility(View.VISIBLE);
                                     }
                                 } else {
-                                    // Handle case where document is null. Maybe log a warning
                                     Log.w(TAG, "Most recent ride document is null.");
                                     view_MyRide.setVisibility(View.GONE);
                                     view_NoRideData.setVisibility(View.VISIBLE);
@@ -183,7 +251,7 @@ public class UserProfile extends AppCompatActivity {
 
 
     private void deleteLastRide() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             db.collection("RideHistory")
@@ -230,4 +298,78 @@ public class UserProfile extends AppCompatActivity {
                     });
         }
     }
+
+    private void checkVerificationStatus() {
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        TextView txt_AccountStatus = findViewById(R.id.TXT_AccountStatus);
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            DatabaseReference statusRef = FirebaseDatabase.getInstance()
+                    .getReference("user_verifications")
+                    .child(userId)
+                    .child("status");
+
+            statusRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String status = snapshot.getValue(String.class);
+
+                    if (status == null) {
+                        txt_AccountStatus.setText("Account Status: Not Verified");
+                        btn_VerifyAccount.setVisibility(View.VISIBLE);
+                    } else if (status.equals("pending")) {
+                        txt_AccountStatus.setText("Account Status: Pending");
+                        btn_VerifyAccount.setVisibility(View.GONE);
+                    } else if (status.equals("approved")) {
+                        txt_AccountStatus.setText("Account Status: Active");
+                        btn_VerifyAccount.setVisibility(View.GONE);
+                    } else if (status.equals("rejected")) {
+                        txt_AccountStatus.setText("Account Status: Rejected");
+                        btn_VerifyAccount.setVisibility(View.VISIBLE);
+                    } else {
+                        txt_AccountStatus.setText("Account Status: Not Verified");
+                        btn_VerifyAccount.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e(TAG, "Failed to read NIC status: " + error.getMessage());
+                    txt_AccountStatus.setText("Account Status: Unknown");
+                    btn_VerifyAccount.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+    }
+
+    private void mainMenu() {
+        Intent goDash = new Intent(this, UserDashboard.class);
+        startActivity(goDash);
+        finish();
+    }
+
+    private void startTimer() {
+        timerHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isTimerRunning) {
+                    int days = elapsedTimeInSeconds / 86400;
+                    int hours = (elapsedTimeInSeconds % 86400) / 3600;
+                    int minutes = (elapsedTimeInSeconds % 3600) / 60;
+                    int seconds = elapsedTimeInSeconds % 60;
+
+                    String timeFormatted = String.format(Locale.getDefault(),
+                            "%02d day %02d hrs %02d min %02d sec", days, hours, minutes, seconds);
+                    txt_Timer.setText("Ride Time: " + timeFormatted);
+
+                    elapsedTimeInSeconds++;
+                    timerHandler.postDelayed(this, 1000);
+                }
+            }
+        }, 1000);
+    }
+
+
 }

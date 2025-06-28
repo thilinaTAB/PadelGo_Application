@@ -2,23 +2,48 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/logonew"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/logonew"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PadelGo"
-        tools:targetApi="31">
+        tools:replace="android:fullBackupContent">
         <activity
-            android:name=".admin.AdminProfile"
+            android:name=".user.PaymentGateway"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminRents"
+            android:name=".common.VerifyPassword"
+            android:exported="false" />
+        <activity
+            android:name=".stationOfficer.AdminVerifyNIC"
+            android:exported="false" />
+        <activity
+            android:name=".user.VerifyNIC"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDqR5FL8WK5YHTPAmjQZ1X_BXCQxWEock4" />
+
+        <activity
+            android:name=".stationOfficer.AdminProfile"
+            android:exported="false" />
+        <activity
+            android:name=".stationOfficer.AdminRents"
             android:exported="false" />
         <activity
             android:name=".common.Settings"
@@ -27,7 +52,7 @@
             android:name=".user.RideHistory"
             android:exported="false" />
         <activity
-            android:name=".common.UserProfile"
+            android:name=".user.UserProfile"
             android:exported="false" />
         <activity
             android:name=".user.SplashActivityConfirm"
@@ -36,25 +61,25 @@
             android:name=".user.RideConfirmation"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminBicycleAvailabitily_Matale"
+            android:name=".stationOfficer.AdminBicycleAvailability_Peradeniya"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminLocation"
+            android:name=".stationOfficer.AdminLocation"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminBicycleAvailabitily_Katugastota"
+            android:name=".stationOfficer.AdminBicycleAvailability_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminBicycleAvailabitily_Kandy"
+            android:name=".stationOfficer.AdminBicycleAvailability_Kandy"
             android:exported="false" />
         <activity
-            android:name=".user.RentBicycle_Matale"
+            android:name=".user.RentBicycle_Peradeniya"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".common.SelectLocation"
+            android:name=".user.SelectLocation"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Kandy"
@@ -63,7 +88,7 @@
             android:name=".user.BicycleList"
             android:exported="false" />
         <activity
-            android:name=".admin.AdminAccountCreate"
+            android:name=".stationOfficer.AdminAccountCreate"
             android:exported="false" />
         <activity
             android:name=".common.SplashActivityStart"
@@ -75,7 +100,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".admin.AdminDash"
+            android:name=".stationOfficer.AdminDash"
             android:exported="false" />
         <activity
             android:name=".user.Register"
@@ -85,17 +110,21 @@
             android:exported="false" />
         <activity
             android:name=".common.Login"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

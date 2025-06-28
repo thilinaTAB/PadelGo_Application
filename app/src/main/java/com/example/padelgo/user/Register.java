@@ -1,6 +1,5 @@
 package com.example.padelgo.user;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -16,12 +15,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
+import com.example.padelgo.common.Login;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -86,36 +86,49 @@ public class Register extends AppCompatActivity {
                 boolean rePasswordValid = checkField(etxt_RePassword);
                 boolean nicValid = checkField(etxt_NIC);
                 boolean mobileValid = checkField(etxt_Mobile);
-                boolean allValid;
 
                 String name = etxt_Name.getText().toString();
-                String emailAddress = etxt_Email.getText().toString();
-                String password = etxt_Password.getText().toString();
-                String confirmPassword = etxt_RePassword.getText().toString();
-                String nic = etxt_NIC.getText().toString();
-                String mobile = etxt_Mobile.getText().toString();
+                String emailAddress = etxt_Email.getText().toString().trim();
+                String password = etxt_Password.getText().toString().trim();
+                String confirmPassword = etxt_RePassword.getText().toString().trim();
+                String nic = etxt_NIC.getText().toString().trim();
+                String mobile = etxt_Mobile.getText().toString().trim();
 
-                if (allValid = nameValid && emailValid && passwordValid && rePasswordValid && nicValid && mobileValid) {
-                    allValid = true;
-                } else {
-                    Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                boolean allValid = nameValid && emailValid && passwordValid && rePasswordValid && nicValid && mobileValid;
+
+                if (!allValid) {
+                    Toast.makeText(Register.this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 if (!nic.matches("^[0-9]{9}[Vv]$|^[0-9]{12}$")) {
                     etxt_NIC.setError("Invalid NIC Number");
                     Toast.makeText(Register.this, "Invalid NIC Number", Toast.LENGTH_SHORT).show();
-                    allValid = false;
+                    return;
                 }
 
                 if (!mobile.matches("[0-9]{10}")) {
                     etxt_Mobile.setError("Invalid Mobile Number");
                     Toast.makeText(Register.this, "Mobile number must have 10 digits", Toast.LENGTH_SHORT).show();
-                    allValid = false;
+                    return;
                 }
 
                 if (!password.equals(confirmPassword)) {
                     etxt_RePassword.setError("Passwords do not match");
-                    allValid = false;
+                    Toast.makeText(Register.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()) {
+                    etxt_Email.setError("Invalid email address");
+                    Toast.makeText(Register.this, "Invalid email address", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (password.length() < 6) {
+                    etxt_Password.setError("Password too short");
+                    etxt_RePassword.setError("Password too short");
+                    Toast.makeText(Register.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 if (allValid) {
@@ -131,6 +144,7 @@ public class Register extends AppCompatActivity {
                             userInfo.put("Email Address", emailAddress);
                             userInfo.put("NIC Number", nic);
                             userInfo.put("Mobile Number", mobile);
+                            userInfo.put("verificationStatus", "not_verified");
                             userInfo.put("Password", password);
 //                            userInfo.put("isAdmin", "1");
 
@@ -143,7 +157,13 @@ public class Register extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                            if (e instanceof FirebaseAuthUserCollisionException) {
+                                // This specific exception means the email already exists
+                                etxt_Email.setError("Email address already in use.");
+                                Toast.makeText(Register.this, "This email address is already registered. Please login or use a different email.", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                 }
@@ -152,7 +172,7 @@ public class Register extends AppCompatActivity {
     }
 
     public boolean checkField(EditText ex) {
-        if (ex.getText().toString().isEmpty()) {
+        if (ex.getText().toString().trim().isEmpty()) {
             ex.setError("Required this field");
             valid = false;
         } else {

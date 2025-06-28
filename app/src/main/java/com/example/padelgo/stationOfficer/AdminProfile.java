@@ -1,9 +1,10 @@
-package com.example.padelgo.admin;
+package com.example.padelgo.stationOfficer;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +25,8 @@ public class AdminProfile extends AppCompatActivity {
     TextView txt_UserName, txt_UserEmail;
 
     ImageView imgbtn_Back;
+
+    Button btn_VerifyIDs;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private static final String TAG = "UserProfile";
@@ -41,6 +44,7 @@ public class AdminProfile extends AppCompatActivity {
         txt_UserName = findViewById(R.id.TXT_UserName);
         txt_UserEmail = findViewById(R.id.TXT_UserEmail);
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
+        btn_VerifyIDs = findViewById(R.id.BTN_VerifyIDs);
 
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +52,14 @@ public class AdminProfile extends AppCompatActivity {
                 Intent intent = new Intent(AdminProfile.this, AdminDash.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        btn_VerifyIDs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdminProfile.this, AdminVerifyNIC.class);
+                startActivity(intent);
             }
         });
 

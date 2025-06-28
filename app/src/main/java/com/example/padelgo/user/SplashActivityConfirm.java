@@ -9,7 +9,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.padelgo.R;
-import com.example.padelgo.common.UserProfile;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,7 +48,6 @@ public class SplashActivityConfirm extends AppCompatActivity {
         FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
-
             Map<String, Object> rideInfo = new HashMap<>();
             rideInfo.put("bicycleType", BicycleType);
             rideInfo.put("location", Location);
@@ -57,6 +55,7 @@ public class SplashActivityConfirm extends AppCompatActivity {
             rideInfo.put("amount", Amount);
             rideInfo.put("date", Date);
             rideInfo.put("timestamp", System.currentTimeMillis());
+            rideInfo.put("payment", "Pending");
 
             db.collection("RideHistory")
                     .document(userId)

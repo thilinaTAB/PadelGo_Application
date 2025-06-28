@@ -8,7 +8,7 @@
     android:background="#E0F8EC"
     android:fillViewport="true"
     android:orientation="horizontal"
-    tools:context=".user.RentBicycle_Matale">
+    tools:context=".user.RentBicycle_Peradeniya">
 
     <LinearLayout
         android:background="@color/white"
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/dash_view"
-            android:text="Matale"
+            android:text="Peradeniya"
             android:paddingTop="10dp"
             android:textAlignment="center"
             android:textColor="@color/white"

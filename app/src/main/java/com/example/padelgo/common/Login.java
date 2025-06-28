@@ -16,7 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.R;
-import com.example.padelgo.admin.AdminDash;
+import com.example.padelgo.stationOfficer.AdminDash;
 import com.example.padelgo.user.Register;
 import com.example.padelgo.user.UserDashboard;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -79,20 +79,20 @@ public class Login extends AppCompatActivity {
                 checkField(etxt_Email);
                 checkField(etxt_Password);
 
-                String emailVal = etxt_Email.getText().toString();
-                String passVal = etxt_Password.getText().toString();
+                String emailVal = etxt_Email.getText().toString().trim();
+                String passVal = etxt_Password.getText().toString().trim();
 
                 if (valid) {
                     fAuth.signInWithEmailAndPassword(emailVal, passVal).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
-                            Toast.makeText(Login.this, "Successfull Sign in", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Login.this, "Successful Sign in", Toast.LENGTH_SHORT).show();
                             checkUserAccess(authResult.getUser().getUid());
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Login.this, "Email or Password incorrect. Please try again", Toast.LENGTH_SHORT).show();
                             txt_btnForgot.setVisibility(View.VISIBLE);
                         }
                     });
@@ -102,7 +102,7 @@ public class Login extends AppCompatActivity {
     }
 
     public boolean checkField(EditText ex) {
-        if (ex.getText().toString().isEmpty()) {
+        if (ex.getText().toString().trim().isEmpty()) {
             ex.setError("Fill This");
             valid = false;
         } else {
