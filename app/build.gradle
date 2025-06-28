@@ -53,6 +53,7 @@ dependencies {
     implementation ('com.cloudinary:cloudinary-android:1.29.0') {
         exclude group: 'com.cloudinary', module: 'cloudinary-android-preprocess'
     }
-
+    implementation 'com.stripe:stripe-android:21.17.0'
+    implementation 'com.android.volley:volley:1.2.1'
 }
 

@@ -78,11 +78,12 @@ public class RideHistory extends AppCompatActivity {
                                 String plan = document.getString("plan");
                                 String amount = document.getString("amount");
                                 String date = document.getString("date");
+                                String payment = document.getString("payment");
 
                                 // Format the ride information into a string
                                 String rideString = String.format(
-                                        "• %s at %s on %s (%s, %s)",
-                                        bicycleType, location, date, plan, amount
+                                        "🔹 %s from %s \n     on %s \n     (For %s, LKR %s) \n     - Payment: %s -",
+                                        bicycleType, location, date, plan, amount, payment
                                 );
 
                                 // Append to the text with a bullet point and newline

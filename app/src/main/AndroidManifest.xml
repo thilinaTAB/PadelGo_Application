@@ -22,7 +22,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PadelGo"
         tools:replace="android:fullBackupContent">
-
+        <activity
+            android:name=".user.PaymentGateway"
+            android:exported="false" />
         <activity
             android:name=".common.VerifyPassword"
             android:exported="false" />
