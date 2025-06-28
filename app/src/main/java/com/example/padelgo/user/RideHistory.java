@@ -66,13 +66,12 @@ public class RideHistory extends AppCompatActivity {
             db.collection("RideHistory")
                     .document(userId)
                     .collection("rides")
-                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent first (optional)
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             StringBuilder historyText = new StringBuilder();
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Extract the ride details you want to display
                                 String bicycleType = document.getString("bicycleType");
                                 String location = document.getString("location");
                                 String plan = document.getString("plan");
@@ -86,7 +85,6 @@ public class RideHistory extends AppCompatActivity {
                                         bicycleType, location, date, plan, amount, payment
                                 );
 
-                                // Append to the text with a bullet point and newline
                                 historyText.append("").append(rideString).append("\n \n");
                             }
 
