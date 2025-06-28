@@ -8,10 +8,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.padelgo.R;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.firebase.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class AdminRents extends AppCompatActivity {
 
@@ -30,7 +36,7 @@ public class AdminRents extends AppCompatActivity {
 
     private void loadAllRideHistory() {
         db.collection("AllHistory")
-                .orderBy("timestamp")
+                .orderBy("serverTimestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     StringBuilder allRideData = new StringBuilder();
@@ -84,6 +90,14 @@ public class AdminRents extends AppCompatActivity {
         String plan = ride.get("plan") != null ? ride.get("plan").toString() : "Unknown Plan";
         String amount = ride.get("amount") != null ? ride.get("amount").toString() : "Unknown Amount";
         String dateAndTime = ride.get("dateAndTime") != null ? ride.get("dateAndTime").toString() : "Unknown Date/Time";
+        String serverTimestampFormatted = "Unknown Timestamp";
+        if (ride.get("serverTimestamp") instanceof Timestamp) {
+            Timestamp timestamp = (Timestamp) ride.get("serverTimestamp");
+            Date date = timestamp.toDate();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
+            serverTimestampFormatted = sdf.format(date);
+        }
+
 
         allRideData.append("User: ").append(userName).append("\n");
         allRideData.append("Bike: ").append(bikeType).append("\n");
@@ -91,6 +105,7 @@ public class AdminRents extends AppCompatActivity {
         allRideData.append("Plan: ").append(plan).append("\n");
         allRideData.append("Amount: ").append(amount).append("\n");
         allRideData.append("Date/Time: ").append(dateAndTime).append("\n");
+        allRideData.append("Order placed: ").append(serverTimestampFormatted).append("\n");
         allRideData.append("-------------------------------------------\n\n");
 
         rideCount[0]++;
