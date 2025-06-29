@@ -31,7 +31,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RideAdapter adapter;
     private List<Ride> rideList = new ArrayList<>();
-    private FirebaseFirestore firestore;
+    private FirebaseFirestore fstore;
     private DatabaseReference realtimeDb;
     private static final String TAG = "ReleaseBicycleActivity";
 
@@ -48,7 +48,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         txt_NULL = findViewById(R.id.TXT_NULL_RELEASE);
         txt_NULL.setVisibility(View.GONE);
 
-        firestore = FirebaseFirestore.getInstance();
+        fstore = FirebaseFirestore.getInstance();
         realtimeDb = FirebaseDatabase.getInstance().getReference("release_bicycle");
 
         adapter = new RideAdapter();
@@ -58,7 +58,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
     }
 
     private void fetchRides() {
-        firestore.collectionGroup("rides")
+        fstore.collectionGroup("rides")
                 .whereEqualTo("payment", "Paid")
                 .whereEqualTo("bikeReleased", false)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -96,20 +96,20 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_release_bike, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_release_bike, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Ride ride = rideList.get(position);
-            holder.tvUserId.setText("User ID: " + ride.userId);
-            holder.tvAmount.setText("Amount: " + ride.amount);
-            holder.tvLocation.setText("Location: " + ride.location);
-            holder.tvPlan.setText("Plan: " + ride.plan);
-            holder.tvBicycleType.setText("Bicycle Type: " + ride.bicycleType);
+            holder.txt_UserId.setText("User ID: " + ride.userId);
+            holder.txt_Amount.setText("Amount: " + ride.amount);
+            holder.txt_Location.setText("Location: " + ride.location);
+            holder.txt_Plan.setText("Plan: " + ride.plan);
+            holder.txt_BicycleType.setText("Bicycle Type: " + ride.bicycleType);
 
-            holder.btnRelease.setOnClickListener(v -> releaseBike(ride));
+            holder.btn_Release.setOnClickListener(v -> releaseBike(ride));
         }
 
         @Override
@@ -118,17 +118,17 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvUserId, tvAmount, tvLocation, tvPlan, tvBicycleType;
-            Button btnRelease;
+            TextView txt_UserId, txt_Amount, txt_Location, txt_Plan, txt_BicycleType;
+            Button btn_Release;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                tvUserId = itemView.findViewById(R.id.TXT_UID_RELEASE);
-                tvAmount = itemView.findViewById(R.id.TXT_Amount_RELEASE);
-                tvLocation = itemView.findViewById(R.id.TXT_Location_RELEASE);
-                tvPlan = itemView.findViewById(R.id.TXT_Plan_RELEASE);
-                tvBicycleType = itemView.findViewById(R.id.TXT_Type_RELEASE);
-                btnRelease = itemView.findViewById(R.id.BTN_ReleaseBike);
+                txt_UserId = itemView.findViewById(R.id.TXT_UID_RELEASE);
+                txt_Amount = itemView.findViewById(R.id.TXT_Amount_RELEASE);
+                txt_Location = itemView.findViewById(R.id.TXT_Location_RELEASE);
+                txt_Plan = itemView.findViewById(R.id.TXT_Plan_RELEASE);
+                txt_BicycleType = itemView.findViewById(R.id.TXT_Type_RELEASE);
+                btn_Release = itemView.findViewById(R.id.BTN_ReleaseBike);
             }
         }
     }
@@ -137,7 +137,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         Map<String, Object> update = new HashMap<>();
         update.put("bikeReleased", true);
 
-        firestore.collection("RideHistory")
+        fstore.collection("RideHistory")
                 .document(ride.userId)
                 .collection("rides")
                 .document(ride.rideId)
