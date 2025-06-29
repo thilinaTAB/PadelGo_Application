@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class AdminDash extends AppCompatActivity {
     ImageView img_signOut, img_addAdmin, img_bicycleAvailability, img_settings, img_rents, img_profile;
     TextView txtBTN_signOut, txtBTN_addAdmin, txtBTN_bicycleAvailability, txtBTN_settings, txtBTN_rents, txtBTN_profile;
+    Button btn_Release;
     FirebaseAuth fauth;
 
     @SuppressLint("MissingInflatedId")
@@ -50,6 +52,7 @@ public class AdminDash extends AppCompatActivity {
         txtBTN_rents = findViewById(R.id.TXTBTN_rents);
         img_profile = findViewById(R.id.IMG__VerifyUser);
         txtBTN_profile = findViewById(R.id.TXTBTN_VerifyUser);
+        btn_Release = findViewById(R.id.BTN_Release);
 
         View.OnClickListener signOutClickListener = v -> showSignOutConfirmationDialog();
         img_signOut.setOnClickListener(signOutClickListener);
@@ -81,11 +84,11 @@ public class AdminDash extends AppCompatActivity {
             startActivity(moveToSettings);
         });
         txtBTN_rents.setOnClickListener(v -> {
-            Intent moveToRents = new Intent(getApplicationContext(), AdminRents.class);
+            Intent moveToRents = new Intent(getApplicationContext(), AdminHistory.class);
             startActivity(moveToRents);
         });
         img_rents.setOnClickListener(v -> {
-            Intent moveToRents = new Intent(getApplicationContext(), AdminRents.class);
+            Intent moveToRents = new Intent(getApplicationContext(), AdminHistory.class);
             startActivity(moveToRents);
         });
         txtBTN_profile.setOnClickListener(v -> {
@@ -95,6 +98,10 @@ public class AdminDash extends AppCompatActivity {
         img_profile.setOnClickListener(v -> {
             Intent moveToProfile = new Intent(getApplicationContext(), AdminVerifyNIC.class);
             startActivity(moveToProfile);
+        });
+        btn_Release.setOnClickListener(v -> {
+            Intent moveToRelease = new Intent(getApplicationContext(), ReleaseBicycleActivity.class);
+            startActivity(moveToRelease);
         });
 
     }

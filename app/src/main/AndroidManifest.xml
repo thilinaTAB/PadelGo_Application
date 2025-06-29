@@ -23,6 +23,12 @@
         android:theme="@style/Theme.PadelGo"
         tools:replace="android:fullBackupContent">
         <activity
+            android:name=".stationOfficer.ReleaseBicycleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".stationOfficer.AdminPaymentDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".user.PaymentGateway"
             android:exported="false" />
         <activity
@@ -43,7 +49,7 @@
             android:name=".stationOfficer.AdminProfile"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminRents"
+            android:name=".stationOfficer.AdminHistory"
             android:exported="false" />
         <activity
             android:name=".common.Settings"

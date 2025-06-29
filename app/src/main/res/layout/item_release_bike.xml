@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@color/white"
+    android:layout_marginBottom="8dp">
+
+    <TextView android:id="@+id/TXT_UID_RELEASE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User ID:"
+        android:textStyle="bold" />
+
+    <TextView android:id="@+id/TXT_Amount_RELEASE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Amount:" />
+
+    <TextView android:id="@+id/TXT_Location_RELEASE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Location:" />
+
+    <TextView android:id="@+id/TXT_Plan_RELEASE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Plan:" />
+
+    <TextView android:id="@+id/TXT_Type_RELEASE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bicycle Type:" />
+
+    <Button
+        android:id="@+id/BTN_ReleaseBike"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Release Bicycle"
+        android:backgroundTint="@color/ThemeColor"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

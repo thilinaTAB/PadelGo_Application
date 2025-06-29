@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class AdminRents extends AppCompatActivity {
+public class AdminHistory extends AppCompatActivity {
 
     private TextView txt_All;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -28,7 +28,7 @@ public class AdminRents extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_rents);
+        setContentView(R.layout.activity_admin_history);
         txt_All = findViewById(R.id.TXT_All);
 
         loadAllRideHistory();

@@ -263,4 +263,14 @@
         android:textSize="36sp"
         android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/BTN_Release"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/top_view"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="66dp"
+        android:layout_marginBottom="12dp"
+        android:text="Release" />
+
 </RelativeLayout>
