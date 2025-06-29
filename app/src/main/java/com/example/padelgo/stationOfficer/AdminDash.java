@@ -21,9 +21,8 @@ import com.example.padelgo.common.Settings;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminDash extends AppCompatActivity {
-    ImageView img_signOut, img_addAdmin, img_bicycleAvailability, img_settings, img_rents, img_profile;
-    TextView txtBTN_signOut, txtBTN_addAdmin, txtBTN_bicycleAvailability, txtBTN_settings, txtBTN_rents, txtBTN_profile;
-    Button btn_Release;
+    ImageView img_signOut, img_addAdmin, img_bicycleAvailability, img_settings, img_rents, img_profile,img_Release;
+    TextView txtBTN_signOut, txtBTN_addAdmin, txtBTN_bicycleAvailability, txtBTN_settings, txtBTN_rents, txtBTN_profile,txtBTN_Release;
     FirebaseAuth fauth;
 
     @SuppressLint("MissingInflatedId")
@@ -52,7 +51,8 @@ public class AdminDash extends AppCompatActivity {
         txtBTN_rents = findViewById(R.id.TXTBTN_rents);
         img_profile = findViewById(R.id.IMG__VerifyUser);
         txtBTN_profile = findViewById(R.id.TXTBTN_VerifyUser);
-        btn_Release = findViewById(R.id.BTN_Release);
+        img_Release = findViewById(R.id.IMG_Release);
+        txtBTN_Release = findViewById(R.id.TXTBTN_Release);
 
         View.OnClickListener signOutClickListener = v -> showSignOutConfirmationDialog();
         img_signOut.setOnClickListener(signOutClickListener);
@@ -99,7 +99,11 @@ public class AdminDash extends AppCompatActivity {
             Intent moveToProfile = new Intent(getApplicationContext(), AdminVerifyNIC.class);
             startActivity(moveToProfile);
         });
-        btn_Release.setOnClickListener(v -> {
+        txtBTN_Release.setOnClickListener(v -> {
+            Intent moveToRelease = new Intent(getApplicationContext(), ReleaseBicycleActivity.class);
+            startActivity(moveToRelease);
+        });
+        img_Release.setOnClickListener(v -> {
             Intent moveToRelease = new Intent(getApplicationContext(), ReleaseBicycleActivity.class);
             startActivity(moveToRelease);
         });
