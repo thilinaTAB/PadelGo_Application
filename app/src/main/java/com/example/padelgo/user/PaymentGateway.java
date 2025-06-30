@@ -19,6 +19,8 @@ import com.android.volley.toolbox.Volley;
 import com.example.padelgo.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.stripe.android.PaymentConfiguration;
 import com.stripe.android.paymentsheet.PaymentSheet;
@@ -33,7 +35,7 @@ public class PaymentGateway extends AppCompatActivity {
     private String paymentIntentClientSecret;
 
     //TEAM:  Replace with your current ngrok url here
-    private final String backendUrl = "https://016c-2402-d000-8120-d0e7-e0f0-a0d7-8c3-d8a2.ngrok-free.app";
+    private final String backendUrl = "https://0b65-2402-4000-2120-954-6453-a86f-8783-9b93.ngrok-free.app";
     private final String publishableKey = "pk_test_51RbjciR9H2dk7jjUA7WKgDP1rQe0xCffEPLBBeoS2Bna0MYPBaqfeG8m5HFVnJs2bZBM81HepLvKJQIAHEEJWOcN00FBwPERRW";
 
     private Button btn_Pay;
@@ -41,6 +43,7 @@ public class PaymentGateway extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth fAuth;
+    private DatabaseReference realtimeDB;
 
     private int rideAmountInCents = 0;
 
@@ -51,6 +54,7 @@ public class PaymentGateway extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         fAuth = FirebaseAuth.getInstance();
+        realtimeDB = FirebaseDatabase.getInstance().getReference();
 
         progressBar = findViewById(R.id.progressBar);
         btn_Pay = findViewById(R.id.btnPay);
@@ -187,7 +191,7 @@ public class PaymentGateway extends AppCompatActivity {
             Toast.makeText(this, "Payment Successful ✅", Toast.LENGTH_LONG).show();
             Log.i("StripePayment", "Payment completed");
 
-            // ✅ Update Firestore payment status
+            //Update Firestore payment status
             FirebaseUser currentUser = fAuth.getCurrentUser();
             if (currentUser != null) {
                 String userId = currentUser.getUid();
@@ -209,15 +213,30 @@ public class PaymentGateway extends AppCompatActivity {
                                         .update("payment", "Paid",
                                                 "bikeReleased", false)
                                         .addOnSuccessListener(unused -> {
-                                            Log.i("FirestoreUpdate", "Payment marked as Paid");
-                                            // ✅ Redirect to dashboard
-                                            startActivity(new Intent(PaymentGateway.this, UserProfile.class));
-                                            finish();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e("FirestoreUpdate", "Failed to update payment status", e);
+                                            Log.i("FirestoreUpdate", "Payment marked as Paid in Firestore");
+
+                                            // --- REALTIME DATABASE ---
+                                            DatabaseReference releaseRef = realtimeDB.child("release_bicycle").child(userId);
+                                            releaseRef.child("bikeReleased").setValue(false).addOnSuccessListener(aVoid -> {
+                                                Log.i("RealtimeDBUpdate", "bikeReleased status saved to Realtime Database");
+                                                // ✅ Redirect to dashboard
+                                                startActivity(new Intent(PaymentGateway.this, UserProfile.class));
+                                                finish();
+                                            }).addOnFailureListener(e -> {
+                                                Log.e("RealtimeDBUpdate", "Failed to save bikeReleased to Realtime Database", e);
+                                                Toast.makeText(this, "Payment done, Firestore updated, but failed to update Realtime DB", Toast.LENGTH_SHORT).show();
+                                                startActivity(new Intent(PaymentGateway.this, UserProfile.class));
+                                                finish();
+                                            });
+                                        }).addOnFailureListener(e -> {
+                                            Log.e("FirestoreUpdate", "Failed to update payment status in Firestore", e);
                                             Toast.makeText(this, "Payment done, but failed to update Firestore", Toast.LENGTH_SHORT).show();
                                         });
+                            } else {
+                                Log.w("FirestoreUpdate", "No ride document found to update after payment.");
+                                Toast.makeText(this, "Payment successful, but no ride record found to update.", Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(PaymentGateway.this, UserProfile.class));
+                                finish();
                             }
                         })
                         .addOnFailureListener(e -> {

@@ -40,7 +40,7 @@ import android.os.Handler;
 import java.util.Locale;
 
 public class UserProfile extends AppCompatActivity {
-    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer;
+    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait;
 
     Button btn_Cancel, btn_VerifyAccount, btn_Pay, btn_Start;
     ImageView imgbtn_Back;
@@ -79,6 +79,7 @@ public class UserProfile extends AppCompatActivity {
         txt_Paid = findViewById(R.id.TXT_Paid);
         btn_Start = findViewById(R.id.BTN_Start);
         txt_Timer = findViewById(R.id.TXT_Timer);
+        txt_wait = findViewById(R.id.TXT_Wait);
 
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,7 +207,7 @@ public class UserProfile extends AppCompatActivity {
                                         btn_Pay.setVisibility(View.GONE);
                                         btn_Cancel.setVisibility(View.GONE);
                                         txt_Paid.setVisibility(View.VISIBLE);
-                                        btn_Start.setVisibility(View.VISIBLE);
+                                        checkBicycleRelease();
                                     } else {
                                         btn_Pay.setVisibility(View.VISIBLE);
                                         btn_Cancel.setVisibility(View.VISIBLE);
@@ -341,6 +342,71 @@ public class UserProfile extends AppCompatActivity {
                     btn_VerifyAccount.setVisibility(View.VISIBLE);
                 }
             });
+        }
+    }
+
+    private void checkBicycleRelease() {
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        // txt_wait and btn_Start are initialized in onCreate
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            DatabaseReference statusRef = FirebaseDatabase.getInstance()
+                    .getReference("release_bicycle")
+                    .child(userId)
+                    .child("bikeReleased");
+
+            // Defensive check for UI elements
+            if (txt_wait == null || btn_Start == null) {
+                Log.e(TAG, "checkBicycleRelease: txt_wait or btn_Start is null. Aborting.");
+                return;
+            }
+
+            statusRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Boolean isBikeReleased = snapshot.getValue(Boolean.class);
+                    Log.d(TAG, "Bike release status for user " + userId + ": " + isBikeReleased);
+
+                    txt_wait.setVisibility(View.GONE);
+                    btn_Start.setVisibility(View.GONE);
+
+                    if (isBikeReleased == null) {
+                        Log.d(TAG, "bikeReleased status is null. Bike not yet processed for release.");
+
+                    } else if (Boolean.FALSE.equals(isBikeReleased)) {
+                        txt_wait.setText("Bike release pending. Please wait.");
+                        txt_wait.setVisibility(View.VISIBLE);
+                    } else if (Boolean.TRUE.equals(isBikeReleased)) {
+                        Log.d(TAG, "bike Released. You can start the ride.");
+                        btn_Start.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e(TAG, "Failed to read bike release status: " + error.getMessage(), error.toException());
+
+                    if (txt_wait != null) {
+                        txt_wait.setText("Error checking bike status.");
+                        txt_wait.setVisibility(View.VISIBLE);
+                    }
+                    if (btn_Start != null) {
+                        btn_Start.setVisibility(View.GONE);
+                    }
+                }
+            });
+        } else {
+            Log.w(TAG, "checkBicycleRelease: Current user is null.");
+
+            if (txt_wait != null) {
+                txt_wait.setText("Please log in.");
+                txt_wait.setVisibility(View.GONE);
+            }
+            if (btn_Start != null) {
+                btn_Start.setVisibility(View.GONE);
+            }
         }
     }
 
