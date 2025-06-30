@@ -3,6 +3,7 @@ package com.example.padelgo.user;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,11 +19,19 @@ import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
 import com.example.padelgo.common.Settings;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class UserDashboard extends AppCompatActivity {
     ImageView img_signOut, img_bicycleCategory, img_rent, img_profile, img_history, img_settings;
-    TextView txtBTN_signOut, txtBTN_bicycleCategory, txtBTN_rent, txtBTN_profile, txtBTN_history, txtBTN_settings;
+    TextView txtBTN_signOut, txtBTN_bicycleCategory, txtBTN_rent, txtBTN_profile, txtBTN_history, txtBTN_settings, greetingText, welcomeText;
     FirebaseAuth fauth;
+    FirebaseFirestore fStore;
+    String userId;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -36,8 +45,8 @@ public class UserDashboard extends AppCompatActivity {
             return insets;
         });
 
-        // Initialize FirebaseAuth
         fauth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
 
         img_signOut = findViewById(R.id.IMG_signOut);
         txtBTN_signOut = findViewById(R.id.TXTBTN_signOut);
@@ -51,6 +60,17 @@ public class UserDashboard extends AppCompatActivity {
         txtBTN_history = findViewById(R.id.TXTBTN_History);
         img_settings = findViewById(R.id.IMG_settings);
         txtBTN_settings = findViewById(R.id.TXTBTN_settings);
+        greetingText = findViewById(R.id.greetingText);
+        welcomeText = findViewById(R.id.welcomeText);
+
+        setTimeBasedGreeting();
+
+        if (fauth.getCurrentUser() != null) {
+            userId = fauth.getCurrentUser().getUid();
+            fetchUserName();
+        } else {
+            welcomeText.setText("Welcome to PadelGo!");
+        }
 
         img_bicycleCategory.setOnClickListener(v -> {
             Intent movetoList = new Intent(getApplicationContext(), BicycleList.class);
@@ -101,6 +121,78 @@ public class UserDashboard extends AppCompatActivity {
 
     }
 
+    private void setTimeBasedGreeting() {
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+
+        if (hour >= 5 && hour < 12) {
+            greetingText.setText("Good Morning!");
+        } else if (hour >= 12 && hour < 18) {
+            greetingText.setText("Good Afternoon!");
+        } else if (hour >= 18 && hour < 22) {  // 6 PM - 9:59 PM
+            greetingText.setText("Good Evening!");
+        } else {                              // 10 PM - 4:59 AM
+            greetingText.setText("Good Night!");
+        }
+    }
+
+    private void fetchUserName() {
+        if (fStore == null || userId == null) {
+            welcomeText.setText("Welcome to PadelGo!");
+            return;
+        }
+
+        // Get the user creation timestamp from FirebaseAuth
+        FirebaseUser user = fauth.getCurrentUser();
+        if (user == null) {
+            welcomeText.setText("Welcome to PadelGo!");
+            return;
+        }
+
+        // Get metadata to check if user is new
+        long creationTimestamp = user.getMetadata().getCreationTimestamp();
+        long currentTimestamp = System.currentTimeMillis();
+        boolean isNewUser = (currentTimestamp - creationTimestamp) < TimeUnit.DAYS.toMillis(1); // Considered new if account created < 1 day ago
+
+        fStore.collection("Users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String fullName = documentSnapshot.getString("Full Name");
+                        if (fullName == null) {
+                            fullName = documentSnapshot.getString("fullName");
+                        }
+
+                        if (fullName != null && !fullName.isEmpty()) {
+                            if (isNewUser) {
+                                welcomeText.setText("Welcome to PadelGo, " + fullName + "!");
+                            } else {
+                                welcomeText.setText("Welcome back, " + fullName + "!");
+                            }
+                        } else {
+                            String email = documentSnapshot.getString("Email Address");
+                            if (email != null && !email.isEmpty()) {
+                                String username = email.split("@")[0];
+                                if (isNewUser) {
+                                    welcomeText.setText("Welcome to PadelGo, " + username + "!");
+                                } else {
+                                    welcomeText.setText("Welcome back, " + username + "!");
+                                }
+                            } else {
+                                welcomeText.setText(isNewUser ? "Welcome to PadelGo!" : "Welcome back!");
+                            }
+                        }
+                    } else {
+                        // User document doesn't exist yet (brand new user)
+                        welcomeText.setText("Welcome to PadelGo!");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    welcomeText.setText("Welcome to PadelGo!");
+                    Log.e("UserDashboard", "Error fetching user data", e);
+                });
+    }
     private void showSignOutConfirmationDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Sign Out")
