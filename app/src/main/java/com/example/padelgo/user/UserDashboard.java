@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,8 +27,9 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public class UserDashboard extends AppCompatActivity {
-    ImageView img_signOut, img_bicycleCategory, img_rent, img_profile, img_history, img_settings;
-    TextView txtBTN_signOut, txtBTN_bicycleCategory, txtBTN_rent, txtBTN_profile, txtBTN_history, txtBTN_settings, greetingText, welcomeText;
+    ImageView img_signOut, img_bicycleCategory, img_rent, img_profile, img_RideHistory, img_settings,img_MyRides;
+    TextView txtBTN_signOut, txtBTN_bicycleCategory, txtBTN_rent, txtBTN_profile, txtBTN_RideHistory, txtBTN_settings,txtBTN_MyRides, greetingText, welcomeText;
+    CardView  cv_Profile, cv_History, cv_Settings, cv_MyRides, cv_SignOut, cv_Packages,cv_RentNow;
     FirebaseAuth fauth;
     FirebaseFirestore fStore;
     String userId;
@@ -50,18 +52,27 @@ public class UserDashboard extends AppCompatActivity {
 
         img_signOut = findViewById(R.id.IMG_signOut);
         txtBTN_signOut = findViewById(R.id.TXTBTN_signOut);
-        img_bicycleCategory = findViewById(R.id.IMG_bicycleCategory);
-        txtBTN_bicycleCategory = findViewById(R.id.TXTBTN_bicycleCategory);
+        img_bicycleCategory = findViewById(R.id.IMG_Packages);
+        txtBTN_bicycleCategory = findViewById(R.id.TXTBTN_Packages);
         img_rent = findViewById(R.id.IMG_rent);
         txtBTN_rent = findViewById(R.id.TXTBTN_rent);
-        img_profile = findViewById(R.id.IMG__VerifyUser);
-        txtBTN_profile = findViewById(R.id.TXTBTN_VerifyUser);
-        img_history = findViewById(R.id.IMGBTN_History);
-        txtBTN_history = findViewById(R.id.TXTBTN_History);
+        img_profile = findViewById(R.id.IMG__UserProfile);
+        txtBTN_profile = findViewById(R.id.TXTBTN_UserProfile);
+        img_RideHistory = findViewById(R.id.IMGBTN_History);
+        txtBTN_RideHistory = findViewById(R.id.TXTBTN_History);
         img_settings = findViewById(R.id.IMG_settings);
         txtBTN_settings = findViewById(R.id.TXTBTN_settings);
         greetingText = findViewById(R.id.greetingText);
         welcomeText = findViewById(R.id.welcomeText);
+        img_MyRides = findViewById(R.id.IMG_MyRides);
+        txtBTN_MyRides = findViewById(R.id.TXTBTN_MyRides);
+        cv_Profile = findViewById(R.id.CV_Profile);
+        cv_History = findViewById(R.id.CV_History);
+        cv_Settings = findViewById(R.id.CV_Settings);
+        cv_MyRides = findViewById(R.id.CV_MyRides);
+        cv_SignOut = findViewById(R.id.CV_SignOut);
+        cv_Packages = findViewById(R.id.CV_Packages);
+        cv_RentNow = findViewById(R.id.CV_RentNow);
 
         setTimeBasedGreeting();
 
@@ -80,6 +91,11 @@ public class UserDashboard extends AppCompatActivity {
             Intent movetoList = new Intent(getApplicationContext(), BicycleList.class);
             startActivity(movetoList);
         });
+        cv_Packages.setOnClickListener(v -> {
+            Intent movetoList = new Intent(getApplicationContext(), BicycleList.class);
+            startActivity(movetoList);
+        });
+
         img_rent.setOnClickListener(v -> {
             Intent moveToLocation = new Intent(getApplicationContext(), SelectLocation.class);
             startActivity(moveToLocation);
@@ -88,23 +104,50 @@ public class UserDashboard extends AppCompatActivity {
             Intent moveToLocation = new Intent(getApplicationContext(), SelectLocation.class);
             startActivity(moveToLocation);
         });
+        cv_RentNow.setOnClickListener(v -> {
+            Intent moveToLocation = new Intent(getApplicationContext(), SelectLocation.class);
+            startActivity(moveToLocation);
+        });
 
         img_profile.setOnClickListener(v -> {
-            Intent moveToProfile = new Intent(getApplicationContext(), UserProfile.class);
+            Intent moveToProfile = new Intent(getApplicationContext(), UserNewProfile.class);
             startActivity(moveToProfile);
         });
         txtBTN_profile.setOnClickListener(v -> {
-            Intent moveToProfile = new Intent(getApplicationContext(), UserProfile.class);
+            Intent moveToProfile = new Intent(getApplicationContext(), UserNewProfile.class);
             startActivity(moveToProfile);
         });
-        img_history.setOnClickListener(v -> {
+        cv_Profile.setOnClickListener(v -> {
+            Intent moveToProfile = new Intent(getApplicationContext(), UserNewProfile.class);
+            startActivity(moveToProfile);
+        });
+
+        img_MyRides.setOnClickListener(v -> {
+            Intent moveToMyRides = new Intent(getApplicationContext(), MyRides.class);
+            startActivity(moveToMyRides);
+        });
+        txtBTN_MyRides.setOnClickListener(v -> {
+            Intent moveToMyRides = new Intent(getApplicationContext(), MyRides.class);
+            startActivity(moveToMyRides);
+        });
+        cv_MyRides.setOnClickListener(v -> {
+            Intent moveToMyRides = new Intent(getApplicationContext(), MyRides.class);
+            startActivity(moveToMyRides);
+        });
+
+        img_RideHistory.setOnClickListener(v -> {
             Intent moveToHistory = new Intent(getApplicationContext(), RideHistory.class);
             startActivity(moveToHistory);
         });
-        txtBTN_history.setOnClickListener(v -> {
+        txtBTN_RideHistory.setOnClickListener(v -> {
             Intent moveToHistory = new Intent(getApplicationContext(), RideHistory.class);
             startActivity(moveToHistory);
         });
+        cv_History.setOnClickListener(v -> {
+            Intent moveToHistory = new Intent(getApplicationContext(), RideHistory.class);
+            startActivity(moveToHistory);
+        });
+
         img_settings.setOnClickListener(v -> {
             Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
             startActivity(moveToSettings);
@@ -113,12 +156,15 @@ public class UserDashboard extends AppCompatActivity {
             Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
             startActivity(moveToSettings);
         });
+        cv_Settings.setOnClickListener(v -> {
+            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
+            startActivity(moveToSettings);
+        });
 
-        // Sign Out Click Listeners
         View.OnClickListener signOutClickListener = v -> showSignOutConfirmationDialog();
         img_signOut.setOnClickListener(signOutClickListener);
         txtBTN_signOut.setOnClickListener(signOutClickListener);
-
+        cv_SignOut.setOnClickListener(signOutClickListener);
     }
 
     private void setTimeBasedGreeting() {

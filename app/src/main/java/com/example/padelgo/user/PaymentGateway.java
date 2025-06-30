@@ -220,12 +220,12 @@ public class PaymentGateway extends AppCompatActivity {
                                             releaseRef.child("bikeReleased").setValue(false).addOnSuccessListener(aVoid -> {
                                                 Log.i("RealtimeDBUpdate", "bikeReleased status saved to Realtime Database");
                                                 // ✅ Redirect to dashboard
-                                                startActivity(new Intent(PaymentGateway.this, UserProfile.class));
+                                                startActivity(new Intent(PaymentGateway.this, MyRides.class));
                                                 finish();
                                             }).addOnFailureListener(e -> {
                                                 Log.e("RealtimeDBUpdate", "Failed to save bikeReleased to Realtime Database", e);
                                                 Toast.makeText(this, "Payment done, Firestore updated, but failed to update Realtime DB", Toast.LENGTH_SHORT).show();
-                                                startActivity(new Intent(PaymentGateway.this, UserProfile.class));
+                                                startActivity(new Intent(PaymentGateway.this, MyRides.class));
                                                 finish();
                                             });
                                         }).addOnFailureListener(e -> {
@@ -235,7 +235,7 @@ public class PaymentGateway extends AppCompatActivity {
                             } else {
                                 Log.w("FirestoreUpdate", "No ride document found to update after payment.");
                                 Toast.makeText(this, "Payment successful, but no ride record found to update.", Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(PaymentGateway.this, UserProfile.class));
+                                startActivity(new Intent(PaymentGateway.this, MyRides.class));
                                 finish();
                             }
                         })

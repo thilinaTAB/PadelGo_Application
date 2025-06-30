@@ -152,7 +152,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/IMG__VerifyUser"
+                    android:id="@+id/IMG__UserProfile"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:layout_gravity="center_horizontal"
@@ -160,7 +160,7 @@
                     android:src="@drawable/reg_name" />
 
                 <TextView
-                    android:id="@+id/TXTBTN_VerifyUser"
+                    android:id="@+id/TXTBTN_UserProfile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"

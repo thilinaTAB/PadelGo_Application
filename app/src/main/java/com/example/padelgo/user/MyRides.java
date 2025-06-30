@@ -39,10 +39,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import android.os.Handler;
 import java.util.Locale;
 
-public class UserProfile extends AppCompatActivity {
-    TextView txt_UserName, txt_UserEmail, txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait;
+public class MyRides extends AppCompatActivity {
+    TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait;
 
-    Button btn_Cancel, btn_VerifyAccount, btn_Pay, btn_Start;
+    Button btn_Cancel, btn_Pay, btn_Start;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
     private FirebaseAuth fAuth;
@@ -57,14 +57,13 @@ public class UserProfile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_user_profile);
+        setContentView(R.layout.activity_user_my_rides);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        txt_UserName = findViewById(R.id.TXT_UserName);
-        txt_UserEmail = findViewById(R.id.TXT_UserEmail);
+
         txt_Bicycle = findViewById(R.id.TXT_Bicycle);
         txt_Location = findViewById(R.id.TXT_Location);
         txt_Plan = findViewById(R.id.TXT_Plan);
@@ -74,7 +73,6 @@ public class UserProfile extends AppCompatActivity {
         view_NoRideData = findViewById(R.id.View_NoRideData);
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
         btn_Cancel = findViewById(R.id.BTN_Cancel);
-        btn_VerifyAccount = findViewById(R.id.BTN_VerifyAccount);
         btn_Pay = findViewById(R.id.BTN_Pay);
         txt_Paid = findViewById(R.id.TXT_Paid);
         btn_Start = findViewById(R.id.BTN_Start);
@@ -84,7 +82,7 @@ public class UserProfile extends AppCompatActivity {
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(UserProfile.this, UserDashboard.class);
+                Intent intent = new Intent(MyRides.this, UserDashboard.class);
                 startActivity(intent);
                 finish();
             }
@@ -106,18 +104,10 @@ public class UserProfile extends AppCompatActivity {
             }
         });
 
-        btn_VerifyAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(UserProfile.this, VerifyNIC.class);
-                startActivity(intent);
-                finish();
-            }
-        });
         btn_Pay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(UserProfile.this, PaymentGateway.class);
+                Intent intent = new Intent(MyRides.this, PaymentGateway.class);
                 startActivity(intent);
             }
         });
@@ -130,7 +120,7 @@ public class UserProfile extends AppCompatActivity {
                     elapsedTimeInSeconds = 0;
                     isTimerRunning = true;
                     startTimer();
-                    Toast.makeText(UserProfile.this, "Ride Started", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MyRides.this, "Ride Started", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -138,39 +128,7 @@ public class UserProfile extends AppCompatActivity {
         fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        loadUserProfile();
-        checkVerificationStatus();
         loadRideInfo();
-    }
-
-    private void loadUserProfile() {
-        FirebaseUser currentUser = fAuth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            DocumentReference userRef = db.collection("Users").document(userId);
-            userRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        String fullName = document.getString("FullName");
-                        if (fullName == null) {
-                            fullName = document.getString("Full Name");
-                            Log.w(TAG, "Field 'FullName' not found, falling back to 'Full Name'");
-                        }
-                        String email = currentUser.getEmail();
-                        txt_UserName.setText(fullName != null ? fullName : "Name not available");
-                        txt_UserEmail.setText(email);
-                    } else {
-                        Log.d(TAG, "No such user document");
-                        txt_UserName.setText("User data not found");
-                        txt_UserEmail.setText(currentUser.getEmail());
-                    }
-                } else {
-                    Log.e(TAG, "Error loading user data: ", task.getException());
-                    txt_UserName.setText("Error loading user data");
-                }
-            });
-        }
     }
 
     private void loadRideInfo() {
@@ -272,7 +230,7 @@ public class UserProfile extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     Log.d(TAG, "Last ride deleted successfully");
-                                                    Toast.makeText(UserProfile.this, "Last ride cancelled.", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(MyRides.this, "Last ride cancelled.", Toast.LENGTH_SHORT).show();
                                                     loadRideInfo(); // Refresh the displayed ride info
                                                 }
                                             })
@@ -280,13 +238,13 @@ public class UserProfile extends AppCompatActivity {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
                                                     Log.e(TAG, "Error deleting last ride: ", e);
-                                                    Toast.makeText(UserProfile.this, "Error cancelling last ride.", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(MyRides.this, "Error cancelling last ride.", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
                                 }
                             } else {
                                 Log.d(TAG, "No last ride history found for user");
-                                Toast.makeText(UserProfile.this, "No ride history to cancel.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MyRides.this, "No ride history to cancel.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     })
@@ -294,54 +252,9 @@ public class UserProfile extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.e(TAG, "Error fetching ride history: ", e);
-                            Toast.makeText(UserProfile.this, "Error accessing ride history.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MyRides.this, "Error accessing ride history.", Toast.LENGTH_SHORT).show();
                         }
                     });
-        }
-    }
-
-    private void checkVerificationStatus() {
-        FirebaseUser currentUser = fAuth.getCurrentUser();
-        TextView txt_AccountStatus = findViewById(R.id.TXT_AccountStatus);
-
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-
-            DatabaseReference statusRef = FirebaseDatabase.getInstance()
-                    .getReference("user_verifications")
-                    .child(userId)
-                    .child("status");
-
-            statusRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String status = snapshot.getValue(String.class);
-
-                    if (status == null) {
-                        txt_AccountStatus.setText("Account Status: Not Verified");
-                        btn_VerifyAccount.setVisibility(View.VISIBLE);
-                    } else if (status.equals("pending")) {
-                        txt_AccountStatus.setText("Account Status: Pending");
-                        btn_VerifyAccount.setVisibility(View.GONE);
-                    } else if (status.equals("approved")) {
-                        txt_AccountStatus.setText("Account Status: Active");
-                        btn_VerifyAccount.setVisibility(View.GONE);
-                    } else if (status.equals("rejected")) {
-                        txt_AccountStatus.setText("Account Status: Rejected");
-                        btn_VerifyAccount.setVisibility(View.VISIBLE);
-                    } else {
-                        txt_AccountStatus.setText("Account Status: Not Verified");
-                        btn_VerifyAccount.setVisibility(View.VISIBLE);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e(TAG, "Failed to read NIC status: " + error.getMessage());
-                    txt_AccountStatus.setText("Account Status: Unknown");
-                    btn_VerifyAccount.setVisibility(View.VISIBLE);
-                }
-            });
         }
     }
 

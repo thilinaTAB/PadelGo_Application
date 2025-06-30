@@ -317,7 +317,7 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
 
     private void GotoAccount()
     {
-        Intent moveToAccount = new Intent(getApplicationContext(), UserProfile.class);
+        Intent moveToAccount = new Intent(getApplicationContext(), MyRides.class);
         startActivity(moveToAccount);
     }
 }

@@ -55,6 +55,7 @@
 
             <!-- Profile Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/CV_Profile"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
@@ -69,21 +70,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <ImageView
-                        android:id="@+id/IMG__VerifyUser"
+                        android:id="@+id/IMG__UserProfile"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/reg_name"
                         app:tint="@color/primaryColor" />
 
                     <TextView
-                        android:id="@+id/TXTBTN_VerifyUser"
+                        android:id="@+id/TXTBTN_UserProfile"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -96,6 +95,7 @@
 
             <!-- Packages Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/CV_Packages"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
@@ -110,21 +110,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <ImageView
-                        android:id="@+id/IMG_bicycleCategory"
+                        android:id="@+id/IMG_Packages"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/bicycle_ico"
                         app:tint="@color/primaryColor" />
 
                     <TextView
-                        android:id="@+id/TXTBTN_bicycleCategory"
+                        android:id="@+id/TXTBTN_Packages"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -137,6 +135,7 @@
 
             <!-- Rent Now Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/CV_RentNow"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
@@ -154,8 +153,6 @@
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
                     android:backgroundTint="@color/primaryLightColor"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
@@ -179,7 +176,9 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- My Rides Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/CV_MyRides"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
@@ -194,21 +193,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <ImageView
-                        android:id="@+id/IMG__Pay"
+                        android:id="@+id/IMG_MyRides"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/money_ico"
                         app:tint="@color/primaryColor" />
 
                     <TextView
-                        android:id="@+id/TXTBTN_Pay"
+                        android:id="@+id/TXTBTN_MyRides"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -221,6 +218,7 @@
 
             <!-- History Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/CV_History"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
@@ -235,8 +233,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
@@ -262,6 +258,7 @@
 
             <!-- Settings Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/CV_Settings"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
@@ -276,8 +273,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
@@ -303,6 +298,7 @@
 
             <!-- Sign Out Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/CV_SignOut"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
@@ -317,8 +313,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
