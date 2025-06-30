@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#EDECED"
     tools:context=".user.UserDashboard">
 
     <RelativeLayout
@@ -60,6 +60,7 @@
                 android:layout_rowWeight="0"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
@@ -101,6 +102,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/white"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
 
@@ -142,6 +144,7 @@
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
                 android:layout_margin="8dp"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
                 app:cardUseCompatPadding="true">
@@ -182,6 +185,7 @@
                 android:layout_rowWeight="0"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
@@ -221,6 +225,7 @@
                 android:layout_height="150dp"
                 android:layout_rowWeight="0"
                 android:layout_columnWeight="1"
+                app:cardBackgroundColor="@color/white"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
@@ -263,6 +268,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/white"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
 
@@ -303,6 +309,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/white"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
 
