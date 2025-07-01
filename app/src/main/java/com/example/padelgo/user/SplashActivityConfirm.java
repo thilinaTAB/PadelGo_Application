@@ -62,7 +62,7 @@ public class SplashActivityConfirm extends AppCompatActivity {
                     .collection("rides")
                     .add(rideInfo)
                     .addOnSuccessListener(documentReference -> {
-                        Intent splash = new Intent(SplashActivityConfirm.this, UserProfile.class);
+                        Intent splash = new Intent(SplashActivityConfirm.this, MyRides.class);
                         startActivity(splash);
                         finish();
                     })

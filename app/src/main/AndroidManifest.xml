@@ -23,10 +23,10 @@
         android:theme="@style/Theme.PadelGo"
         tools:replace="android:fullBackupContent">
         <activity
-            android:name=".stationOfficer.ReleaseBicycleActivity"
+            android:name=".user.UserNewProfile"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminPaymentDetailsActivity"
+            android:name=".stationOfficer.ReleaseBicycleActivity"
             android:exported="false" />
         <activity
             android:name=".user.PaymentGateway"
@@ -58,7 +58,7 @@
             android:name=".user.RideHistory"
             android:exported="false" />
         <activity
-            android:name=".user.UserProfile"
+            android:name=".user.MyRides"
             android:exported="false" />
         <activity
             android:name=".user.SplashActivityConfirm"

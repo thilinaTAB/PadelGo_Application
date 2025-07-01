@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,8 +48,8 @@ public class AdminDash extends AppCompatActivity {
         txtBTN_settings = findViewById(R.id.TXTBTN_settings);
         img_rents = findViewById(R.id.IMG_rents);
         txtBTN_rents = findViewById(R.id.TXTBTN_rents);
-        img_profile = findViewById(R.id.IMG__VerifyUser);
-        txtBTN_profile = findViewById(R.id.TXTBTN_VerifyUser);
+        img_profile = findViewById(R.id.IMG__UserProfile);
+        txtBTN_profile = findViewById(R.id.TXTBTN_UserProfile);
         img_Release = findViewById(R.id.IMG_Release);
         txtBTN_Release = findViewById(R.id.TXTBTN_Release);
 

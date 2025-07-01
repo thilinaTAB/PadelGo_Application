@@ -8,7 +8,7 @@
     android:background="@drawable/bg"
     android:fillViewport="true"
     android:orientation="horizontal"
-    tools:context=".user.UserProfile">
+    tools:context=".user.MyRides">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,100 +32,6 @@
         android:layout_marginTop="20dp"
         android:src="@drawable/logo" />
 
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        app:cardBackgroundColor="@color/black"
-        app:cardCornerRadius="30dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/reg_border"
-            android:backgroundTint="#E2FBE2"
-            android:orientation="vertical"
-            android:padding="24dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="My Profile"
-                android:textAlignment="center"
-                android:textColor="#052CDE"
-                android:textSize="30sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="Name: "
-                android:textColor="@color/ThemeColor"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/TXT_UserName"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/common_border"
-                android:drawablePadding="4dp"
-                android:text=""
-                android:padding="4dp"
-                android:textColor="#0630F0"
-                android:textSize="25sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="Email: "
-                android:textColor="@color/ThemeColor"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/TXT_UserEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/common_border"
-                android:drawablePadding="4dp"
-                android:padding="4dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textColor="#0630F0"
-                android:textSize="25sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/TXT_AccountStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Account Status: Not Verified"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginTop="10dp"/>
-
-        </LinearLayout>
-
-
-    </androidx.cardview.widget.CardView>
-
-        <Button
-            android:id="@+id/BTN_VerifyAccount"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:text="Verify Account"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/View_MyRide"
