@@ -251,6 +251,10 @@ public class RideConfirmation extends AppCompatActivity {
 
         int totalPrice = basePrice * multiplier;
 
+        if (totalPrice < 150 && totalPrice > 0) {
+            totalPrice = 150;
+        }
+
         if (basePrice != -1) {
             totalPayment = ""+totalPrice;
             txt_amount.setText("LKR"+ totalPrice+".00");

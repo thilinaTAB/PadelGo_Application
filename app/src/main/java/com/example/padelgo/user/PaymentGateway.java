@@ -35,7 +35,7 @@ public class PaymentGateway extends AppCompatActivity {
     private String paymentIntentClientSecret;
 
     //TEAM:  Replace with your current ngrok url here
-    private final String backendUrl = "https://0b65-2402-4000-2120-954-6453-a86f-8783-9b93.ngrok-free.app";
+    private final String backendUrl = "https://6584-2402-d000-8120-5686-31c9-9ff5-ecd0-e4a4.ngrok-free.app";
     private final String publishableKey = "pk_test_51RbjciR9H2dk7jjUA7WKgDP1rQe0xCffEPLBBeoS2Bna0MYPBaqfeG8m5HFVnJs2bZBM81HepLvKJQIAHEEJWOcN00FBwPERRW";
 
     private Button btn_Pay;
@@ -206,18 +206,20 @@ public class PaymentGateway extends AppCompatActivity {
                             if (!querySnapshot.isEmpty()) {
                                 String docId = querySnapshot.getDocuments().get(0).getId();
 
+                                boolean rideStartRequestValue = false;
+
                                 db.collection("RideHistory")
                                         .document(userId)
                                         .collection("rides")
                                         .document(docId)
                                         .update("payment", "Paid",
-                                                "bikeReleased", false)
+                                                "rideStartRequest", rideStartRequestValue)
                                         .addOnSuccessListener(unused -> {
                                             Log.i("FirestoreUpdate", "Payment marked as Paid in Firestore");
 
                                             // --- REALTIME DATABASE ---
                                             DatabaseReference releaseRef = realtimeDB.child("release_bicycle").child(userId);
-                                            releaseRef.child("bikeReleased").setValue(false).addOnSuccessListener(aVoid -> {
+                                            releaseRef.child("rideStartRequest").setValue(rideStartRequestValue).addOnSuccessListener(aVoid -> {
                                                 Log.i("RealtimeDBUpdate", "bikeReleased status saved to Realtime Database");
                                                 // ✅ Redirect to dashboard
                                                 startActivity(new Intent(PaymentGateway.this, MyRides.class));
