@@ -35,7 +35,7 @@ public class PaymentGateway extends AppCompatActivity {
     private String paymentIntentClientSecret;
 
     //TEAM:  Replace with your current ngrok url here
-    private final String backendUrl = "https://6584-2402-d000-8120-5686-31c9-9ff5-ecd0-e4a4.ngrok-free.app";
+    private final String backendUrl = "https://e094-2402-d000-8120-1a2f-1858-f463-2868-35e2.ngrok-free.app";
     private final String publishableKey = "pk_test_51RbjciR9H2dk7jjUA7WKgDP1rQe0xCffEPLBBeoS2Bna0MYPBaqfeG8m5HFVnJs2bZBM81HepLvKJQIAHEEJWOcN00FBwPERRW";
 
     private Button btn_Pay;
@@ -87,7 +87,7 @@ public class PaymentGateway extends AppCompatActivity {
         db.collection("RideHistory")
                 .document(userId)
                 .collection("rides")
-                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .orderBy("serverTimestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -199,7 +199,7 @@ public class PaymentGateway extends AppCompatActivity {
                 db.collection("RideHistory")
                         .document(userId)
                         .collection("rides")
-                        .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                        .orderBy("serverTimestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                         .limit(1)
                         .get()
                         .addOnSuccessListener(querySnapshot -> {

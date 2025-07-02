@@ -66,7 +66,7 @@ public class RideHistory extends AppCompatActivity {
             db.collection("RideHistory")
                     .document(userId)
                     .collection("rides")
-                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .orderBy("serverTimestamptimestamp", Query.Direction.DESCENDING)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
