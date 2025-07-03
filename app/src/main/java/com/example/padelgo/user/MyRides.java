@@ -33,7 +33,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class MyRides extends AppCompatActivity {
     TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait;
@@ -332,7 +334,6 @@ public class MyRides extends AppCompatActivity {
                 .show();
     }
 
-
     private void startRideAction() {
         FirebaseUser user = fAuth.getCurrentUser();
         if (user == null) {
@@ -343,37 +344,95 @@ public class MyRides extends AppCompatActivity {
         Log.d(TAG, "startRideAction: Attempting to start ride for user " + uid);
         DatabaseReference rtRef = realtimeDB.child("release_bicycle").child(uid);
 
-        db.collection("RideHistory").document(uid)
-                .collection("rides").orderBy("serverTimestamp", Query.Direction.DESCENDING)
-                .limit(1).get().addOnSuccessListener(snap -> {
-                    if (!snap.isEmpty()) {
-                        String docId = snap.getDocuments().get(0).getId();
-                        Log.d(TAG, "startRideAction: Found ride " + docId + " to update for start request.");
-                        db.collection("RideHistory").document(uid)
-                                .collection("rides").document(docId)
-                                .update("rideStartRequest", true, "bikeReleased", false, "elapsedTime", 0)
-                                .addOnSuccessListener(a -> {
-                                    Log.i(TAG, "startRideAction: Firestore updated successfully for ride " + docId + ". RideStartRequest=true, bikeReleased=false, elapsedTime=0.");
-                                    rtRef.child("rideStartRequest").setValue(true);
-                                    rtRef.child("bikeReleased").setValue(false);
-                                    Log.i(TAG, "startRideAction: Realtime DB updated for user " + uid + ". rideStartRequest=true, bikeReleased=false.");
+        //Fetch user's full name first
+        db.collection("Users").document(uid).get()
+                .addOnSuccessListener(userDoc -> {
+                    if (userDoc.exists()) {
+                        String userFullName = userDoc.getString("Full Name");
+                        if (userFullName == null) {
+                            userFullName = "";
+                            Log.w(TAG, "User fullName not found in Firestore. Using empty string.");
+                        }
+                        final String finalUserFullName = userFullName;
 
-                                    btn_Start.setVisibility(View.GONE);
-                                    txt_wait.setText("Bike release pending. Please wait.");
-                                    txt_wait.setVisibility(View.VISIBLE);
-                                    checkBicycleRelease();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e(TAG, "startRideAction: Failed to update RideStartRequest in Firestore for ride " + docId, e);
-                                    Toast.makeText(MyRides.this, "Failed to start ride. Please try again.", Toast.LENGTH_SHORT).show();
+                        //Fetch RideHistory
+                        db.collection("RideHistory").document(uid)
+                                .collection("rides").orderBy("serverTimestamp", Query.Direction.DESCENDING)
+                                .limit(1).get()
+                                .addOnSuccessListener(rideHistorySnapshot -> {
+                                    if (!rideHistorySnapshot.isEmpty()) {
+                                        DocumentSnapshot rideHistoryDoc = rideHistorySnapshot.getDocuments().get(0);
+                                        String rideHistoryDocId = rideHistoryDoc.getId();
+                                        Long bookingTimestamp = rideHistoryDoc.getLong("bookingTimestamp");
+
+                                        Log.d(TAG, "startRideAction: Found RideHistory doc " + rideHistoryDocId + " to update.");
+
+                                        // 1. Update RideHistory
+                                        db.collection("RideHistory").document(uid)
+                                                .collection("rides").document(rideHistoryDocId)
+                                                .update("rideStartRequest", true, "bikeReleased", false, "elapsedTime", 0)
+                                                .addOnSuccessListener(a -> {
+                                                    Log.i(TAG, "startRideAction: RideHistory updated for doc " + rideHistoryDocId + ". rideStartRequest=true");
+
+                                                    // 2. Update AllHistory
+                                                    if (bookingTimestamp != null) {
+                                                        db.collection("AllHistory")
+                                                                .whereEqualTo("userId", uid) // or rideHistoryDoc.getString("userId")
+                                                                .whereEqualTo("bookingTimestamp", bookingTimestamp)
+                                                                .limit(1)
+                                                                .get()
+                                                                .addOnSuccessListener(allHistorySnapshot -> {
+                                                                    if (!allHistorySnapshot.isEmpty()) {
+                                                                        String allHistoryDocId = allHistorySnapshot.getDocuments().get(0).getId();
+                                                                        db.collection("AllHistory").document(allHistoryDocId)
+                                                                                .update("rideStartRequest", true)
+                                                                                .addOnSuccessListener(aVoid -> Log.i(TAG, "startRideAction: AllHistory updated for doc " + allHistoryDocId + ". rideStartRequest=true"))
+                                                                                .addOnFailureListener(e -> Log.e(TAG, "startRideAction: Failed to update rideStartRequest in AllHistory for doc " + allHistoryDocId, e));
+                                                                    } else {
+                                                                        Log.w(TAG, "startRideAction: Could not find matching document in AllHistory to update. UserID: " + uid + ", BookingTimestamp: " + bookingTimestamp);
+                                                                    }
+                                                                })
+                                                                .addOnFailureListener(e -> Log.e(TAG, "startRideAction: Error querying AllHistory", e));
+                                                    } else {
+                                                        Log.w(TAG, "startRideAction: bookingTimestamp is null in RideHistory doc (" + rideHistoryDocId + "), cannot accurately update AllHistory.");
+                                                    }
+
+                                                    // 3. Update Realtime Database
+                                                    Map<String, Object> releaseData = new HashMap<>();
+                                                    releaseData.put("rideStartRequest", true);
+                                                    releaseData.put("bikeReleased", false);
+                                                    releaseData.put("fullName", finalUserFullName);
+
+                                                    rtRef.setValue(releaseData)
+                                                            .addOnSuccessListener(unused -> Log.i(TAG, "startRideAction: Realtime DB updated for user " + uid + ". rideStartRequest=true, fullName=" + finalUserFullName))
+                                                            .addOnFailureListener(e -> Log.e(TAG, "startRideAction: Failed to update Realtime DB for user " + uid, e));
+
+                                                    //4. Update UI
+                                                    btn_Start.setVisibility(View.GONE);
+                                                    txt_wait.setText("Bike release pending. Please wait.");
+                                                    txt_wait.setVisibility(View.VISIBLE);
+                                                    checkBicycleRelease();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e(TAG, "startRideAction: Failed to update RideStartRequest in RideHistory for doc " + rideHistoryDocId, e);
+                                                    Toast.makeText(MyRides.this, "Failed to start ride. Please try again.", Toast.LENGTH_SHORT).show();
+                                                });
+                                    } else {
+                                        Log.w(TAG, "startRideAction: No ride found in RideHistory to start for user " + uid);
+                                        Toast.makeText(MyRides.this, "No ride found to start.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(e -> {
+                                    Log.e(TAG, "startRideAction: Failed to get RideHistory document for ride start action for user " + uid, e);
+                                    Toast.makeText(MyRides.this, "Error starting ride: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 });
                     } else {
-                        Log.w(TAG, "startRideAction: No ride found to start for user " + uid);
-                        Toast.makeText(MyRides.this, "No ride found to start.", Toast.LENGTH_SHORT).show();
+                        Log.w(TAG, "startRideAction: User document not found in Firestore. Cannot get fullName for Realtime DB.");
+                        Toast.makeText(MyRides.this, "User profile not found, cannot start ride.", Toast.LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(e -> {
-                    Log.e(TAG, "startRideAction: Failed to get document for ride start action for user " + uid, e);
-                    Toast.makeText(MyRides.this, "Error starting ride: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "startRideAction: Failed to fetch user fullName from Firestore for Realtime DB update.", e);
+                    Toast.makeText(MyRides.this, "Error fetching user details for ride start.", Toast.LENGTH_SHORT).show();
                 });
     }
 

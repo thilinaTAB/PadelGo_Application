@@ -66,23 +66,30 @@ public class RideHistory extends AppCompatActivity {
             db.collection("RideHistory")
                     .document(userId)
                     .collection("rides")
-                    .orderBy("serverTimestamptimestamp", Query.Direction.DESCENDING)
+                    .orderBy("serverTimestamp", Query.Direction.DESCENDING)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             StringBuilder historyText = new StringBuilder();
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                String bicycleType = document.getString("bicycleType");
+                                String bicycleType = document.getString("bikeType");
                                 String location = document.getString("location");
                                 String plan = document.getString("plan");
                                 String amount = document.getString("amount");
-                                String date = document.getString("date");
+                                String date = document.getString("dateAndTime");
                                 String payment = document.getString("payment");
+                                Boolean rideStartRequestBool = document.getBoolean("rideStartRequest");
+                                String rideStartRequestText;
+                                if (Boolean.TRUE.equals(rideStartRequestBool)) {
+                                    rideStartRequestText = "Yes";
+                                } else {
+                                    rideStartRequestText = "No";
+                                }
 
                                 // Format the ride information into a string
                                 String rideString = String.format(
-                                        "🔹 %s from %s \n     on %s \n     (For %s, LKR %s) \n     - Payment: %s -",
-                                        bicycleType, location, date, plan, amount, payment
+                                        "🔹 %s from %s \n     on %s \n     (For %s, LKR %s) \n     - Payment: %s - \n     - Ride Started?: %s -",
+                                        bicycleType, location, date, plan, amount, payment, rideStartRequestText
                                 );
 
                                 historyText.append("").append(rideString).append("\n \n");

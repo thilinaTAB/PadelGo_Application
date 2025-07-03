@@ -88,6 +88,19 @@ public class AdminHistory extends AppCompatActivity {
         String location = ride.get("location") != null ? ride.get("location").toString() : "Unknown Location";
         String plan = ride.get("plan") != null ? ride.get("plan").toString() : "Unknown Plan";
         String amount = ride.get("amount") != null ? ride.get("amount").toString() : "Unknown Amount";
+        String Payment = ride.get("payment") != null ? ride.get("payment").toString() : "Unknown Payment";
+        Boolean rideStartRequestBool = null;
+        Object rideStartRequestObj = ride.get("rideStartRequest");
+        if (rideStartRequestObj instanceof Boolean) {
+            rideStartRequestBool = (Boolean) rideStartRequestObj;
+        }
+
+        String rideReq;
+        if (Boolean.TRUE.equals(rideStartRequestBool)) {
+            rideReq = "Yes";
+        } else {
+            rideReq = "Not yet";
+        }
         String dateAndTime = ride.get("dateAndTime") != null ? ride.get("dateAndTime").toString() : "Unknown Date/Time";
         String serverTimestampFormatted = "Unknown Timestamp";
         if (ride.get("serverTimestamp") instanceof Timestamp) {
@@ -105,6 +118,8 @@ public class AdminHistory extends AppCompatActivity {
         allRideData.append("Amount: ").append(amount).append("\n");
         allRideData.append("Date/Time: ").append(dateAndTime).append("\n");
         allRideData.append("Order placed: ").append(serverTimestampFormatted).append("\n");
+        allRideData.append("Payment status: ").append(Payment).append("\n");
+        allRideData.append("Ride requested?: ").append(rideReq).append("\n");
         allRideData.append("-------------------------------------------\n\n");
 
         rideCount[0]++;
