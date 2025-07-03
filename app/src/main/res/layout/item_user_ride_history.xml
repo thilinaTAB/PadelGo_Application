@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/item_txt_bike_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bike Type"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" from "
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/item_txt_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/item_txt_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="on Date"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:id="@+id/item_txt_plan_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(For Plan, LKR Amount)"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:id="@+id/item_txt_payment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="- Payment: Status -"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:id="@+id/item_txt_ride_started"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="- Ride Started?: Status -"
+            android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
