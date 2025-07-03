@@ -251,6 +251,7 @@ public class UserDashboard extends AppCompatActivity {
     private void signOut() {
         fauth.signOut();
         Intent intent = new Intent(this, Login.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
