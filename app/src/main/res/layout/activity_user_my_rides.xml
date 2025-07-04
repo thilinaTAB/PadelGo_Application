@@ -232,6 +232,16 @@
                     android:visibility="gone" />
 
                 <Button
+                    android:id="@+id/BTN_End"
+                    android:layout_width="200dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:textColor="@color/white"
+                    android:backgroundTint="#7A3D79"
+                    android:text="End My Ride"/>
+
+                <Button
                     android:id="@+id/BTN_Start"
                     android:layout_width="200dp"
                     android:layout_height="50dp"

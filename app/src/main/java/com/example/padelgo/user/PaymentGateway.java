@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.stripe.android.PaymentConfiguration;
 import com.stripe.android.paymentsheet.PaymentSheet;
@@ -35,7 +36,7 @@ public class PaymentGateway extends AppCompatActivity {
     private String paymentIntentClientSecret;
 
     //TEAM:  Replace with your current ngrok url here
-    private final String backendUrl = "https://0b65-2402-4000-2120-954-6453-a86f-8783-9b93.ngrok-free.app";
+    private final String backendUrl = "https://a3f7-2402-d000-8120-1a2f-d420-93a0-5b2f-f341.ngrok-free.app";
     private final String publishableKey = "pk_test_51RbjciR9H2dk7jjUA7WKgDP1rQe0xCffEPLBBeoS2Bna0MYPBaqfeG8m5HFVnJs2bZBM81HepLvKJQIAHEEJWOcN00FBwPERRW";
 
     private Button btn_Pay;
@@ -87,7 +88,7 @@ public class PaymentGateway extends AppCompatActivity {
         db.collection("RideHistory")
                 .document(userId)
                 .collection("rides")
-                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .orderBy("serverTimestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -191,7 +192,6 @@ public class PaymentGateway extends AppCompatActivity {
             Toast.makeText(this, "Payment Successful ✅", Toast.LENGTH_LONG).show();
             Log.i("StripePayment", "Payment completed");
 
-            //Update Firestore payment status
             FirebaseUser currentUser = fAuth.getCurrentUser();
             if (currentUser != null) {
                 String userId = currentUser.getUid();
@@ -199,50 +199,88 @@ public class PaymentGateway extends AppCompatActivity {
                 db.collection("RideHistory")
                         .document(userId)
                         .collection("rides")
-                        .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                        .orderBy("serverTimestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                         .limit(1)
                         .get()
-                        .addOnSuccessListener(querySnapshot -> {
-                            if (!querySnapshot.isEmpty()) {
-                                String docId = querySnapshot.getDocuments().get(0).getId();
+                        .addOnSuccessListener(rideHistorySnapshot -> {
+                            if (!rideHistorySnapshot.isEmpty()) {
+                                DocumentSnapshot rideHistoryDoc = rideHistorySnapshot.getDocuments().get(0);
+                                String rideHistoryDocId = rideHistoryDoc.getId();
+                                Long bookingTimestamp = rideHistoryDoc.getLong("bookingTimestamp");
+
+                                boolean rideStartRequestValue = false;
 
                                 db.collection("RideHistory")
                                         .document(userId)
                                         .collection("rides")
-                                        .document(docId)
+                                        .document(rideHistoryDocId)
                                         .update("payment", "Paid",
-                                                "bikeReleased", false)
+                                                "rideStartRequest", rideStartRequestValue)
                                         .addOnSuccessListener(unused -> {
-                                            Log.i("FirestoreUpdate", "Payment marked as Paid in Firestore");
+                                            Log.i("FirestoreUpdate", "Payment marked as Paid in RideHistory for doc: " + rideHistoryDocId);
 
-                                            // --- REALTIME DATABASE ---
+                                            if (bookingTimestamp != null) {
+                                                db.collection("AllHistory")
+                                                        .whereEqualTo("userId", userId)
+                                                        .whereEqualTo("bookingTimestamp", bookingTimestamp)
+                                                        .limit(1)
+                                                        .get()
+                                                        .addOnSuccessListener(allHistorySnapshot -> {
+                                                            if (!allHistorySnapshot.isEmpty()) {
+                                                                String allHistoryDocId = allHistorySnapshot.getDocuments().get(0).getId();
+                                                                db.collection("AllHistory").document(allHistoryDocId)
+                                                                        .update("payment", "Paid",
+                                                                                "rideStartRequest", rideStartRequestValue)
+                                                                        .addOnSuccessListener(aVoid1 -> Log.i("FirestoreUpdate", "Payment marked as Paid in AllHistory for doc: " + allHistoryDocId))
+                                                                        .addOnFailureListener(e1 -> Log.e("FirestoreUpdate", "Failed to update payment status in AllHistory for doc: " + allHistoryDocId, e1));
+                                                            } else {
+                                                                Log.w("FirestoreUpdate", "Could not find matching document in AllHistory to update. UserID: " + userId + ", BookingTimestamp: " + bookingTimestamp);
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(e1 -> Log.e("FirestoreUpdate", "Error querying AllHistory", e1));
+                                            } else {
+                                                Log.w("FirestoreUpdate", "bookingTimestamp is null in RideHistory doc (" + rideHistoryDocId + "), cannot accurately update AllHistory.");
+                                            }
+
                                             DatabaseReference releaseRef = realtimeDB.child("release_bicycle").child(userId);
-                                            releaseRef.child("bikeReleased").setValue(false).addOnSuccessListener(aVoid -> {
-                                                Log.i("RealtimeDBUpdate", "bikeReleased status saved to Realtime Database");
-                                                // ✅ Redirect to dashboard
-                                                startActivity(new Intent(PaymentGateway.this, MyRides.class));
-                                                finish();
-                                            }).addOnFailureListener(e -> {
-                                                Log.e("RealtimeDBUpdate", "Failed to save bikeReleased to Realtime Database", e);
-                                                Toast.makeText(this, "Payment done, Firestore updated, but failed to update Realtime DB", Toast.LENGTH_SHORT).show();
-                                                startActivity(new Intent(PaymentGateway.this, MyRides.class));
-                                                finish();
-                                            });
-                                        }).addOnFailureListener(e -> {
-                                            Log.e("FirestoreUpdate", "Failed to update payment status in Firestore", e);
-                                            Toast.makeText(this, "Payment done, but failed to update Firestore", Toast.LENGTH_SHORT).show();
+                                            releaseRef.child("rideStartRequest").setValue(rideStartRequestValue)
+                                                    .addOnSuccessListener(aVoid2 -> {
+                                                        Log.i("RealtimeDBUpdate", "rideStartRequest status saved to Realtime Database");
+                                                        startActivity(new Intent(PaymentGateway.this, MyRides.class));
+                                                        finish();
+                                                    })
+                                                    .addOnFailureListener(e2 -> {
+                                                        Log.e("RealtimeDBUpdate", "Failed to save rideStartRequest to Realtime Database", e2);
+                                                        Toast.makeText(this, "Payment & Firestore updated, but failed to update Realtime DB.", Toast.LENGTH_LONG).show();
+                                                        startActivity(new Intent(PaymentGateway.this, MyRides.class));
+                                                        finish();
+                                                    });
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("FirestoreUpdate", "Failed to update payment status in RideHistory for doc: " + rideHistoryDocId, e);
+                                            Toast.makeText(this, "Payment successful, but failed to update RideHistory.", Toast.LENGTH_LONG).show();
+                                            startActivity(new Intent(PaymentGateway.this, MyRides.class));
+                                            finish();
                                         });
+
                             } else {
-                                Log.w("FirestoreUpdate", "No ride document found to update after payment.");
+                                Log.w("FirestoreUpdate", "No ride document found in RideHistory to update after payment.");
                                 Toast.makeText(this, "Payment successful, but no ride record found to update.", Toast.LENGTH_LONG).show();
                                 startActivity(new Intent(PaymentGateway.this, MyRides.class));
                                 finish();
                             }
                         })
                         .addOnFailureListener(e -> {
-                            Log.e("FirestoreRead", "Error fetching latest ride for update", e);
-                            Toast.makeText(this, "Payment done, but couldn't find ride to update", Toast.LENGTH_SHORT).show();
+                            Log.e("FirestoreRead", "Error fetching latest ride from RideHistory for update", e);
+                            Toast.makeText(this, "Payment successful, but couldn't find ride to update its details.", Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(PaymentGateway.this, MyRides.class));
+                            finish();
                         });
+            } else {
+                Log.w("StripePayment", "Current user is null after payment completion.");
+                Toast.makeText(this, "Payment successful, but user session lost.", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(PaymentGateway.this, UserDashboard.class));
+                finish();
             }
 
         } else if (result instanceof PaymentSheetResult.Canceled) {

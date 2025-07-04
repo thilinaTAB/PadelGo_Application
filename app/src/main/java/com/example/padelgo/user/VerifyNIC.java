@@ -27,6 +27,7 @@ import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.example.padelgo.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -54,6 +55,7 @@ public class VerifyNIC extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSIONS = 101;
     private static final String TAG = "VerifyNIC";
+    private String userFullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,7 @@ public class VerifyNIC extends AppCompatActivity {
         requestPermissionsIfNeeded();
         initCloudinary();
         setupLaunchers();
+        fetchUserFullName();
 
         img_ViewFront.setOnClickListener(v -> {
             selectingFront = true;
@@ -84,9 +87,44 @@ public class VerifyNIC extends AppCompatActivity {
                 Toast.makeText(this, "Upload both front and back images", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (userFullName == null || userFullName.isEmpty()) {
+                Toast.makeText(this, "Could not retrieve user name. Please try again.", Toast.LENGTH_SHORT).show();
+                fetchUserFullName();
+                return;
+            }
             progressBar.setVisibility(View.VISIBLE);
             uploadToCloudinary(frontUri, true);
         });
+    }
+
+    private void fetchUserFullName() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String uid = currentUser.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("Users").document(uid).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            userFullName = documentSnapshot.getString("Full Name");
+                            if (userFullName != null) {
+                                Log.d(TAG, "User full name fetched: " + userFullName);
+                            } else {
+                                Log.w(TAG, "User full name field is null in Firestore.");
+                                Toast.makeText(VerifyNIC.this, "Full name not found in profile.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.w(TAG, "User document does not exist in Firestore.");
+                            Toast.makeText(VerifyNIC.this, "User profile not found.", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to fetch user full name from Firestore", e);
+                        Toast.makeText(VerifyNIC.this, "Error fetching user details.", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Log.w(TAG, "Current user is null, cannot fetch full name.");
+            Toast.makeText(this, "Not logged in.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void requestPermissionsIfNeeded() {
@@ -183,10 +221,10 @@ public class VerifyNIC extends AppCompatActivity {
                 Log.d("Upload", (isFront ? "Front" : "Back") + " uploaded: " + url);
 
                 if (isFront) {
-                    saveToFirebase(url, null);
-                    uploadToCloudinary(backUri, false);
+                    saveToFirebase(url, null); // Save front URL first
+                    uploadToCloudinary(backUri, false); // Then upload back
                 } else {
-                    saveToFirebase(null, url);
+                    saveToFirebase(null, url); // Save back URL and other details
                 }
             }
 
@@ -200,7 +238,15 @@ public class VerifyNIC extends AppCompatActivity {
     }
 
     private void saveToFirebase(String frontUrl, String backUrl) {
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Log.e(TAG, "User not logged in. Cannot save verification data.");
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String uid = currentUser.getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user_verifications").child(uid);
 
         if (frontUrl != null) {
@@ -208,23 +254,36 @@ public class VerifyNIC extends AppCompatActivity {
         }
 
         if (backUrl != null) {
-            ref.child("nic_back_url").setValue(backUrl);
-            ref.child("status").setValue("pending");
+            Map<String, Object> verificationDetails = new HashMap<>();
+            verificationDetails.put("nic_back_url", backUrl);
+            verificationDetails.put("status", "pending");
+            if (userFullName != null && !userFullName.isEmpty()) {
+                verificationDetails.put("fullName", userFullName);
+            }
 
-            // 🔥 Firestore verificationStatus update
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            Map<String, Object> update = new HashMap<>();
-            update.put("verificationStatus", "pending");
+            ref.updateChildren(verificationDetails).addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Realtime DB updated with back URL, status, and full name.");
+                FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
+                Map<String, Object> firestoreUpdate = new HashMap<>();
+                firestoreUpdate.put("verificationStatus", "pending");
+                firestoreUpdate.put("fullName", userFullName);
 
-            db.collection("Users").document(uid)
-                    .update(update)
-                    .addOnSuccessListener(aVoid -> Log.d("VerifyNIC", "Firestore status set to pending"))
-                    .addOnFailureListener(e -> Log.e("VerifyNIC", "Failed to update Firestore status", e));
 
-            progressBar.setVisibility(View.GONE);
-            Toast.makeText(this, "NIC Images Uploaded Successfully!", Toast.LENGTH_SHORT).show();
-            finish();
-            startActivity(new Intent(this, UserDashboard.class));
+                dbFirestore.collection("Users").document(uid)
+                        .update(firestoreUpdate)
+                        .addOnSuccessListener(aVoid2 -> Log.d(TAG, "Firestore status and FullName set to pending"))
+                        .addOnFailureListener(e -> Log.e(TAG, "Failed to update Firestore status and FullName", e));
+
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(this, "NIC Images Uploaded Successfully!", Toast.LENGTH_SHORT).show();
+                finish();
+                startActivity(new Intent(this, UserDashboard.class));
+
+            }).addOnFailureListener(e -> {
+                Log.e(TAG, "Failed to update Realtime DB for back image details.", e);
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(this, "Error saving details.", Toast.LENGTH_SHORT).show();
+            });
         }
     }
 }

@@ -1,114 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@drawable/bg"
-    android:fillViewport="true"
-    android:orientation="horizontal"
     tools:context=".stationOfficer.AdminHistory">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+<ImageView
+android:id="@+id/IMGBTN_Back"
+android:layout_width="40dp"
+android:layout_height="40dp"
+android:layout_marginLeft="10dp"
+android:layout_marginTop="10dp"
+android:src="@drawable/backbutton"
+    android:contentDescription="Back Button" />
 
-        <ImageView
-            android:id="@+id/IMGBTN_Back"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
+<ImageView
+android:layout_width="200dp"
+android:layout_height="73dp"
+android:layout_gravity="center_horizontal"
+android:layout_marginBottom="10dp"
+android:layout_marginTop="20dp"
+android:src="@drawable/logo"
+    android:contentDescription="App Logo" />
 
-            android:src="@drawable/backbutton"/>
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="All Ride History"
+android:layout_gravity="center_horizontal"
+android:textColor="#21242F"
+android:layout_marginBottom="20dp"
+android:layout_marginTop="20dp"
+android:textSize="30sp"
+android:textStyle="bold" />
 
-        <ImageView
-            android:layout_width="200dp"
-            android:layout_height="73dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/logo" />
+    <!-- RecyclerView to display the list of ride history items -->
+<androidx.recyclerview.widget.RecyclerView
+android:id="@+id/recycler_view_admin_history"
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_weight="1"
+android:padding="8dp"
+android:clipToPadding="false" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="All Ride History"
-            android:layout_gravity="center_horizontal"
-            android:textAlignment="center"
-            android:textColor="#21242F"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/reg_border"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/View_MyRide"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="30dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/reg_border"
-                android:backgroundTint="#FBEFD1"
-                android:orientation="vertical"
-                android:padding="24dp">
-
-                <TextView
-                    android:id="@+id/TXT_All"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:drawablePadding="4dp"
-                    android:padding="4dp"
-                    android:textColor="@color/ThemeColor"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/View_NoRideData"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="30dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/reg_border"
-                android:backgroundTint="#7A7A75"
-                android:orientation="vertical"
-                android:padding="24dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No recent bicycle reservations."
-                    android:textAlignment="center"
-                    android:textColor="#21242F"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+    <!-- TextView to show when no history is found or if there's an error -->
+<TextView
+android:id="@+id/txt_admin_no_history_message"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Loading history..."
+android:textAlignment="center"
+android:textSize="18sp"
+android:visibility="gone"
+android:padding="16dp"/>
 
     </LinearLayout>
-
-</ScrollView>

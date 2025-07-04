@@ -82,7 +82,7 @@ public class RentBicycle_Peradeniya extends AppCompatActivity {
     private void checkPlan() {
         if (cb_BasicHour.isChecked()) {
             plan = "Hourly";
-            price = 70;
+            price = 100;
 
             cb_BasicDay.setEnabled(false);
 
@@ -159,7 +159,7 @@ public class RentBicycle_Peradeniya extends AppCompatActivity {
 
                 if (cb_BasicHour.isChecked()) {
                     currentPlan = "Hours";
-                    currentPrice = 70;
+                    currentPrice = 100;
                 } else if (cb_BasicDay.isChecked()) {
                     currentPlan = "Days";
                     currentPrice = 500;

@@ -61,7 +61,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         fstore.collectionGroup("rides")
                 .whereEqualTo("payment", "Paid")
                 .whereEqualTo("bikeReleased", false)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .orderBy("serverTimestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     rideList.clear();
@@ -79,7 +79,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
                                 doc.getString("amount"),
                                 doc.getString("location"),
                                 doc.getString("plan"),
-                                doc.getString("bicycleType")
+                                doc.getString("bikeType")
                         );
                         rideList.add(ride);
                     }

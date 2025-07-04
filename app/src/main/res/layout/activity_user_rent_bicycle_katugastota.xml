@@ -68,7 +68,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@drawable/login_border"
-                    android:text="  Hourly : LKR 70.00 "
+                    android:text="  Hourly : LKR 100.00 "
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:padding="8dp"
