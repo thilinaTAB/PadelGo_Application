@@ -29,7 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit; // Import TimeUnit
+import java.util.concurrent.TimeUnit;
 
 public class RideHistory extends AppCompatActivity {
 

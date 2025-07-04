@@ -261,16 +261,13 @@ public class MyRides extends AppCompatActivity {
                             } else {
                                 txt_Timer.setText("Ride Completed (duration unavailable)");
                             }
-                            // No buttons for a completed ride, except maybe "Cancel" if that logic remains for completed rides
-                            // For now, only cancel button if payment is not "Paid"
                             if (!"Paid".equalsIgnoreCase(payStatus)) {
-                                btn_Cancel.setVisibility(View.VISIBLE); // Or hide if cancel is not allowed for completed rides
+                                btn_Cancel.setVisibility(View.VISIBLE);
                             }
                             view_MyRide.setVisibility(View.VISIBLE);
                             view_NoRideData.setVisibility(View.GONE);
-                            return; // Early exit, no need to check RTDB for an already completed ride.
+                            return;
                         }
-
 
                         if ("Paid".equalsIgnoreCase(payStatus)) {
                             Log.d(TAG, "loadRideInfo: Ride is Paid (but not yet completed).");
@@ -281,13 +278,12 @@ public class MyRides extends AppCompatActivity {
                                 public void onDataChange(@NonNull DataSnapshot releaseSnapshot) {
                                     if (!releaseSnapshot.exists()){
                                         Log.w(TAG, "loadRideInfo: release_bicycle node does not exist in RTDB for user " + uid);
-                                        // Ride paid, not completed, no RTDB node. Means start was not fully initiated or RTDB cleared.
                                         if (Boolean.TRUE.equals(rideStartRequestFirestore)) {
                                             Log.e(TAG, "Inconsistent state: Firestore rideStartRequest=true, but no RTDB release_bicycle node.");
                                             txt_wait.setText("Error: Ride status unclear. Please retry.");
                                             txt_wait.setVisibility(View.VISIBLE);
                                         } else {
-                                            btn_Start.setVisibility(View.VISIBLE); // Show start button
+                                            btn_Start.setVisibility(View.VISIBLE);
                                         }
                                         return;
                                     }
@@ -317,16 +313,10 @@ public class MyRides extends AppCompatActivity {
                                             }
                                         } else if ("ended".equals(timerStatusFromRTDB) || "ended_fs_error".equals(timerStatusFromRTDB) || "ended_fs_missing".equals(timerStatusFromRTDB)) {
                                             Log.d(TAG, "loadRideInfo: Bike released, but timer is 'ended' in RTDB. This state should have been caught by 'Completed' rideStatus earlier.");
-                                            // This case might mean Firestore 'rideStatus' hasn't updated yet or there's an inconsistency.
-                                            // Force a reload which should pick up "Completed" status if Firestore updated.
-                                            // For now, just show timer as ended and hide end button.
                                             txt_Timer.setText("Ride Ended (processing...)");
                                             btn_End.setVisibility(View.GONE);
-                                            // Potentially call loadRideInfo() again after a short delay if expecting Firestore to catch up.
                                         } else {
                                             Log.w(TAG, "loadRideInfo: Bike released, but timer not 'running' or 'ended' or startTime invalid. RTDB state: " + timerStatusFromRTDB);
-                                            // This is an ambiguous state. Could be an error during start.
-                                            // Let's attach the listener to sync up.
                                             checkBicycleRelease();
                                         }
                                     } else if (Boolean.TRUE.equals(rideStartRequestFirestore)) {
@@ -334,7 +324,7 @@ public class MyRides extends AppCompatActivity {
                                         txt_wait.setText("Bike release pending. Please wait.");
                                         txt_wait.setVisibility(View.VISIBLE);
                                         btn_Start.setVisibility(View.GONE);
-                                        checkBicycleRelease(); // Start listening for RTDB changes
+                                        checkBicycleRelease();
                                     } else {
                                         Log.d(TAG, "loadRideInfo: Ride Paid, but not started/released and no start request. Show START button.");
                                         btn_Start.setVisibility(View.VISIBLE);
@@ -348,7 +338,7 @@ public class MyRides extends AppCompatActivity {
                                     btn_Start.setVisibility(View.VISIBLE); // Fallback: show start
                                 }
                             });
-                        } else { // Not Paid
+                        } else {
                             Log.d(TAG, "loadRideInfo: Ride is NOT Paid.");
                             btn_Pay.setVisibility(View.VISIBLE);
                             btn_Cancel.setVisibility(View.VISIBLE);
@@ -359,7 +349,6 @@ public class MyRides extends AppCompatActivity {
                         Log.d(TAG, "loadRideInfo: No ride history found for user.");
                         view_MyRide.setVisibility(View.GONE);
                         view_NoRideData.setVisibility(View.VISIBLE);
-                        // All buttons and text views remain hidden as per initial reset
                     }
                 }).addOnFailureListener(e -> {
                     Log.e(TAG, "loadRideInfo: Error loading ride info from Firestore", e);
@@ -400,18 +389,11 @@ public class MyRides extends AppCompatActivity {
                         String rideStatus = rideDoc.getString("rideStatus");
                         String paymentStatus = rideDoc.getString("payment");
 
-                        // Add a condition: only allow deletion if ride is not "Completed" or if it's "Paid" but not started.
-                        // For simplicity now, just checking if it's not "Paid"
                         if ("Paid".equalsIgnoreCase(paymentStatus) && !"Completed".equalsIgnoreCase(rideStatus)) {
-                            // Or if rideStatus is null/empty, or not "Pending Payment" etc.
-                            // Add more specific logic based on your ride lifecycle.
-                            // For instance, you might not want to allow cancellation of an active ride here.
-                            // This delete is more for "undoing" a booking.
                             Toast.makeText(this, "Cannot cancel a ride that is already paid or in progress. Contact support if needed.", Toast.LENGTH_LONG).show();
                             Log.w(TAG, "deleteLastRide: Attempted to cancel a ride that is already paid or was active. Ride ID: " + docId);
                             return;
                         }
-
 
                         Log.d(TAG, "deleteLastRide: Found ride " + docId + " to delete.");
                         rideDoc.getReference().delete()
@@ -434,14 +416,13 @@ public class MyRides extends AppCompatActivity {
                                                     }
                                                 }).addOnFailureListener(e -> Log.e(TAG, "Error finding ride in AllHistory for deletion.",e));
                                     }
-                                    // Also clear relevant RTDB data if a start was requested
                                     if (userReleaseBikeRef != null) {
-                                        userReleaseBikeRef.removeValue() // Removes the entire release_bicycle/userId node
+                                        userReleaseBikeRef.removeValue()
                                                 .addOnSuccessListener(unused -> Log.i(TAG, "Cleared release_bicycle RTDB node for user after ride cancellation."))
                                                 .addOnFailureListener(e -> Log.e(TAG, "Failed to clear release_bicycle RTDB node.", e));
                                     }
 
-                                    loadRideInfo(); // Refresh UI
+                                    loadRideInfo();
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.e(TAG, "deleteLastRide: Failed to delete ride " + docId, e);
@@ -489,7 +470,7 @@ public class MyRides extends AppCompatActivity {
                     if (userDoc.exists()) {
                         String userFullName = userDoc.getString("Full Name");
                         if (userFullName == null) {
-                            userFullName = "Unknown User"; // Provide a default
+                            userFullName = "Unknown User";
                             Log.w(TAG, "User fullName not found in Firestore. Using default.");
                         }
                         final String finalUserFullName = userFullName;
@@ -507,9 +488,9 @@ public class MyRides extends AppCompatActivity {
 
                                         Map<String, Object> rideHistoryUpdates = new HashMap<>();
                                         rideHistoryUpdates.put("rideStartRequest", true);
-                                        rideHistoryUpdates.put("bikeReleased", false); // Default to false, server/admin will set true
-                                        rideHistoryUpdates.put("elapsedTime", 0L); // Reset elapsedTime
-                                        rideHistoryUpdates.put("rideStatus", "Active"); // Or "Pending Release"
+                                        rideHistoryUpdates.put("bikeReleased", false);
+                                        rideHistoryUpdates.put("elapsedTime", 0L);
+                                        rideHistoryUpdates.put("rideStatus", "Active");
 
                                         db.collection("RideHistory").document(uid)
                                                 .collection("rides").document(rideHistoryDocId)
@@ -520,7 +501,7 @@ public class MyRides extends AppCompatActivity {
                                                     if (bookingTimestamp != null) {
                                                         Map<String, Object> allHistoryUpdates = new HashMap<>();
                                                         allHistoryUpdates.put("rideStartRequest", true);
-                                                        allHistoryUpdates.put("rideStatus", "Active"); // Or "Pending Release"
+                                                        allHistoryUpdates.put("rideStatus", "Active");
 
                                                         db.collection("AllHistory")
                                                                 .whereEqualTo("userId", uid)
@@ -559,7 +540,7 @@ public class MyRides extends AppCompatActivity {
                                                                 btn_Start.setVisibility(View.GONE);
                                                                 txt_wait.setText("Bike release pending. Please wait.");
                                                                 txt_wait.setVisibility(View.VISIBLE);
-                                                                txt_Timer.setVisibility(View.GONE); // Hide timer until bike is released
+                                                                txt_Timer.setVisibility(View.GONE);
                                                                 checkBicycleRelease();
                                                             })
                                                             .addOnFailureListener(e -> {
@@ -775,15 +756,9 @@ public class MyRides extends AppCompatActivity {
         } else {
             Log.d(TAG, "startTimerDisplay: Timer explicitly stopped or rideStartTimeMillis invalid. isTimerRunning=" + isTimerRunning + ", rideStartTimeMillis=" + rideStartTimeMillis);
             isTimerRunning = false;
-            // txt_Timer.setText("Ride Time: 00 day 00 hrs 00 min 00 sec"); // Keep this if you want to show 0 when stopped
-            // txt_Timer.setVisibility(View.GONE); // Or hide it
-            if (shouldRun && rideStartTimeMillis == 0) { // Specific case: tried to start but no valid time
+            if (shouldRun && rideStartTimeMillis == 0) {
                 Log.e(TAG, "startTimerDisplay: Attempted to start timer display but rideStartTimeMillis is 0!");
                 txt_Timer.setVisibility(View.GONE);
-            } else if (!shouldRun) { // Explicitly stopping
-                // If not running, and not trying to start with 0 time, let loadRideInfo decide visibility/text for completed rides.
-                // txt_Timer.setText("Ride Time: 00 day 00 hrs 00 min 00 sec");
-                // txt_Timer.setVisibility(View.GONE); // Let loadRideInfo handle visibility based on rideStatus
             }
         }
     }
@@ -838,7 +813,7 @@ public class MyRides extends AppCompatActivity {
 
                         Map<String, Object> rideUpdates = new HashMap<>();
                         rideUpdates.put("elapsedTime", finalDurationForFirestore);
-                        rideUpdates.put("rideStatus", "Completed"); // CRITICAL: Set status to Completed
+                        rideUpdates.put("rideStatus", "Completed");
                         rideUpdates.put("rideEndTime", rideEndTimeMillis);
 
                         rideDoc.getReference().update(rideUpdates)
@@ -875,14 +850,13 @@ public class MyRides extends AppCompatActivity {
 
                                     Toast.makeText(MyRides.this, "Ride Ended. Duration: " + formatSecondsToDisplay(finalDurationForFirestore), Toast.LENGTH_LONG).show();
                                     rideStartTimeMillis = 0;
-                                    loadRideInfo(); // Reload to display completed state
+                                    loadRideInfo();
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.e(TAG, "endRideAction: Failed to update RideHistory in Firestore.", e);
                                     Toast.makeText(MyRides.this, "Error finalizing ride. Please check history.", Toast.LENGTH_SHORT).show();
                                     rideTimerRef.child("status").setValue("ended_fs_error");
                                     userReleaseBikeRef.child("bikeReleased").setValue(false);
-                                    // Still try to load info, it might pick up partial updates or show an error state from RTDB
                                     loadRideInfo();
                                 });
                     } else {
@@ -896,7 +870,6 @@ public class MyRides extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "endRideAction: Error fetching ride document from Firestore.", e);
                     Toast.makeText(MyRides.this, "Error accessing ride data to end.", Toast.LENGTH_SHORT).show();
-                    // Attempt to load info to reset UI even on failure
                     loadRideInfo();
                 });
     }

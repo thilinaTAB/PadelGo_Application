@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit; // Import TimeUnit
+import java.util.concurrent.TimeUnit;
 
 public class AdminHistory extends AppCompatActivity {
 
@@ -157,7 +158,7 @@ public class AdminHistory extends AppCompatActivity {
         String rideRequestedStatus;
         String dateAndTime;
         String orderPlacedTimestamp;
-        String formattedRideDuration; // Changed to store formatted duration
+        String formattedRideDuration;
         Timestamp serverTimestamp;
 
         public RideItem(Map<String, Object> data) {
@@ -314,7 +315,6 @@ public class AdminHistory extends AppCompatActivity {
         class RideViewHolder extends RecyclerView.ViewHolder {
             TextView txtUserName, txtBikeType, txtLocation, txtPlan, txtAmount,
                     txtDateTime, txtOrderPlaced, txtPaymentStatus, txtRideRequested, txtRideTime;
-
             public RideViewHolder(@NonNull View itemView) {
                 super(itemView);
                 txtUserName = itemView.findViewById(R.id.item_txt_user_name);
