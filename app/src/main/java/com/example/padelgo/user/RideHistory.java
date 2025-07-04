@@ -29,6 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit; // Import TimeUnit
 
 public class RideHistory extends AppCompatActivity {
 
@@ -61,7 +62,6 @@ public class RideHistory extends AppCompatActivity {
         txtUserHistoryMessage = findViewById(R.id.txt_user_history_message);
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
 
-        // Setup Back Button
         imgbtn_Back.setOnClickListener(view -> {
             Intent intent = new Intent(RideHistory.this, UserDashboard.class);
             startActivity(intent);
@@ -132,6 +132,7 @@ public class RideHistory extends AppCompatActivity {
         String date;
         String payment;
         String rideStartRequestText;
+        String formattedRideDuration;
         String documentId;
 
         public RideHistoryItem(QueryDocumentSnapshot document) {
@@ -149,6 +150,59 @@ public class RideHistory extends AppCompatActivity {
             } else {
                 this.rideStartRequestText = "No";
             }
+
+            Object elapsedTimeObj = document.get("elapsedTime");
+            if (elapsedTimeObj instanceof Long) {
+                long totalSeconds = (Long) elapsedTimeObj;
+                if (totalSeconds > 0) {
+                    this.formattedRideDuration = formatDuration(totalSeconds);
+                } else if ("Completed".equalsIgnoreCase(document.getString("rideStatus"))) {
+                    this.formattedRideDuration = "0s";
+                } else {
+                    this.formattedRideDuration = "Not Started";
+                }
+            } else if (elapsedTimeObj instanceof Integer) {
+                long totalSeconds = ((Integer) elapsedTimeObj).longValue();
+                if (totalSeconds > 0) {
+                    this.formattedRideDuration = formatDuration(totalSeconds);
+                } else if ("Completed".equalsIgnoreCase(document.getString("rideStatus"))) {
+                    this.formattedRideDuration = "0s";
+                } else {
+                    this.formattedRideDuration = "Not Started";
+                }
+            } else {
+                String rideStatus = document.getString("rideStatus");
+                if ("Completed".equalsIgnoreCase(rideStatus)) {
+                    this.formattedRideDuration = "N/A";
+                } else {
+                    this.formattedRideDuration = "Not Started";
+                }
+            }
+        }
+
+        private static String formatDuration(long totalSeconds) {
+            if (totalSeconds < 0) totalSeconds = 0;
+            long days = TimeUnit.SECONDS.toDays(totalSeconds);
+            totalSeconds -= TimeUnit.DAYS.toSeconds(days);
+            long hours = TimeUnit.SECONDS.toHours(totalSeconds);
+            totalSeconds -= TimeUnit.HOURS.toSeconds(hours);
+            long minutes = TimeUnit.SECONDS.toMinutes(totalSeconds);
+            totalSeconds -= TimeUnit.MINUTES.toSeconds(minutes);
+            long seconds = totalSeconds;
+
+            StringBuilder sb = new StringBuilder();
+            if (days > 0) {
+                sb.append(days).append("days ");
+            }
+            if (hours > 0 || days > 0) {
+                sb.append(hours).append("hrs ");
+            }
+            if (minutes > 0 || hours > 0 || days > 0) {
+                sb.append(minutes).append("mins ");
+            }
+            sb.append(seconds).append("sec");
+
+            return sb.toString().trim();
         }
 
         public String getBicycleType() { return bicycleType != null ? bicycleType : "N/A"; }
@@ -158,6 +212,8 @@ public class RideHistory extends AppCompatActivity {
         public String getDate() { return date != null ? date : "N/A"; }
         public String getPayment() { return payment != null ? payment : "N/A"; }
         public String getRideStartRequestText() { return rideStartRequestText; }
+        public String getFormattedRideDuration() { return formattedRideDuration != null ? formattedRideDuration : "N/A"; }
+
 
         @Override
         public boolean equals(Object o) {
@@ -195,10 +251,12 @@ public class RideHistory extends AppCompatActivity {
 
             holder.txtBikeType.setText(currentItem.getBicycleType());
             holder.txtLocation.setText(currentItem.getLocation());
-            holder.txtDate.setText("on " + currentItem.getDate());
+            holder.txtDate.setText("On: " + currentItem.getDate());
             holder.txtPlanAmount.setText(String.format("(For %s, LKR %s)", currentItem.getPlan(), currentItem.getAmount()));
             holder.txtPayment.setText("- Payment: " + currentItem.getPayment());
             holder.txtRideStarted.setText("- Ride Started?: " + currentItem.getRideStartRequestText());
+            holder.txtRideTime.setText("- Duration: " + currentItem.getFormattedRideDuration());
+            holder.txtRideTime.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -207,7 +265,7 @@ public class RideHistory extends AppCompatActivity {
         }
 
         class RideViewHolder extends RecyclerView.ViewHolder {
-            TextView txtBikeType, txtLocation, txtDate, txtPlanAmount, txtPayment, txtRideStarted;
+            TextView txtBikeType, txtLocation, txtDate, txtPlanAmount, txtPayment, txtRideStarted, txtRideTime;
 
             public RideViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -217,6 +275,7 @@ public class RideHistory extends AppCompatActivity {
                 txtPlanAmount = itemView.findViewById(R.id.item_txt_plan_amount);
                 txtPayment = itemView.findViewById(R.id.item_txt_payment);
                 txtRideStarted = itemView.findViewById(R.id.item_txt_ride_started);
+                txtRideTime = itemView.findViewById(R.id.item_txt_ride_time);
             }
         }
     }

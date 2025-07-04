@@ -1,4 +1,3 @@
-
 package com.example.padelgo.stationOfficer;
 
 import android.annotation.SuppressLint;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit; // Import TimeUnit
 
 public class AdminHistory extends AppCompatActivity {
 
@@ -47,21 +47,17 @@ public class AdminHistory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_history);
 
-        // Initialize Views
         recyclerViewAdminHistory = findViewById(R.id.recycler_view_admin_history);
         txtAdminNoHistoryMessage = findViewById(R.id.txt_admin_no_history_message);
         imgBtnBack = findViewById(R.id.IMGBTN_Back);
 
-        // Setup Back Button
         imgBtnBack.setOnClickListener(v -> finish());
 
-        // Initialize RecyclerView
         rideList = new ArrayList<>();
         adapter = new AdminHistoryAdapter(rideList);
         recyclerViewAdminHistory.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewAdminHistory.setAdapter(adapter);
 
-        // Load the ride history data
         loadAllRideHistory();
     }
 
@@ -101,10 +97,8 @@ public class AdminHistory extends AppCompatActivity {
                         txtAdminNoHistoryMessage.setVisibility(View.GONE);
                         recyclerViewAdminHistory.setVisibility(View.VISIBLE);
                     }
-                    adapter.notifyDataSetChanged(); // Initial load
-
-                    fetchUserNamesForList(); // Fetch user names and update adapter items
-
+                    adapter.notifyDataSetChanged();
+                    fetchUserNamesForList();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error getting all ride history: ", e);
@@ -163,23 +157,24 @@ public class AdminHistory extends AppCompatActivity {
         String rideRequestedStatus;
         String dateAndTime;
         String orderPlacedTimestamp;
+        String formattedRideDuration; // Changed to store formatted duration
         Timestamp serverTimestamp;
 
         public RideItem(Map<String, Object> data) {
             this.userId = (String) data.get("userId");
-            this.bikeType = data.get("bikeType") != null ? data.get("bikeType").toString() : "Unknown Bike";
-            this.location = data.get("location") != null ? data.get("location").toString() : "Unknown Location";
-            this.plan = data.get("plan") != null ? data.get("plan").toString() : "Unknown Plan";
-            this.amount = data.get("amount") != null ? data.get("amount").toString() : "Unknown Amount";
-            this.paymentStatus = data.get("payment") != null ? data.get("payment").toString() : "Unknown Payment";
-            this.dateAndTime = data.get("dateAndTime") != null ? data.get("dateAndTime").toString() : "Unknown Date/Time";
+            this.bikeType = data.get("bikeType") != null ? data.get("bikeType").toString() : "N/A";
+            this.location = data.get("location") != null ? data.get("location").toString() : "N/A";
+            this.plan = data.get("plan") != null ? data.get("plan").toString() : "N/A";
+            this.amount = data.get("amount") != null ? data.get("amount").toString() : "N/A";
+            this.paymentStatus = data.get("payment") != null ? data.get("payment").toString() : "N/A";
+            this.dateAndTime = data.get("dateAndTime") != null ? data.get("dateAndTime").toString() : "N/A";
 
             Boolean rideStartRequestBool = null;
             Object rideStartRequestObj = data.get("rideStartRequest");
             if (rideStartRequestObj instanceof Boolean) {
                 rideStartRequestBool = (Boolean) rideStartRequestObj;
             }
-            this.rideRequestedStatus = Boolean.TRUE.equals(rideStartRequestBool) ? "Yes" : "Not requested yet";
+            this.rideRequestedStatus = Boolean.TRUE.equals(rideStartRequestBool) ? "Yes" : "No";
 
             Object serverTimestampObj = data.get("serverTimestamp");
             if (serverTimestampObj instanceof Timestamp) {
@@ -188,12 +183,69 @@ public class AdminHistory extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
                 this.orderPlacedTimestamp = sdf.format(date);
             } else {
-                this.orderPlacedTimestamp = "Unknown Timestamp";
+                this.orderPlacedTimestamp = "N/A";
             }
-            this.userName = "Loading user...";
+
+            Object elapsedTimeObj = data.get("elapsedTime");
+            if (elapsedTimeObj instanceof Long) {
+                long totalSeconds = (Long) elapsedTimeObj;
+                if (totalSeconds > 0) {
+                    this.formattedRideDuration = formatDuration(totalSeconds);
+                } else if ("Completed".equalsIgnoreCase((String) data.get("rideStatus"))) {
+                    this.formattedRideDuration = "0s";
+                }
+                else {
+                    this.formattedRideDuration = "Not Started/Ended";
+                }
+            } else if (elapsedTimeObj instanceof Integer) {
+                long totalSeconds = ((Integer) elapsedTimeObj).longValue();
+                if (totalSeconds > 0) {
+                    this.formattedRideDuration = formatDuration(totalSeconds);
+                } else if ("Completed".equalsIgnoreCase((String) data.get("rideStatus"))) {
+                    this.formattedRideDuration = "0s";
+                } else {
+                    this.formattedRideDuration = "Not Started/Ended";
+                }
+            }
+            else {
+
+                String rideStatus = (String) data.get("rideStatus");
+                if ("Completed".equalsIgnoreCase(rideStatus)) {
+                    this.formattedRideDuration = "N/A (no duration)";
+                } else {
+                    this.formattedRideDuration = "Not Ended";
+                }
+            }
+
+            this.userName = "Loading...";
         }
 
-        // Getters
+        private String formatDuration(long totalSeconds) {
+            if (totalSeconds < 0) totalSeconds = 0;
+            long days = TimeUnit.SECONDS.toDays(totalSeconds);
+            totalSeconds -= TimeUnit.DAYS.toSeconds(days);
+            long hours = TimeUnit.SECONDS.toHours(totalSeconds);
+            totalSeconds -= TimeUnit.HOURS.toSeconds(hours);
+            long minutes = TimeUnit.SECONDS.toMinutes(totalSeconds);
+            totalSeconds -= TimeUnit.MINUTES.toSeconds(minutes);
+            long seconds = totalSeconds;
+
+            StringBuilder sb = new StringBuilder();
+            if (days > 0) {
+                sb.append(days).append("days ");
+            }
+            if (hours > 0 || days > 0) {
+                sb.append(hours).append("hrs ");
+            }
+            if (minutes > 0 || hours > 0 || days > 0) {
+                sb.append(minutes).append("mins ");
+            }
+            sb.append(seconds).append("sec");
+
+            return sb.toString().trim();
+        }
+
+
         public String getUserId() { return userId; }
         public String getUserName() { return userName; }
         public String getBikeType() { return bikeType; }
@@ -204,6 +256,7 @@ public class AdminHistory extends AppCompatActivity {
         public String getRideRequestedStatus() { return rideRequestedStatus; }
         public String getDateAndTime() { return dateAndTime; }
         public String getOrderPlacedTimestamp() { return orderPlacedTimestamp; }
+        public String getFormattedRideDuration() { return formattedRideDuration; } // Getter for duration
 
         public void setUserName(String userName) { this.userName = userName; }
 
@@ -213,12 +266,12 @@ public class AdminHistory extends AppCompatActivity {
             if (o == null || getClass() != o.getClass()) return false;
             RideItem rideItem = (RideItem) o;
             return Objects.equals(userId, rideItem.userId) &&
-                    Objects.equals(serverTimestamp, rideItem.serverTimestamp);
+                    Objects.equals(orderPlacedTimestamp, rideItem.orderPlacedTimestamp);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(userId, serverTimestamp);
+            return Objects.hash(userId, orderPlacedTimestamp);
         }
     }
 
@@ -246,10 +299,11 @@ public class AdminHistory extends AppCompatActivity {
             holder.txtLocation.setText("Location: " + currentRide.getLocation());
             holder.txtPlan.setText("Plan: " + currentRide.getPlan());
             holder.txtAmount.setText("Amount: " + currentRide.getAmount());
-            holder.txtDateTime.setText("Date/Time: " + currentRide.getDateAndTime());
+            holder.txtDateTime.setText("Booked For: " + currentRide.getDateAndTime());
             holder.txtOrderPlaced.setText("Order Placed: " + currentRide.getOrderPlacedTimestamp());
             holder.txtPaymentStatus.setText("Payment: " + currentRide.getPaymentStatus());
             holder.txtRideRequested.setText("Ride Requested?: " + currentRide.getRideRequestedStatus());
+            holder.txtRideTime.setText("Ride Duration: " + currentRide.getFormattedRideDuration()); // Use formatted duration
         }
 
         @Override
@@ -259,7 +313,7 @@ public class AdminHistory extends AppCompatActivity {
 
         class RideViewHolder extends RecyclerView.ViewHolder {
             TextView txtUserName, txtBikeType, txtLocation, txtPlan, txtAmount,
-                    txtDateTime, txtOrderPlaced, txtPaymentStatus, txtRideRequested;
+                    txtDateTime, txtOrderPlaced, txtPaymentStatus, txtRideRequested, txtRideTime;
 
             public RideViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -272,6 +326,7 @@ public class AdminHistory extends AppCompatActivity {
                 txtOrderPlaced = itemView.findViewById(R.id.item_txt_order_placed);
                 txtPaymentStatus = itemView.findViewById(R.id.item_txt_payment_status);
                 txtRideRequested = itemView.findViewById(R.id.item_txt_ride_requested);
+                txtRideTime = itemView.findViewById(R.id.item_txt_ride_time);
             }
         }
     }
