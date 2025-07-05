@@ -9,29 +9,29 @@
     android:padding="12dp">
 
     <TextView
-        android:id="@+id/textUID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="UID: ..." />
-
-    <TextView
         android:id="@+id/TXT_Status"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Status: ..." />
 
     <TextView
-        android:id="@+id/textName"
+        android:id="@+id/TXT_FullName"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/TXT_NIC"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/TXT_Mobile"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

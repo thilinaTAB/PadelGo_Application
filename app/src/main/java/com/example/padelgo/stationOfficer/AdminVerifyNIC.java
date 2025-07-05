@@ -1,6 +1,5 @@
 package com.example.padelgo.stationOfficer;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -138,16 +137,15 @@ public class AdminVerifyNIC extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             UserNIC user = userList.get(position);
-            holder.uidText.setText("UID: " + user.uid);
-            holder.nameText.setText("Name: " + user.fullName);
-            holder.nicText.setText("NIC: " + user.nic);
-            holder.mobileText.setText("Mobile: " + user.mobile);
-            holder.statusText.setText("Status: " + user.status);
+            holder.txt_Name.setText("Name: " + user.fullName);
+            holder.txt_NIC.setText("NIC: " + user.nic);
+            holder.txt_Mobile.setText("Mobile: " + user.mobile);
+            holder.txt_Status.setText("Status: " + user.status);
 
-            Picasso.get().load(user.frontUrl).into(holder.imageFront);
-            Picasso.get().load(user.backUrl).into(holder.imageBack);
+            Picasso.get().load(user.frontUrl).into(holder.img_Front);
+            Picasso.get().load(user.backUrl).into(holder.img_Back);
 
-            holder.buttonApprove.setOnClickListener(v -> {
+            holder.btn_Approve.setOnClickListener(v -> {
                 new AlertDialog.Builder(v.getContext()) // Use itemView's context
                         .setTitle("Confirm Approval")
                         .setMessage("Are you sure you want to approve this user's NIC?")
@@ -158,7 +156,7 @@ public class AdminVerifyNIC extends AppCompatActivity {
                         .show();
             });
 
-            holder.buttonReject.setOnClickListener(v -> {
+            holder.btn_Reject.setOnClickListener(v -> {
                 new AlertDialog.Builder(v.getContext()) // Use itemView's context
                         .setTitle("Confirm Rejection")
                         .setMessage("Are you sure you want to reject this user's NIC?")
@@ -176,21 +174,20 @@ public class AdminVerifyNIC extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView uidText, nameText, nicText, mobileText, statusText;
-            ImageView imageFront, imageBack;
-            Button buttonApprove, buttonReject;
+            TextView txt_Name, txt_NIC, txt_Mobile, txt_Status;
+            ImageView img_Front, img_Back;
+            Button btn_Approve, btn_Reject;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                uidText = itemView.findViewById(R.id.textUID);
-                nameText = itemView.findViewById(R.id.textName);
-                nicText = itemView.findViewById(R.id.TXT_NIC);
-                mobileText = itemView.findViewById(R.id.TXT_Mobile);
-                statusText = itemView.findViewById(R.id.TXT_Status);
-                imageFront = itemView.findViewById(R.id.IMG_NICFront);
-                imageBack = itemView.findViewById(R.id.IMG_NICBack);
-                buttonApprove = itemView.findViewById(R.id.BTN_Approve);
-                buttonReject = itemView.findViewById(R.id.BTN_Reject);
+                txt_Name = itemView.findViewById(R.id.TXT_FullName);
+                txt_NIC = itemView.findViewById(R.id.TXT_NIC);
+                txt_Mobile = itemView.findViewById(R.id.TXT_Mobile);
+                txt_Status = itemView.findViewById(R.id.TXT_Status);
+                img_Front = itemView.findViewById(R.id.IMG_NICFront);
+                img_Back = itemView.findViewById(R.id.IMG_NICBack);
+                btn_Approve = itemView.findViewById(R.id.BTN_Approve);
+                btn_Reject = itemView.findViewById(R.id.BTN_Reject);
             }
         }
     }
