@@ -15,7 +15,7 @@
         android:layout_height="50dp"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:text="Please Upload your NIC images"/>
+        android:text="Please Upload Your NIC images"/>
 
     <TextView
         android:layout_width="match_parent"
