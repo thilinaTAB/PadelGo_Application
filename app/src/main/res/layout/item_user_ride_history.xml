@@ -68,5 +68,13 @@
             android:text="- Ride Started?: Status -"
             android:layout_marginTop="4dp"/>
 
+        <TextView
+            android:id="@+id/item_txt_ride_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Ride Time: -" />
+
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

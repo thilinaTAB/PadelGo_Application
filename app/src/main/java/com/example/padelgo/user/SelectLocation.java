@@ -44,6 +44,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.DocumentSnapshot;
+
 
 public class SelectLocation extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -61,6 +65,7 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
 
     private FirebaseAuth fAuth;
     private DatabaseReference userVerificationRef;
+    private FirebaseFirestore db;
 
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), permissions -> {
@@ -92,6 +97,7 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_common_select_location);
+        db = FirebaseFirestore.getInstance();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -163,25 +169,36 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
                 Toast.makeText(this, "Please log in to proceed.", Toast.LENGTH_SHORT).show();
                 return true; // Consume the click
             }
+            String userId = currentUser.getUid();
 
-            if (marker.equals(kandyMarker)) {
-                checkUserVerificationStatus(currentUser.getUid(), () -> {
-                    startActivity(new Intent(this, RentBicycle_Kandy.class));
+            checkUserVerificationStatus(userId, () -> {
+                checkActiveRideStatus(userId, (canProceed, message) -> {
+                    if (canProceed) {
+                        // User is verified and has no active/unpaid rides, proceed to specific location
+                        if (marker.equals(kandyMarker)) {
+                            startActivity(new Intent(this, RentBicycle_Kandy.class));
+                        } else if (marker.equals(katugastotaMarker)) {
+                            startActivity(new Intent(this, RentBicycle_Katugastota.class));
+                        } else if (marker.equals(peradeniyaMarker)) {
+                            startActivity(new Intent(this, RentBicycle_Peradeniya.class));
+                        }
+                    } else {
+                        // User has an active/unpaid ride or an error occurred
+                        new AlertDialog.Builder(SelectLocation.this)
+                                .setTitle("Cannot Start New Ride")
+                                .setMessage(message)
+                                .setPositiveButton("Go to My Rides", (dialog, which) -> {
+                                    Intent intent = new Intent(SelectLocation.this, MyRides.class);
+                                    startActivity(intent);
+                                })
+                                .setNegativeButton("OK", null)
+                                .show();
+                    }
                 });
-                return true;
-            } else if (marker.equals(katugastotaMarker)) {
-                checkUserVerificationStatus(currentUser.getUid(), () -> {
-                    startActivity(new Intent(this, RentBicycle_Katugastota.class));
-                });
-                return true;
-            } else if (marker.equals(peradeniyaMarker)) {
-                checkUserVerificationStatus(currentUser.getUid(), () -> {
-                    startActivity(new Intent(this, RentBicycle_Peradeniya.class));
-                });
-                return true;
-            }
-            return false;
+            });
+            return true;
         });
+
     }
 
 
@@ -212,11 +229,10 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
                                 .show();
                     }
                 } else {
-                    // database problem triger this
                     Toast.makeText(SelectLocation.this, "Verification status not found. Please contact support.", Toast.LENGTH_LONG).show();
                     new AlertDialog.Builder(SelectLocation.this)
                             .setTitle("Sorry! Can't proceed")
-                            .setMessage("Verification status not found. Please contact support.")
+                            .setMessage("Please Verify your account first. Thank you.")
                             .setNegativeButton("OK", (dialog, which) -> GotoAccount())
                             .show();
 
@@ -230,6 +246,56 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
             }
         });
     }
+
+    private interface RideStatusCallback {
+        void onStatusChecked(boolean canProceed, String message);
+    }
+
+    private void checkActiveRideStatus(String userId, RideStatusCallback callback) {
+        if (userId == null || userId.isEmpty()) {
+            callback.onStatusChecked(false, "User not logged in.");
+            return;
+        }
+
+        db.collection("RideHistory").document(userId)
+                .collection("rides")
+                .orderBy("serverTimestamp", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // No ride history, user can proceed
+                        callback.onStatusChecked(true, "No previous rides.");
+                        return;
+                    }
+
+                    DocumentSnapshot lastRide = queryDocumentSnapshots.getDocuments().get(0);
+                    String rideStatus = lastRide.getString("rideStatus");
+                    String paymentStatus = lastRide.getString("payment");
+
+                    // Check if the ride is ongoing or active
+                    if ("ongoing".equalsIgnoreCase(rideStatus) && !"Paid".equalsIgnoreCase(paymentStatus)) {
+                        callback.onStatusChecked(false, "You have an ongoing ride. Please complete or cancel it first.");
+                    }
+//                     Check if the ride is active but not paid
+                    else if ("Active".equalsIgnoreCase(rideStatus)) {
+                        callback.onStatusChecked(false, "You have a requested ride. Please complete the ride first.");
+                    }
+                    // Check if the ride is booked but not yet paid and not yet started/active (this means it's pending payment or start)
+                    else if ("Paid".equalsIgnoreCase(paymentStatus) && "ongoing".equalsIgnoreCase(rideStatus)){
+                        callback.onStatusChecked(false, "You have a pending ride booking. Please go to 'My Rides' to manage it.");
+                    }
+                    else {
+                        // Ride is completed and paid, or cancelled, user can proceed
+                        callback.onStatusChecked(true, "Ready for a new ride.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error checking active ride status: ", e);
+                    callback.onStatusChecked(false, "Could not verify ride status. Please try again.");
+                });
+    }
+
 
     private void setupMapMarkersAndBounds() {
         if (padelGoMap == null) return;
@@ -317,7 +383,7 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
 
     private void GotoAccount()
     {
-        Intent moveToAccount = new Intent(getApplicationContext(), MyRides.class);
+        Intent moveToAccount = new Intent(getApplicationContext(),UserNewProfile.class);
         startActivity(moveToAccount);
     }
 }

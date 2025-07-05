@@ -20,11 +20,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReleaseBicycleActivity extends AppCompatActivity {
 
@@ -68,22 +70,52 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
                     if (querySnapshot.isEmpty()) {
                         txt_NULL.setVisibility(View.VISIBLE);
                         adapter.notifyDataSetChanged();
+                        Log.d(TAG, "No rides found matching criteria.");
                         return;
                     }
+                    txt_NULL.setVisibility(View.GONE);
+                    List<DocumentSnapshot> rideDocs = querySnapshot.getDocuments();
+
+                    AtomicInteger pendingUserFetches = new AtomicInteger(rideDocs.size());
+
                     for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
                         String userId = doc.getReference().getParent().getParent().getId();
                         String docId = doc.getId();
                         Ride ride = new Ride(
                                 userId,
                                 docId,
+                                doc.getString("Full Name"),
+                                null,
                                 doc.getString("amount"),
                                 doc.getString("location"),
                                 doc.getString("plan"),
                                 doc.getString("bikeType")
                         );
-                        rideList.add(ride);
+                        fstore.collection("Users").document(userId).get()
+                                .addOnSuccessListener(userDocumentSnapshot -> {
+                                    if (userDocumentSnapshot.exists()) {
+                                        ride.userNIC = userDocumentSnapshot.getString("NIC Number");
+                                    } else {
+                                        Log.w(TAG, "User document not found for userId: " + userId);
+                                        ride.userNIC = "N/A"; // Or some default
+                                    }
+                                    rideList.add(ride);
+
+                                    if (pendingUserFetches.decrementAndGet() == 0) {
+                                        adapter.notifyDataSetChanged();
+                                        Log.d(TAG, "All rides and user NICs fetched.");
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Error fetching user details for " + userId + ": " + e.getMessage());
+                                    ride.userNIC = "--";
+                                    rideList.add(ride);
+
+                                    if (pendingUserFetches.decrementAndGet() == 0) {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
                     }
-                    adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error fetching rides: " + e.getMessage());
@@ -103,7 +135,8 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Ride ride = rideList.get(position);
-            holder.txt_UserId.setText("User ID: " + ride.userId);
+            holder.txt_Name.setText("Name: " + ride.userName);
+            holder.txt_NIC.setText("NIC: " + ride.userNIC);
             holder.txt_Amount.setText("Amount: " + ride.amount);
             holder.txt_Location.setText("Location: " + ride.location);
             holder.txt_Plan.setText("Plan: " + ride.plan);
@@ -118,17 +151,18 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txt_UserId, txt_Amount, txt_Location, txt_Plan, txt_BicycleType;
+            TextView txt_Name, txt_NIC,txt_Amount, txt_Location, txt_Plan, txt_BicycleType;
             Button btn_Release;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                txt_UserId = itemView.findViewById(R.id.TXT_UID_RELEASE);
+                txt_Name = itemView.findViewById(R.id.TXT_Name_RELEASE);
+                txt_NIC = itemView.findViewById(R.id.TXT_NIC_RELEASE);
                 txt_Amount = itemView.findViewById(R.id.TXT_Amount_RELEASE);
                 txt_Location = itemView.findViewById(R.id.TXT_Location_RELEASE);
                 txt_Plan = itemView.findViewById(R.id.TXT_Plan_RELEASE);
                 txt_BicycleType = itemView.findViewById(R.id.TXT_Type_RELEASE);
-                btn_Release = itemView.findViewById(R.id.BTN_ReleaseBike);
+                btn_Release = itemView.findViewById(R.id.BTN_ReleaseBicycle);
             }
         }
     }
@@ -160,11 +194,13 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
     }
 
     static class Ride {
-        String userId, rideId, amount, location, plan, bicycleType;
+        String userId, rideId, userName, userNIC, amount, location, plan, bicycleType;
 
-        Ride(String userId, String rideId, String amount, String location, String plan, String bicycleType) {
+        Ride(String userId, String rideId, String userName, String userNIC, String amount, String location, String plan, String bicycleType) {
             this.userId = userId;
             this.rideId = rideId;
+            this.userName = userName;
+            this.userNIC = userNIC;
             this.amount = amount;
             this.location = location;
             this.plan = plan;

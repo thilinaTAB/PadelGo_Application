@@ -121,7 +121,7 @@ public class RideConfirmation extends AppCompatActivity {
 
         btn_confirm.setOnClickListener(v -> {
             if (validateFields() && isSelectedDateTimeValid()) {
-                saveRideDetailsToFirestore();
+                saveRideDetailsToAllHistory();
             } else if (!validateFields()) {
                 Toast.makeText(RideConfirmation.this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             }
@@ -320,8 +320,8 @@ public class RideConfirmation extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-    private void saveRideDetailsToFirestore() {
+    //Save to AllHistory Document
+    private void saveRideDetailsToAllHistory() {
         if (fAuth.getCurrentUser() == null) {
             Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
             return;
@@ -369,6 +369,7 @@ public class RideConfirmation extends AppCompatActivity {
                 rideDetails.put("bookingTimestamp", calendar.getTimeInMillis());
                 rideDetails.put("serverTimestamp", FieldValue.serverTimestamp());
                 rideDetails.put("payment", "pending");
+                rideDetails.put("rideStatus", "ongoing");
 
                 CollectionReference allHistoryRef = db.collection("AllHistory");
 
@@ -376,7 +377,7 @@ public class RideConfirmation extends AppCompatActivity {
                     Log.d(TAG, "Ride details added to AllHistory with ID: " + documentReference.getId());
                     Toast.makeText(RideConfirmation.this, "Ride confirmed and details saved!", Toast.LENGTH_SHORT).show();
                     Intent goConfirm = new Intent(RideConfirmation.this, SplashActivityConfirm.class);
-                    saveRideDetailsToUserHistory();
+                    saveRideDetailsToRideHistory();
                     startActivity(goConfirm);
                     finish();
                 }).addOnFailureListener(e -> {
@@ -391,8 +392,8 @@ public class RideConfirmation extends AppCompatActivity {
             }
         });
     }
-
-    private void saveRideDetailsToUserHistory() {
+//Save to RideHistory Document
+    private void saveRideDetailsToRideHistory() {
         FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
@@ -440,6 +441,7 @@ public class RideConfirmation extends AppCompatActivity {
                 rideInfo.put("bookingTimestamp", calendar.getTimeInMillis());
                 rideInfo.put("serverTimestamp", FieldValue.serverTimestamp());
                 rideInfo.put("payment", "pending");
+                rideInfo.put("rideStatus", "ongoing");
 
                 db.collection("RideHistory").document(userId).collection("rides").add(rideInfo).addOnSuccessListener(documentReference -> {
                     Log.d(TAG, "Ride details added to user's RideHistory/rides with ID: " + documentReference.getId());
