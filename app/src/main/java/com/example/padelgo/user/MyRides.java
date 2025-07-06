@@ -1078,7 +1078,6 @@ public class MyRides extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "endRideAction: Error fetching ride document from Firestore.", e);
                     Toast.makeText(MyRides.this, "Error accessing ride data to end.", Toast.LENGTH_SHORT).show();
-                    // Don't change RTDB state if initial fetch fails, just reload UI
                     loadRideInfo();
                 });
     }
