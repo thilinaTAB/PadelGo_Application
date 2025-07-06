@@ -38,9 +38,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class MyRides extends AppCompatActivity {
-    TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait;
+    TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait,txt_ExtraTimer;
     Button btn_Cancel, btn_Pay, btn_Start, btn_End;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
@@ -86,6 +87,7 @@ public class MyRides extends AppCompatActivity {
         view_MyRide = findViewById(R.id.View_MyRide);
         view_NoRideData = findViewById(R.id.View_NoRideData);
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
+        txt_ExtraTimer = findViewById(R.id.TXT_ExtraTimer);
 
         fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -181,9 +183,7 @@ public class MyRides extends AppCompatActivity {
         Log.d(TAG, "onPause called.");
         if (userReleaseBikeRef != null && bikeReleaseListener != null) {
             Log.d(TAG, "onPause: Removing bikeReleaseListener.");
-            // Important: Remove listener only from the specific path it was added to.
             userReleaseBikeRef.child("bikeReleased").removeEventListener(bikeReleaseListener);
-            // bikeReleaseListener = null; // Let it be re-assigned in checkBicycleRelease
         }
         if (isTimerRunning) {
             Log.d(TAG, "onPause: Timer was running, stopping local display updates.");
@@ -205,7 +205,8 @@ public class MyRides extends AppCompatActivity {
             txt_Paid.setVisibility(View.GONE);
             txt_Timer.setVisibility(View.GONE);
             txt_wait.setVisibility(View.GONE);
-            if (isTimerRunning) startTimerDisplay(false);
+            txt_ExtraTimer.setVisibility(View.GONE);
+            if (isTimerRunning) startTimerDisplay(false, null);
             return;
         }
 
@@ -227,19 +228,23 @@ public class MyRides extends AppCompatActivity {
                         Log.d(TAG, "loadRideInfo: Firestore Document ID: " + firestoreRideDocId);
                         txt_Bicycle.setText(doc.getString("bikeType"));
                         txt_Location.setText(doc.getString("location"));
-                        txt_Plan.setText(doc.getString("plan"));
+                        final String planString = doc.getString("plan");
+                        txt_Plan.setText(planString);
                         txt_Amount.setText("LKR " + doc.getString("amount") + ".00");
                         txt_Date.setText(doc.getString("dateAndTime"));
 
                         String payStatus = doc.getString("payment");
-                        String rideStatus = doc.getString("rideStatus"); // Get rideStatus from Firestore
+                        String rideStatus = doc.getString("rideStatus");
                         Boolean rideStartRequestFirestore = doc.getBoolean("rideStartRequest");
-                        Long elapsedTimeFirestore = doc.getLong("elapsedTime"); // Get final elapsedTime
+                        Long elapsedTimeFirestore = doc.getLong("elapsedTime");
+                        Long extraTimeFirestore = doc.getLong("extraTime");
+
 
                         Log.d(TAG, "loadRideInfo: payStatus=" + payStatus +
                                 ", rideStatus=" + rideStatus +
                                 ", rideStartRequestFirestore=" + rideStartRequestFirestore +
-                                ", elapsedTimeFirestore=" + elapsedTimeFirestore);
+                                ", elapsedTimeFirestore=" + elapsedTimeFirestore +
+                                ", extraTimeFirestore=" + extraTimeFirestore);
 
                         // Reset UI elements
                         txt_Paid.setVisibility(View.GONE);
@@ -249,20 +254,25 @@ public class MyRides extends AppCompatActivity {
                         btn_End.setVisibility(View.GONE);
                         txt_Timer.setVisibility(View.GONE);
                         txt_wait.setVisibility(View.GONE);
-                        if (isTimerRunning) startTimerDisplay(false); // Stop any local timer first
+                        txt_ExtraTimer.setVisibility(View.GONE);
+                        if (isTimerRunning) startTimerDisplay(false, null);
 
 
                         if ("Completed".equalsIgnoreCase(rideStatus)) {
                             Log.d(TAG, "loadRideInfo: Ride is COMPLETED.");
-                            txt_Paid.setVisibility(View.VISIBLE); // Assume paid if completed
+                            txt_Paid.setVisibility(View.VISIBLE);
                             txt_Timer.setVisibility(View.VISIBLE);
                             if (elapsedTimeFirestore != null) {
                                 txt_Timer.setText("Ride Duration: " + formatSecondsToDisplay(elapsedTimeFirestore));
+                                if (extraTimeFirestore != null && extraTimeFirestore > 0) {
+                                    txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeFirestore));
+                                    txt_ExtraTimer.setVisibility(View.VISIBLE);
+                                }
                             } else {
                                 txt_Timer.setText("Ride Completed (duration unavailable)");
                             }
                             if (!"Paid".equalsIgnoreCase(payStatus)) {
-                                btn_Cancel.setVisibility(View.VISIBLE);
+                                btn_Cancel.setVisibility(View.VISIBLE); // Or some other action like "View Invoice"
                             }
                             view_MyRide.setVisibility(View.VISIBLE);
                             view_NoRideData.setVisibility(View.GONE);
@@ -306,17 +316,17 @@ public class MyRides extends AppCompatActivity {
                                             rideStartTimeMillis = startTimeFromRTDB;
                                             if (!isTimerRunning) {
                                                 Log.d(TAG, "loadRideInfo: Timer was not running locally. Starting display timer.");
-                                                startTimerDisplay(true);
+                                                startTimerDisplay(true, planString);
                                             } else {
                                                 Log.d(TAG, "loadRideInfo: Timer already considered running locally. Restarting for consistency.");
-                                                startTimerDisplay(true); // Restart to ensure it uses fresh startTime
+                                                startTimerDisplay(true, planString); // Restart to ensure it uses fresh startTime
                                             }
                                         } else if ("ended".equals(timerStatusFromRTDB) || "ended_fs_error".equals(timerStatusFromRTDB) || "ended_fs_missing".equals(timerStatusFromRTDB)) {
                                             Log.d(TAG, "loadRideInfo: Bike released, but timer is 'ended' in RTDB. This state should have been caught by 'Completed' rideStatus earlier.");
                                             txt_Timer.setText("Ride Ended (processing...)");
                                             btn_End.setVisibility(View.GONE);
                                         } else {
-                                            Log.w(TAG, "loadRideInfo: Bike released, but timer not 'running' or 'ended' or startTime invalid. RTDB state: " + timerStatusFromRTDB);
+                                            Log.w(TAG, "loadRideInfo: Bike released, but timer not 'running' or 'ended' or startTime invalid. RTDB state: " + timerStatusFromRTDB + ". Checking release.");
                                             checkBicycleRelease();
                                         }
                                     } else if (Boolean.TRUE.equals(rideStartRequestFirestore)) {
@@ -390,10 +400,14 @@ public class MyRides extends AppCompatActivity {
                         String paymentStatus = rideDoc.getString("payment");
 
                         if ("Paid".equalsIgnoreCase(paymentStatus) && !"Completed".equalsIgnoreCase(rideStatus)) {
+                            // Check if rideStartRequest is true or bikeReleased is true, or elapsedTime > 0
+                            // These checks are now more robust in startRideAction and checkBicycleRelease
+                            // For cancellation, if it's "Paid" but not "Completed", it usually means it's active or pending release.
                             Toast.makeText(this, "Cannot cancel a ride that is already paid or in progress. Contact support if needed.", Toast.LENGTH_LONG).show();
                             Log.w(TAG, "deleteLastRide: Attempted to cancel a ride that is already paid or was active. Ride ID: " + docId);
                             return;
                         }
+
 
                         Log.d(TAG, "deleteLastRide: Found ride " + docId + " to delete.");
                         rideDoc.getReference().delete()
@@ -401,7 +415,6 @@ public class MyRides extends AppCompatActivity {
                                     Log.d(TAG, "deleteLastRide: Ride " + docId + " deleted successfully from RideHistory.");
                                     Toast.makeText(this, "Last ride booking cancelled.", Toast.LENGTH_SHORT).show();
 
-                                    // Also delete from AllHistory
                                     Long bookingTimestamp = rideDoc.getLong("bookingTimestamp");
                                     if (bookingTimestamp != null) {
                                         db.collection("AllHistory")
@@ -483,14 +496,17 @@ public class MyRides extends AppCompatActivity {
                                         DocumentSnapshot rideHistoryDoc = rideHistorySnapshot.getDocuments().get(0);
                                         String rideHistoryDocId = rideHistoryDoc.getId();
                                         Long bookingTimestamp = rideHistoryDoc.getLong("bookingTimestamp");
+                                        final String planString = rideHistoryDoc.getString("plan");
+
 
                                         Log.d(TAG, "startRideAction: Found RideHistory doc " + rideHistoryDocId + " to update.");
 
                                         Map<String, Object> rideHistoryUpdates = new HashMap<>();
                                         rideHistoryUpdates.put("rideStartRequest", true);
-                                        rideHistoryUpdates.put("bikeReleased", false);
-                                        rideHistoryUpdates.put("elapsedTime", 0L);
-                                        rideHistoryUpdates.put("rideStatus", "Active");
+                                        rideHistoryUpdates.put("bikeReleased", false); // Will be set by device or admin
+                                        rideHistoryUpdates.put("elapsedTime", 0L); // Initialize
+                                        rideHistoryUpdates.put("extraTime", 0L); // Initialize extra time
+                                        rideHistoryUpdates.put("rideStatus", "Active"); // Mark as active
 
                                         db.collection("RideHistory").document(uid)
                                                 .collection("rides").document(rideHistoryDocId)
@@ -502,6 +518,8 @@ public class MyRides extends AppCompatActivity {
                                                         Map<String, Object> allHistoryUpdates = new HashMap<>();
                                                         allHistoryUpdates.put("rideStartRequest", true);
                                                         allHistoryUpdates.put("rideStatus", "Active");
+                                                        allHistoryUpdates.put("extraTime", 0L); // Initialize extra time
+
 
                                                         db.collection("AllHistory")
                                                                 .whereEqualTo("userId", uid)
@@ -524,14 +542,15 @@ public class MyRides extends AppCompatActivity {
                                                         Log.w(TAG, "startRideAction: bookingTimestamp is null in RideHistory doc (" + rideHistoryDocId + ").");
                                                     }
 
+                                                    // Update Realtime Database
                                                     Map<String, Object> releaseData = new HashMap<>();
                                                     releaseData.put("rideStartRequest", true);
-                                                    releaseData.put("bikeReleased", false);
-                                                    releaseData.put("fullName", finalUserFullName);
+                                                    releaseData.put("bikeReleased", false); // Bike not released yet
+                                                    releaseData.put("fullName", finalUserFullName); // Add full name for admin panel
 
                                                     Map<String, Object> initialTimerData = new HashMap<>();
-                                                    initialTimerData.put("status", "pending_release");
-                                                    initialTimerData.put("startTimeMillis", 0L);
+                                                    initialTimerData.put("status", "pending_release"); // Initial status
+                                                    initialTimerData.put("startTimeMillis", 0L); // Will be set on actual release
                                                     releaseData.put("rideTimer", initialTimerData);
 
                                                     userReleaseBikeRef.setValue(releaseData)
@@ -541,7 +560,8 @@ public class MyRides extends AppCompatActivity {
                                                                 txt_wait.setText("Bike release pending. Please wait.");
                                                                 txt_wait.setVisibility(View.VISIBLE);
                                                                 txt_Timer.setVisibility(View.GONE);
-                                                                checkBicycleRelease();
+                                                                txt_ExtraTimer.setVisibility(View.GONE);
+                                                                checkBicycleRelease(); // Start listening for bike release
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 Log.e(TAG, "startRideAction: Failed to update Realtime DB for user " + uid, e);
@@ -601,61 +621,157 @@ public class MyRides extends AppCompatActivity {
                     btn_Start.setVisibility(View.GONE);
                     txt_Timer.setVisibility(View.VISIBLE);
 
-                    rideTimerRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot timerNodeSnapshot) {
-                            Long existingStartTime = timerNodeSnapshot.child("startTimeMillis").getValue(Long.class);
-                            String currentStatus = timerNodeSnapshot.child("status").getValue(String.class);
+                    // Fetch the plan from Firestore to pass to the timer
+                    db.collection("RideHistory").document(uid)
+                            .collection("rides").orderBy("serverTimestamp", Query.Direction.DESCENDING)
+                            .limit(1).get()
+                            .addOnSuccessListener(rideSnapshot -> {
+                                if (!rideSnapshot.isEmpty()) {
+                                    final String planString = rideSnapshot.getDocuments().get(0).getString("plan");
 
-                            if (!"running".equals(currentStatus) || existingStartTime == null || existingStartTime == 0L) {
-                                Log.d(TAG, "Bike released, startTimeMillis not set or status not 'running'. Setting it now.");
-                                Map<String, Object> timerUpdate = new HashMap<>();
-                                timerUpdate.put("startTimeMillis", ServerValue.TIMESTAMP);
-                                timerUpdate.put("status", "running");
-                                rideTimerRef.updateChildren(timerUpdate)
-                                        .addOnSuccessListener(aVoid -> {
-                                            Log.d(TAG, "Set startTimeMillis and status=running in RTDB.");
-                                            rideTimerRef.child("startTimeMillis").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot newStartTimeSnap) {
-                                                    rideStartTimeMillis = Objects.requireNonNullElse(newStartTimeSnap.getValue(Long.class), System.currentTimeMillis());
-                                                    if (!isTimerRunning) startTimerDisplay(true);
-                                                    Toast.makeText(MyRides.this, "Ride Started!", Toast.LENGTH_SHORT).show();
-                                                }
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-                                                    Log.e(TAG, "Failed to fetch ServerValue.TIMESTAMP after setting.", error.toException());
-                                                    rideStartTimeMillis = System.currentTimeMillis();
-                                                    if (!isTimerRunning) startTimerDisplay(true);
-                                                    Toast.makeText(MyRides.this, "Ride Started (local time).", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e(TAG, "Failed to set startTimeMillis in RTDB", e);
+                                    rideTimerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot timerNodeSnapshot) {
+                                            Long existingStartTime = timerNodeSnapshot.child("startTimeMillis").getValue(Long.class);
+                                            String currentStatus = timerNodeSnapshot.child("status").getValue(String.class);
+
+                                            if (!"running".equals(currentStatus) || existingStartTime == null || existingStartTime == 0L) {
+                                                Log.d(TAG, "Bike released, startTimeMillis not set or status not 'running'. Setting it now.");
+                                                Map<String, Object> timerUpdate = new HashMap<>();
+                                                timerUpdate.put("startTimeMillis", ServerValue.TIMESTAMP);
+                                                timerUpdate.put("status", "running");
+                                                rideTimerRef.updateChildren(timerUpdate)
+                                                        .addOnSuccessListener(aVoid -> {
+                                                            Log.d(TAG, "Set startTimeMillis and status=running in RTDB.");
+                                                            // Fetch the server-generated timestamp
+                                                            rideTimerRef.child("startTimeMillis").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot newStartTimeSnap) {
+                                                                    rideStartTimeMillis = Objects.requireNonNullElse(newStartTimeSnap.getValue(Long.class), System.currentTimeMillis());
+                                                                    if (!isTimerRunning) startTimerDisplay(true, planString);
+                                                                    Toast.makeText(MyRides.this, "Ride Started!", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                                    Log.e(TAG, "Failed to fetch ServerValue.TIMESTAMP after setting.", error.toException());
+                                                                    rideStartTimeMillis = System.currentTimeMillis(); // Fallback to client time
+                                                                    if (!isTimerRunning) startTimerDisplay(true, planString);
+                                                                    Toast.makeText(MyRides.this, "Ride Started (local time).", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            });
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e(TAG, "Failed to set startTimeMillis in RTDB", e);
+                                                            rideStartTimeMillis = System.currentTimeMillis(); // Fallback
+                                                            if (!isTimerRunning) startTimerDisplay(true, planString);
+                                                            Toast.makeText(MyRides.this, "Ride Started (error setting start time).", Toast.LENGTH_SHORT).show();
+                                                        });
+                                            } else {
+                                                Log.d(TAG, "Bike released, startTimeMillis already exists in RTDB: " + existingStartTime + ", status: " + currentStatus);
+                                                rideStartTimeMillis = existingStartTime;
+                                                if (!isTimerRunning) startTimerDisplay(true, planString);
+                                                else startTimerDisplay(true, planString); // Restart to ensure it's using the correct plan
+                                                Toast.makeText(MyRides.this, "Ride Resumed/Started.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            Log.e(TAG, "Error fetching rideTimer node on bike release", error.toException());
+                                            rideStartTimeMillis = System.currentTimeMillis(); // Fallback
+                                            if (!isTimerRunning) startTimerDisplay(true, planString);
+                                            Toast.makeText(MyRides.this, "Ride Started (error checking timer state).", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } else {
+                                    Log.w(TAG, "checkBicycleRelease: RideHistory document not found when trying to get plan for timer.");
+                                    // Fallback if plan cannot be fetched, though timer will run without extra time logic
+                                    rideTimerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot timerNodeSnapshot) {
+                                            Long existingStartTime = timerNodeSnapshot.child("startTimeMillis").getValue(Long.class);
+                                            String currentStatus = timerNodeSnapshot.child("status").getValue(String.class);
+                                            if (!"running".equals(currentStatus) || existingStartTime == null || existingStartTime == 0L) {
+                                                Map<String, Object> timerUpdate = new HashMap<>();
+                                                timerUpdate.put("startTimeMillis", ServerValue.TIMESTAMP);
+                                                timerUpdate.put("status", "running");
+                                                rideTimerRef.updateChildren(timerUpdate).addOnSuccessListener(aVoid ->
+                                                        rideTimerRef.child("startTimeMillis").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot newStartTimeSnap) {
+                                                                rideStartTimeMillis = Objects.requireNonNullElse(newStartTimeSnap.getValue(Long.class), System.currentTimeMillis());
+                                                                if (!isTimerRunning) startTimerDisplay(true, null); // No plan
+                                                                Toast.makeText(MyRides.this, "Ride Started!", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                                rideStartTimeMillis = System.currentTimeMillis();
+                                                                if (!isTimerRunning) startTimerDisplay(true, null);
+                                                                Toast.makeText(MyRides.this, "Ride Started (local time).", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }));
+                                            } else {
+                                                rideStartTimeMillis = existingStartTime;
+                                                if (!isTimerRunning) startTimerDisplay(true, null);
+                                                else startTimerDisplay(true, null);
+                                                Toast.makeText(MyRides.this, "Ride Resumed/Started.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
                                             rideStartTimeMillis = System.currentTimeMillis();
-                                            if (!isTimerRunning) startTimerDisplay(true);
-                                            Toast.makeText(MyRides.this, "Ride Started (error setting start time).", Toast.LENGTH_SHORT).show();
-                                        });
-                            } else {
-                                Log.d(TAG, "Bike released, startTimeMillis already exists in RTDB: " + existingStartTime + ", status: " + currentStatus);
-                                rideStartTimeMillis = existingStartTime;
-                                if (!isTimerRunning) startTimerDisplay(true);
-                                else startTimerDisplay(true);
-                                Toast.makeText(MyRides.this, "Ride Resumed/Started.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                                            if (!isTimerRunning) startTimerDisplay(true, null);
+                                            Toast.makeText(MyRides.this, "Ride Started (error timer state).", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "checkBicycleRelease: Failed to get RideHistory for planString.", e);
+                                // Fallback: start timer without plan context if Firestore read fails
+                                rideTimerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot timerNodeSnapshot) {
+                                        Long existingStartTime = timerNodeSnapshot.child("startTimeMillis").getValue(Long.class);
+                                        String currentStatus = timerNodeSnapshot.child("status").getValue(String.class);
+                                        if (!"running".equals(currentStatus) || existingStartTime == null || existingStartTime == 0L) {
+                                            Map<String, Object> timerUpdate = new HashMap<>();
+                                            timerUpdate.put("startTimeMillis", ServerValue.TIMESTAMP);
+                                            timerUpdate.put("status", "running");
+                                            rideTimerRef.updateChildren(timerUpdate).addOnSuccessListener(aVoid ->
+                                                    rideTimerRef.child("startTimeMillis").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot newStartTimeSnap) {
+                                                            rideStartTimeMillis = Objects.requireNonNullElse(newStartTimeSnap.getValue(Long.class), System.currentTimeMillis());
+                                                            if (!isTimerRunning) startTimerDisplay(true, null);
+                                                            Toast.makeText(MyRides.this, "Ride Started!", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+                                                            rideStartTimeMillis = System.currentTimeMillis();
+                                                            if (!isTimerRunning) startTimerDisplay(true, null);
+                                                            Toast.makeText(MyRides.this, "Ride Started (local time).", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }));
+                                        } else {
+                                            rideStartTimeMillis = existingStartTime;
+                                            if (!isTimerRunning) startTimerDisplay(true, null);
+                                            else startTimerDisplay(true, null);
+                                            Toast.makeText(MyRides.this, "Ride Resumed/Started.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        rideStartTimeMillis = System.currentTimeMillis();
+                                        if (!isTimerRunning) startTimerDisplay(true, null);
+                                        Toast.makeText(MyRides.this, "Ride Started (error timer state).", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            });
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Log.e(TAG, "Error fetching rideTimer node on bike release", error.toException());
-                            rideStartTimeMillis = System.currentTimeMillis();
-                            if (!isTimerRunning) startTimerDisplay(true);
-                            Toast.makeText(MyRides.this, "Ride Started (error checking timer state).", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    Log.d(TAG, "checkBicycleRelease - onDataChange: Bike IS NOT RELEASED (or value is null).");
+                } else { // Bike NOT released (or value is null/false)
+                    Log.d(TAG, "checkBicycleRelease - onDataChange: Bike IS NOT RELEASED (or value is null/false).");
+                    // Check Firestore to see if a start was requested or if the ride is already completed
                     db.collection("RideHistory").document(uid)
                             .collection("rides").orderBy("serverTimestamp", Query.Direction.DESCENDING)
                             .limit(1).get().addOnSuccessListener(rideSnap -> {
@@ -664,34 +780,40 @@ public class MyRides extends AppCompatActivity {
                                     String rideStatusFirestore = rideSnap.getDocuments().get(0).getString("rideStatus");
 
                                     if ("Completed".equalsIgnoreCase(rideStatusFirestore)) {
-                                        // If Firestore says completed, then we shouldn't be in this listener path ideally
-                                        // but if we are, just load info to show completed state.
                                         Log.d(TAG, "checkBicycleRelease: Bike not released, but Firestore says ride is Completed. Reloading.");
-                                        if (isTimerRunning) startTimerDisplay(false);
+                                        if (isTimerRunning) startTimerDisplay(false, null);
                                         loadRideInfo(); // Reload to show completed state
                                         return;
                                     }
 
                                     if (Boolean.TRUE.equals(rideStartRequestedFirestore)) {
+                                        // Still waiting for release from admin/device
                                         txt_wait.setText("Bike release pending. Please wait.");
                                         txt_wait.setVisibility(View.VISIBLE);
-                                        txt_Paid.setVisibility(View.VISIBLE);
+                                        txt_Paid.setVisibility(View.VISIBLE); // It's paid, so show paid status
                                         btn_End.setVisibility(View.GONE);
                                         txt_Timer.setVisibility(View.GONE);
+                                        txt_ExtraTimer.setVisibility(View.GONE);
                                         btn_Start.setVisibility(View.GONE);
-                                        if (isTimerRunning) startTimerDisplay(false);
+                                        if (isTimerRunning) startTimerDisplay(false, null);
                                     } else {
-                                        if (isTimerRunning) startTimerDisplay(false);
-                                        loadRideInfo(); // Reload to show appropriate state (e.g. Start button if eligible)
+                                        // Not released, and no start request in Firestore.
+                                        // This means the user might need to click "Start" again or something is inconsistent.
+                                        // Reloading info will show the "Start" button if applicable.
+                                        Log.d(TAG, "checkBicycleRelease: Bike not released, no start request in Firestore. Reloading info.");
+                                        if (isTimerRunning) startTimerDisplay(false, null);
+                                        loadRideInfo();
                                     }
                                 } else {
-                                    if (isTimerRunning) startTimerDisplay(false);
-                                    loadRideInfo();
+                                    // No ride history found, this shouldn't happen if we are checking release.
+                                    Log.w(TAG, "checkBicycleRelease: Bike not released, and no ride history found in Firestore.");
+                                    if (isTimerRunning) startTimerDisplay(false, null);
+                                    loadRideInfo(); // Reload to show appropriate state (e.g., no ride data)
                                 }
                             }).addOnFailureListener(e -> {
                                 Log.e(TAG, "checkBicycleRelease - onDataChange (bike not released): Error fetching ride doc from Firestore.", e);
-                                if (isTimerRunning) startTimerDisplay(false);
-                                loadRideInfo();
+                                if (isTimerRunning) startTimerDisplay(false, null);
+                                loadRideInfo(); // Fallback to reload
                             });
                 }
             }
@@ -703,8 +825,9 @@ public class MyRides extends AppCompatActivity {
                 txt_wait.setVisibility(View.VISIBLE);
                 btn_End.setVisibility(View.GONE);
                 txt_Timer.setVisibility(View.GONE);
-                btn_Start.setVisibility(View.GONE);
-                if (isTimerRunning) startTimerDisplay(false);
+                txt_ExtraTimer.setVisibility(View.GONE);
+                btn_Start.setVisibility(View.GONE); // Hide start as status is unknown
+                if (isTimerRunning) startTimerDisplay(false, null);
             }
         };
         bikeReleasedStatusRef.addValueEventListener(bikeReleaseListener);
@@ -716,17 +839,18 @@ public class MyRides extends AppCompatActivity {
         finish();
     }
 
-    private void startTimerDisplay(boolean shouldRun) {
+    private void startTimerDisplay(boolean shouldRun, final String planString) {
         timerHandler.removeCallbacksAndMessages(null);
         isTimerRunning = shouldRun;
 
-        Log.d(TAG, "startTimerDisplay() called. shouldRun = " + shouldRun + ", isTimerRunning = " + isTimerRunning + ", rideStartTimeMillis = " + rideStartTimeMillis);
+        Log.d(TAG, "startTimerDisplay() called. shouldRun = " + shouldRun + ", isTimerRunning = " + isTimerRunning + ", rideStartTimeMillis = " + rideStartTimeMillis + ", planString: " + planString);
 
         if (isTimerRunning && rideStartTimeMillis > 0) {
             if (txt_Timer.getVisibility() != View.VISIBLE) {
                 Log.d(TAG, "startTimerDisplay: txt_Timer was not visible, making it visible now.");
                 txt_Timer.setVisibility(View.VISIBLE);
             }
+            txt_ExtraTimer.setVisibility(View.GONE); // Initially hide extra timer
 
             Runnable uiTimerRunnable = new Runnable() {
                 @Override
@@ -740,15 +864,40 @@ public class MyRides extends AppCompatActivity {
                     long currentElapsedTimeMillis = System.currentTimeMillis() - rideStartTimeMillis;
                     if (currentElapsedTimeMillis < 0) currentElapsedTimeMillis = 0;
 
-                    int totalElapsedSeconds = (int) (currentElapsedTimeMillis / 1000);
+                    long totalElapsedSeconds = currentElapsedTimeMillis / 1000;
 
-                    int days = totalElapsedSeconds / 86400;
-                    int hours = (totalElapsedSeconds % 86400) / 3600;
-                    int minutes = (totalElapsedSeconds % 3600) / 60;
-                    int seconds = totalElapsedSeconds % 60;
-                    String formattedTime = String.format(Locale.getDefault(), "%02d day %02d hrs %02d min %02d sec", days, hours, minutes, seconds);
-                    txt_Timer.setText("Ride Time: " + formattedTime);
+                    // Parse plan duration (e.g., "1 hour", "30 minutes")
+                    long planDurationSeconds = 0;
+                    if (planString != null && !planString.isEmpty()) {
+                        try {
+                            String[] parts = planString.toLowerCase().split(" ");
+                            if (parts.length >= 2) {
+                                int value = Integer.parseInt(parts[0]);
+                                if (parts[1].startsWith("hour")) {
+                                    planDurationSeconds = TimeUnit.HOURS.toSeconds(value);
+                                } else if (parts[1].startsWith("min")) {
+                                    planDurationSeconds = TimeUnit.MINUTES.toSeconds(value);
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            Log.e(TAG, "Error parsing planString: " + planString, e);
+                        }
+                    }
 
+                    long mainRideSeconds;
+                    long extraTimeSeconds = 0;
+
+                    if (planDurationSeconds > 0 && totalElapsedSeconds > planDurationSeconds) {
+                        mainRideSeconds = planDurationSeconds;
+                        extraTimeSeconds = totalElapsedSeconds - planDurationSeconds;
+                        txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeSeconds));
+                        txt_ExtraTimer.setVisibility(View.VISIBLE);
+                    } else {
+                        mainRideSeconds = totalElapsedSeconds;
+                        txt_ExtraTimer.setVisibility(View.GONE);
+                    }
+
+                    txt_Timer.setText("Ride Time: " + formatSecondsToDisplay(mainRideSeconds));
                     timerHandler.postDelayed(this, 1000);
                 }
             };
@@ -756,9 +905,12 @@ public class MyRides extends AppCompatActivity {
         } else {
             Log.d(TAG, "startTimerDisplay: Timer explicitly stopped or rideStartTimeMillis invalid. isTimerRunning=" + isTimerRunning + ", rideStartTimeMillis=" + rideStartTimeMillis);
             isTimerRunning = false;
+            // txt_Timer.setVisibility(View.GONE); // Keep timer visible if ride ended to show final time
+            // txt_ExtraTimer.setVisibility(View.GONE); // Hide extra timer when main timer stops
             if (shouldRun && rideStartTimeMillis == 0) {
                 Log.e(TAG, "startTimerDisplay: Attempted to start timer display but rideStartTimeMillis is 0!");
                 txt_Timer.setVisibility(View.GONE);
+                txt_ExtraTimer.setVisibility(View.GONE);
             }
         }
     }
@@ -768,7 +920,7 @@ public class MyRides extends AppCompatActivity {
         if (user == null || rideStartTimeMillis == 0 || !isTimerRunning) {
             Toast.makeText(this, "No active ride to end.", Toast.LENGTH_SHORT).show();
             Log.w(TAG,"showEndRideConfirmationDialog: No active ride criteria met. User: " + (user!=null) + ", startTime: " +rideStartTimeMillis + ", isTimerRunning: " + isTimerRunning);
-            loadRideInfo();
+            loadRideInfo(); // Reload to refresh state
             return;
         }
 
@@ -793,16 +945,57 @@ public class MyRides extends AppCompatActivity {
         }
         final String uid = user.getUid();
 
-        startTimerDisplay(false);
+        // Stop the UI timer immediately
+        final String currentPlanString = txt_Plan.getText().toString(); // Get plan from TextView
+        startTimerDisplay(false, currentPlanString);
+
 
         long rideEndTimeMillis = System.currentTimeMillis();
-        long finalElapsedTimeSeconds = (rideEndTimeMillis - rideStartTimeMillis) / 1000;
-        if (finalElapsedTimeSeconds < 0) finalElapsedTimeSeconds = 0;
+        long totalElapsedTimeSeconds = (rideEndTimeMillis - rideStartTimeMillis) / 1000;
+        if (totalElapsedTimeSeconds < 0) totalElapsedTimeSeconds = 0; // Ensure non-negative
 
         Log.d(TAG, "endRideAction: Ride ended. StartTime(ms): " + rideStartTimeMillis +
-                ", EndTime(ms): " + rideEndTimeMillis + ", Duration (sec): " + finalElapsedTimeSeconds);
+                ", EndTime(ms): " + rideEndTimeMillis + ", Total Duration (sec): " + totalElapsedTimeSeconds);
 
-        final long finalDurationForFirestore = finalElapsedTimeSeconds;
+        // Calculate plan duration and extra time
+        long planDurationSeconds = 0;
+        if (currentPlanString != null && !currentPlanString.isEmpty()) {
+            try {
+                String[] parts = currentPlanString.toLowerCase().split(" ");
+                if (parts.length >= 2) {
+                    int value = Integer.parseInt(parts[0]);
+                    if (parts[1].startsWith("hour")) {
+                        planDurationSeconds = TimeUnit.HOURS.toSeconds(value);
+                    } else if (parts[1].startsWith("min")) {
+                        planDurationSeconds = TimeUnit.MINUTES.toSeconds(value);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "Error parsing planString for endRideAction: " + currentPlanString, e);
+            }
+        }
+
+        long finalMainRideDurationSeconds;
+        long finalExtraTimeSeconds = 0;
+
+        if (planDurationSeconds > 0 && totalElapsedTimeSeconds > planDurationSeconds) {
+            finalMainRideDurationSeconds = planDurationSeconds; // The part covered by the plan
+            finalExtraTimeSeconds = totalElapsedTimeSeconds - planDurationSeconds;
+        } else {
+            finalMainRideDurationSeconds = totalElapsedTimeSeconds; // Entire duration is within plan
+        }
+        // The totalElapsedTimeSeconds is the overall ride duration, which can be stored as "elapsedTime"
+        // And finalExtraTimeSeconds is the specific "extraTime"
+
+        final long finalDurationForFirestore = totalElapsedTimeSeconds; // Store total duration
+        final long extraTimeForFirestore = finalExtraTimeSeconds;
+
+        Log.d(TAG, "endRideAction: PlanDuration(s): " + planDurationSeconds +
+                ", TotalElapsed(s): " + totalElapsedTimeSeconds +
+                ", MainRideDuration(s): " + finalMainRideDurationSeconds + // This is essentially the plan portion or total if no extra.
+                ", ExtraTime(s): " + extraTimeForFirestore);
+
+
         db.collection("RideHistory").document(uid)
                 .collection("rides").orderBy("serverTimestamp", Query.Direction.DESCENDING)
                 .limit(1).get()
@@ -812,18 +1005,20 @@ public class MyRides extends AppCompatActivity {
                         String rideDocId = rideDoc.getId();
 
                         Map<String, Object> rideUpdates = new HashMap<>();
-                        rideUpdates.put("elapsedTime", finalDurationForFirestore);
+                        rideUpdates.put("elapsedTime", finalDurationForFirestore); // Store total elapsed time
+                        rideUpdates.put("extraTime", extraTimeForFirestore);     // Store calculated extra time
                         rideUpdates.put("rideStatus", "Completed");
-                        rideUpdates.put("rideEndTime", rideEndTimeMillis);
+                        rideUpdates.put("rideEndTime", rideEndTimeMillis); // Store the actual end timestamp
 
                         rideDoc.getReference().update(rideUpdates)
                                 .addOnSuccessListener(aVoid -> {
-                                    Log.i(TAG, "endRideAction: RideHistory/" + rideDocId + " updated in Firestore with final duration: " + finalDurationForFirestore + " and status: Completed");
+                                    Log.i(TAG, "endRideAction: RideHistory/" + rideDocId + " updated in Firestore. Duration: " + finalDurationForFirestore + ", ExtraTime: " + extraTimeForFirestore + ", Status: Completed");
 
                                     Long bookingTimestamp = rideDoc.getLong("bookingTimestamp");
                                     if (bookingTimestamp != null) {
                                         Map<String, Object> allHistoryUpdates = new HashMap<>();
                                         allHistoryUpdates.put("elapsedTime", finalDurationForFirestore);
+                                        allHistoryUpdates.put("extraTime", extraTimeForFirestore);
                                         allHistoryUpdates.put("rideStatus", "Completed");
                                         allHistoryUpdates.put("rideEndTime", rideEndTimeMillis);
                                         db.collection("AllHistory")
@@ -839,53 +1034,73 @@ public class MyRides extends AppCompatActivity {
                                                 }).addOnFailureListener(e -> Log.e(TAG, "Error finding AllHistory doc for ride end update.",e));
                                     }
 
+                                    // Update Realtime Database
                                     Map<String, Object> timerEndUpdate = new HashMap<>();
                                     timerEndUpdate.put("status", "ended");
+                                    // Optionally, you could also put finalElapsedTime and extraTime in RTDB if admin panel needs it immediately
+                                    // timerEndUpdate.put("finalElapsedTimeSec", finalDurationForFirestore);
+                                    // timerEndUpdate.put("finalExtraTimeSec", extraTimeForFirestore);
                                     rideTimerRef.updateChildren(timerEndUpdate)
                                             .addOnSuccessListener(unused -> Log.i(TAG, "endRideAction: rideTimer status set to 'ended' in RTDB."))
                                             .addOnFailureListener(e -> Log.e(TAG, "endRideAction: Failed to update rideTimer status in RTDB.", e));
 
-                                    userReleaseBikeRef.child("bikeReleased").setValue(false);
-                                    userReleaseBikeRef.child("rideStartRequest").setValue(false);
+                                    // Clear rideStartRequest and bikeReleased in RTDB for the user
+                                    userReleaseBikeRef.child("bikeReleased").setValue(false); // Mark as no longer released
+                                    userReleaseBikeRef.child("rideStartRequest").setValue(false); // Reset request
 
-                                    Toast.makeText(MyRides.this, "Ride Ended. Duration: " + formatSecondsToDisplay(finalDurationForFirestore), Toast.LENGTH_LONG).show();
-                                    rideStartTimeMillis = 0;
-                                    loadRideInfo();
+                                    // Display confirmation
+                                    String durationMsg = "Ride Ended. Duration: " + formatSecondsToDisplay(finalDurationForFirestore);
+                                    if (extraTimeForFirestore > 0) {
+                                        durationMsg += " (including " + formatSecondsToDisplay(extraTimeForFirestore) + " extra)";
+                                    }
+                                    Toast.makeText(MyRides.this, durationMsg, Toast.LENGTH_LONG).show();
+
+                                    rideStartTimeMillis = 0; // Reset start time
+                                    loadRideInfo(); // Reload to show completed state
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.e(TAG, "endRideAction: Failed to update RideHistory in Firestore.", e);
                                     Toast.makeText(MyRides.this, "Error finalizing ride. Please check history.", Toast.LENGTH_SHORT).show();
+                                    // Try to mark RTDB timer as ended with error if Firestore fails
                                     rideTimerRef.child("status").setValue("ended_fs_error");
-                                    userReleaseBikeRef.child("bikeReleased").setValue(false);
+                                    userReleaseBikeRef.child("bikeReleased").setValue(false); // Still try to mark as not released
                                     loadRideInfo();
                                 });
                     } else {
                         Log.w(TAG, "endRideAction: No active ride document found in Firestore to update.");
                         Toast.makeText(MyRides.this, "Could not find ride to finalize.", Toast.LENGTH_SHORT).show();
+                        // Try to mark RTDB timer as ended with error if Firestore doc is missing
                         rideTimerRef.child("status").setValue("ended_fs_missing");
-                        userReleaseBikeRef.child("bikeReleased").setValue(false);
+                        userReleaseBikeRef.child("bikeReleased").setValue(false); // Still try to mark as not released
                         loadRideInfo();
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "endRideAction: Error fetching ride document from Firestore.", e);
                     Toast.makeText(MyRides.this, "Error accessing ride data to end.", Toast.LENGTH_SHORT).show();
+                    // Don't change RTDB state if initial fetch fails, just reload UI
                     loadRideInfo();
                 });
     }
 
+
     private String formatSecondsToDisplay(long totalSeconds) {
         if (totalSeconds < 0) totalSeconds = 0;
-        int days = (int) (totalSeconds / 86400);
-        int hours = (int) ((totalSeconds % 86400) / 3600);
-        int minutes = (int) ((totalSeconds % 3600) / 60);
-        int seconds = (int) (totalSeconds % 60);
+        long days = totalSeconds / 86400;
+        long hours = (totalSeconds % 86400) / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
         if (days > 0) {
-            return String.format(Locale.getDefault(), "%d days %02d hrs %02d mins %02d sec", days, hours, minutes, seconds);
+            return String.format(Locale.getDefault(), "%d day%s %02d hr%s %02d min %02d sec",
+                    days, days > 1 ? "s" : "",
+                    hours, hours > 1 ? "s" : "",
+                    minutes, seconds);
         } else if (hours > 0) {
-            return String.format(Locale.getDefault(), "%02d hrs %02d mins %02d sec", hours, minutes, seconds);
+            return String.format(Locale.getDefault(), "%02d hr%s %02d min %02d sec",
+                    hours, hours > 1 ? "s" : "",
+                    minutes, seconds);
         } else if (minutes > 0) {
-            return String.format(Locale.getDefault(), "%02d mins %02d sec", minutes, seconds);
+            return String.format(Locale.getDefault(), "%02d min %02d sec", minutes, seconds);
         } else {
             return String.format(Locale.getDefault(), "%02d sec", seconds);
         }

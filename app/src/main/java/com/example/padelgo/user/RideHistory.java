@@ -159,7 +159,7 @@ public class RideHistory extends AppCompatActivity {
                 } else if ("Completed".equalsIgnoreCase(document.getString("rideStatus"))) {
                     this.formattedRideDuration = "0s";
                 } else {
-                    this.formattedRideDuration = "Not Started";
+                    this.formattedRideDuration = "N/A";
                 }
             } else if (elapsedTimeObj instanceof Integer) {
                 long totalSeconds = ((Integer) elapsedTimeObj).longValue();
@@ -168,14 +168,14 @@ public class RideHistory extends AppCompatActivity {
                 } else if ("Completed".equalsIgnoreCase(document.getString("rideStatus"))) {
                     this.formattedRideDuration = "0s";
                 } else {
-                    this.formattedRideDuration = "Not Started";
+                    this.formattedRideDuration = "N/A";
                 }
             } else {
                 String rideStatus = document.getString("rideStatus");
                 if ("Completed".equalsIgnoreCase(rideStatus)) {
                     this.formattedRideDuration = "N/A";
                 } else {
-                    this.formattedRideDuration = "Not Started";
+                    this.formattedRideDuration = "N/A";
                 }
             }
         }
