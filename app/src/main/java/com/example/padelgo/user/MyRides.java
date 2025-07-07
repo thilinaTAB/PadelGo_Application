@@ -1,5 +1,6 @@
 package com.example.padelgo.user;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -190,6 +191,7 @@ public class MyRides extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void loadRideInfo() {
         FirebaseUser user = fAuth.getCurrentUser();
         if (user == null) {
@@ -262,6 +264,10 @@ public class MyRides extends AppCompatActivity {
                                 if (extraTimeFirestore != null && extraTimeFirestore > 0) {
                                     txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeFirestore));
                                     txt_ExtraTimer.setVisibility(View.VISIBLE);
+                                    if (extraTimeFirestore > 120){
+                                        txt_Paid.setText("Extra charge need to be paid!");
+                                        txt_Paid.setVisibility(View.VISIBLE);
+                                    }
                                 }
                             } else {
                                 txt_Timer.setText("Ride Completed (duration unavailable)");
@@ -590,6 +596,7 @@ public class MyRides extends AppCompatActivity {
         DatabaseReference bikeReleasedStatusRef = userReleaseBikeRef.child("bikeReleased");
 
         bikeReleaseListener = new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Boolean released = snapshot.getValue(Boolean.class);
@@ -599,6 +606,7 @@ public class MyRides extends AppCompatActivity {
 
                 if (Boolean.TRUE.equals(released)) {
                     Log.d(TAG, "checkBicycleRelease - onDataChange: Bike IS RELEASED.");
+                    txt_Paid.setText("Ride Started 🚴");
                     txt_Paid.setVisibility(View.VISIBLE);
                     btn_End.setVisibility(View.VISIBLE);
                     btn_Start.setVisibility(View.GONE);
