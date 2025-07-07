@@ -207,6 +207,19 @@
                     android:visibility="gone" />
 
                 <TextView
+                    android:id="@+id/TXT_ExtraCharge"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Extra charges will apply if 15 minutes are exceeded‼️"
+                    android:textAlignment="center"
+                    android:textColor="#F2093B"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone" />
+
+                <TextView
                     android:id="@+id/TXT_Timer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

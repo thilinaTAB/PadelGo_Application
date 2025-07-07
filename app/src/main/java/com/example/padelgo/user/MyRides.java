@@ -42,7 +42,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MyRides extends AppCompatActivity {
-    TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait,txt_ExtraTimer;
+    TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait,txt_ExtraTimer,txt_ExtraCharge;
     Button btn_Cancel, btn_Pay, btn_Start, btn_End;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
@@ -89,6 +89,7 @@ public class MyRides extends AppCompatActivity {
         view_NoRideData = findViewById(R.id.View_NoRideData);
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
         txt_ExtraTimer = findViewById(R.id.TXT_ExtraTimer);
+        txt_ExtraCharge = findViewById(R.id.TXT_ExtraCharge);
 
         fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -264,10 +265,8 @@ public class MyRides extends AppCompatActivity {
                                 if (extraTimeFirestore != null && extraTimeFirestore > 0) {
                                     txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeFirestore));
                                     txt_ExtraTimer.setVisibility(View.VISIBLE);
-                                    if (extraTimeFirestore > 120){
-                                        txt_Paid.setText("Extra charge need to be paid!");
-                                        txt_Paid.setVisibility(View.VISIBLE);
-                                    }
+                                        txt_Paid.setVisibility(View.GONE);
+                                        txt_ExtraCharge.setVisibility(View.VISIBLE);
                                 }
                             } else {
                                 txt_Timer.setText("Ride Completed (duration unavailable)");
