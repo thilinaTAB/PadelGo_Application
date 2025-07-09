@@ -20,7 +20,7 @@
                 android:id="@+id/classic"
                 android:layout_width="200dp"
                 android:layout_height="150dp"
-                android:src="@drawable/classic_3" />
+                android:src="@drawable/classic_bicycle" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -42,7 +42,7 @@
                 android:id="@+id/citybike"
                 android:layout_width="200dp"
                 android:layout_height="150dp"
-                android:src="@drawable/citybike_3" />
+                android:src="@drawable/citybike_bicycle" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -64,7 +64,7 @@
                 android:id="@+id/cruiser"
                 android:layout_width="200dp"
                 android:layout_height="150dp"
-                android:src="@drawable/cruiser_3" />
+                android:src="@drawable/cruiser_bicycle" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -86,7 +86,7 @@
                 android:id="@+id/folding"
                 android:layout_width="200dp"
                 android:layout_height="150dp"
-                android:src="@drawable/folding_3" />
+                android:src="@drawable/folding_bicycle" />
 
             <TextView
                 android:layout_width="wrap_content"
