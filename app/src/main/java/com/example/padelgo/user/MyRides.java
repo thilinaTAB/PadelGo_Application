@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MyRides extends AppCompatActivity {
     TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait,txt_ExtraTimer,txt_ExtraCharge;
-    Button btn_Cancel, btn_Pay, btn_Start, btn_End;
+    Button btn_Cancel, btn_Pay, btn_Start, btn_End, btn_ExtraPay;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
     private FirebaseAuth fAuth;
@@ -90,6 +90,7 @@ public class MyRides extends AppCompatActivity {
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
         txt_ExtraTimer = findViewById(R.id.TXT_ExtraTimer);
         txt_ExtraCharge = findViewById(R.id.TXT_ExtraCharge);
+        btn_ExtraPay = findViewById(R.id.BTN_ExtraPay);
 
         fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -161,6 +162,13 @@ public class MyRides extends AppCompatActivity {
         });
 
         loadRideInfo();
+
+        btn_ExtraPay.setOnClickListener(v -> {
+            Log.d(TAG, "Extra Pay button clicked");
+            Intent intent = new Intent(MyRides.this, ExtraCharges.class);
+            startActivity(intent);
+        });
+
     }
 
     @Override
@@ -267,6 +275,33 @@ public class MyRides extends AppCompatActivity {
                                     txt_ExtraTimer.setVisibility(View.VISIBLE);
                                         txt_Paid.setVisibility(View.GONE);
                                         txt_ExtraCharge.setVisibility(View.VISIBLE);
+
+                                    String extraPayStatus = doc.getString("extraPay");
+                                    if (extraPayStatus == null || !"Paid".equals(extraPayStatus)) {
+                                        // If extraPay field doesn't exist or is not "Paid",
+                                        // it implies it's "Unpaid" or needs to be set.
+                                        // This is also where you make btn_ExtraPay visible.
+                                        if (extraTimeFirestore > 0) { // Ensure there is extra time
+                                            btn_ExtraPay.setVisibility(View.VISIBLE);
+                                            txt_Amount.setVisibility(View.GONE);
+                                            // Update Firestore if extraPay is not already "Unpaid" or "Paid"
+                                            if (!"Unpaid".equals(extraPayStatus) && !"Paid".equals(extraPayStatus)) {
+                                                updateExtraPayStatus(uid, firestoreRideDocId, "Unpaid");
+                                            }
+                                        } else {
+                                            btn_ExtraPay.setVisibility(View.GONE);
+                                        }
+                                    } else if ("Paid".equals(extraPayStatus)){
+                                        // If extraPay is "Paid", hide the button
+                                        btn_ExtraPay.setVisibility(View.GONE);
+                                        txt_ExtraCharge.setText("Extra Charges Paid"); // Or similar
+                                    }
+
+                                    if (extraTimeFirestore > 900) { // 15 minutes * 60 seconds/minute = 900 seconds
+                                        btn_ExtraPay.setVisibility(View.VISIBLE);
+                                    } else {
+                                        btn_ExtraPay.setVisibility(View.GONE); // Explicitly hide if less than or equal to 15 mins
+                                    }
                                 }
                             } else {
                                 txt_Timer.setText("Ride Completed (duration unavailable)");
@@ -871,6 +906,8 @@ public class MyRides extends AppCompatActivity {
                         extraTimeSeconds = totalElapsedSeconds - planDurationSeconds;
                         txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeSeconds));
                         txt_ExtraTimer.setVisibility(View.VISIBLE);
+                        txt_Paid.setVisibility(View.GONE);
+                        txt_ExtraCharge.setVisibility(View.VISIBLE);
                     } else {
                         mainRideSeconds = totalElapsedSeconds;
                         txt_ExtraTimer.setVisibility(View.GONE);
@@ -1069,4 +1106,30 @@ public class MyRides extends AppCompatActivity {
             return String.format(Locale.getDefault(), "%02d sec", seconds);
         }
     }
+
+    private void updateExtraPayStatus(String userId, String rideDocumentId, String status) {
+        if (userId == null || rideDocumentId == null) {
+            Log.e(TAG, "Cannot update extraPay status: userId or rideDocumentId is null.");
+            return;
+        }
+
+        Map<String, Object> extraPayUpdate = new HashMap<>();
+        extraPayUpdate.put("extraPay", status);
+
+        // Update in user's RideHistory
+        db.collection("RideHistory").document(userId)
+                .collection("rides").document(rideDocumentId)
+                .update(extraPayUpdate)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "updated extraPay to " + status + " in RideHistory for " + rideDocumentId))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating extraPay in RideHistory for " + rideDocumentId, e));
+
+        // Update in AllHistory (assuming the document ID is the same, which is common)
+        // If AllHistory uses a different structure or ID, you'll need to adjust this.
+        // It's also possible AllHistory is a denormalized copy, ensure your update strategy is consistent.
+        db.collection("AllHistory").document(rideDocumentId) // Assuming rideDocumentId is also the ID in AllHistory
+                .update(extraPayUpdate)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "updated extraPay to " + status + " in AllHistory for " + rideDocumentId))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating extraPay in AllHistory for " + rideDocumentId, e));
+    }
+
 }

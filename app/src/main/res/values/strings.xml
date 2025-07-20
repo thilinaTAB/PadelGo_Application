@@ -2,4 +2,6 @@
     <string name="app_name">PadelGo</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="extra_time_format" />
+    <string name="currency_format" />
 </resources>
