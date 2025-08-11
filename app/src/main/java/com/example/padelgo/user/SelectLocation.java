@@ -272,6 +272,7 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
                     DocumentSnapshot lastRide = queryDocumentSnapshots.getDocuments().get(0);
                     String rideStatus = lastRide.getString("rideStatus");
                     String paymentStatus = lastRide.getString("payment");
+                    String extraCharge = lastRide.getString("extraPay");
 
                     // Check if the ride is ongoing or active
                     if ("ongoing".equalsIgnoreCase(rideStatus) && !"Paid".equalsIgnoreCase(paymentStatus)) {
@@ -284,6 +285,10 @@ public class SelectLocation extends AppCompatActivity implements OnMapReadyCallb
                     // Check if the ride is booked but not yet paid and not yet started/active (this means it's pending payment or start)
                     else if ("Paid".equalsIgnoreCase(paymentStatus) && "ongoing".equalsIgnoreCase(rideStatus)){
                         callback.onStatusChecked(false, "You have a pending ride booking. Please go to 'My Rides' to manage it.");
+                    }
+                    // Check if the last ride extra charges remain or not
+                    else if ("Unpaid".equalsIgnoreCase(extraCharge)){
+                        callback.onStatusChecked(false, "You have to pay last ride Extra charges first.");
                     }
                     else {
                         // Ride is completed and paid, or cancelled, user can proceed

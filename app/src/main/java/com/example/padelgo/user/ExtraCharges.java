@@ -23,18 +23,18 @@ import java.util.Locale;
 public class ExtraCharges extends AppCompatActivity {
 
     private static final String TAG = "ExtraCharges";
-    private static final int GRACE_PERIOD_SECONDS = 900;
-    private static final double CHARGE_PER_MINUTE_AFTER_GRACE = 0.25;
-    private static final double FIXED_CHARGE_IF_ANY_PER_MINUTE_CHARGE_IS_LESS_THAN_THIS = 150.0;
+    private static final int gracePeriodSec = 900;
+    private static final double chargePerMin = 0.25;
+    private static final double minimumCharge = 150.0;
 
-    TextView txt_DisplayExtraTime, txt_CalculatedExtraChargeDisplay, txt_TotalDueDisplay;
-    Button btn_ProceedToPaymentGateway;
+    TextView txt_ExtraTime, txt_ExtraTimeCharge, txt_TotalCharge;
+    Button btn_ExtaPay;
 
     private FirebaseFirestore db;
     private FirebaseAuth fAuth;
-    private static final String FIRESTORE_EXTRA_CHARGE_FIELD_FOR_DISPLAY = "calculatedExtraChargeAmountLKR";
-    private static final String FIRESTORE_EXTRA_TIME_SECONDS_FIELD = "extraTime";
-    private static final String FIRESTORE_TOTAL_AMOUNT_FOR_PAYMENT_GATEWAY = "amount";
+    private static final String fStoreExtraChargeField = "calculatedExtraChargeAmountLKR";
+    private static final String fStoreExtraTime = "extraTime";
+    private static final String fStoreTotalPayment = "amount";
 
 
     @Override
@@ -48,31 +48,31 @@ public class ExtraCharges extends AppCompatActivity {
             return insets;
         });
 
-        txt_DisplayExtraTime = findViewById(R.id.TXT_ExtraTime);
-        txt_CalculatedExtraChargeDisplay = findViewById(R.id.TXT_ExtraTimeCharge);
-        txt_TotalDueDisplay = findViewById(R.id.TXT_TotalCharge);
-        btn_ProceedToPaymentGateway = findViewById(R.id.BTN_ExtraPay);
+        txt_ExtraTime = findViewById(R.id.TXT_ExtraTime);
+        txt_ExtraTimeCharge = findViewById(R.id.TXT_ExtraTimeCharge);
+        txt_TotalCharge = findViewById(R.id.TXT_TotalCharge);
+        btn_ExtaPay = findViewById(R.id.BTN_ExtraPay);
 
         db = FirebaseFirestore.getInstance();
         fAuth = FirebaseAuth.getInstance();
 
-        btn_ProceedToPaymentGateway.setVisibility(View.INVISIBLE); // Initially hide
+        btn_ExtaPay.setVisibility(View.INVISIBLE);
 
-        btn_ProceedToPaymentGateway.setOnClickListener(v -> {
+        btn_ExtaPay.setOnClickListener(v -> {
             Log.d(TAG, "Proceed to Payment Gateway button clicked.");
             Intent paymentIntent = new Intent(ExtraCharges.this, PaymentGateway.class);
             startActivity(paymentIntent);
             finish();
         });
 
-        loadRideDetailsForDisplay();
+        loadRideDetails();
     }
 
-    private void loadRideDetailsForDisplay() {
+    private void loadRideDetails() {
         FirebaseUser currentUser = fAuth.getCurrentUser();
         if (currentUser == null) {
             updateDisplay("User not logged in", "LKR 0.00", "LKR 0.00");
-            btn_ProceedToPaymentGateway.setVisibility(View.INVISIBLE);
+            btn_ExtaPay.setVisibility(View.INVISIBLE);
             return;
         }
 
@@ -85,8 +85,7 @@ public class ExtraCharges extends AppCompatActivity {
                         DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
                         String rideDocId = doc.getId();
 
-                        // 1. Display Extra Time
-                        Long extraTimeSecondsRaw = doc.getLong(FIRESTORE_EXTRA_TIME_SECONDS_FIELD);
+                        Long extraTimeSecondsRaw = doc.getLong(fStoreExtraTime);
                         String displayExtraTimeText = "No extra time recorded";
                         if (extraTimeSecondsRaw != null) {
                             long totalDisplayMinutes = extraTimeSecondsRaw / 60;
@@ -100,7 +99,7 @@ public class ExtraCharges extends AppCompatActivity {
                             }
                         }
 
-                        String extraChargeAmountLKRString = doc.getString(FIRESTORE_EXTRA_CHARGE_FIELD_FOR_DISPLAY);
+                        String extraChargeAmountLKRString = doc.getString(fStoreExtraChargeField);
                         String displayExtraChargeText = "LKR 0.00";
 
                         if (extraChargeAmountLKRString != null && !extraChargeAmountLKRString.isEmpty()) {
@@ -112,15 +111,15 @@ public class ExtraCharges extends AppCompatActivity {
                                     displayExtraChargeText = "LKR 0.00 (No extra charge)";
                                 }
                             } catch (NumberFormatException e) {
-                                Log.w(TAG, "Display: Invalid number format for " + FIRESTORE_EXTRA_CHARGE_FIELD_FOR_DISPLAY + " in " + rideDocId + ": " + extraChargeAmountLKRString + ". Using client-side calc for display.");
-                                displayExtraChargeText = calculateClientSideExtraChargeForDisplayOnly(extraTimeSecondsRaw);
+                                Log.w(TAG, "Display: Invalid number format for " + fStoreExtraChargeField + " in " + rideDocId + ": " + extraChargeAmountLKRString + ". Using client-side calc for display.");
+                                displayExtraChargeText = calculateExtraChargeDisplay(extraTimeSecondsRaw);
                             }
                         } else {
-                            Log.w(TAG, "Display: " + FIRESTORE_EXTRA_CHARGE_FIELD_FOR_DISPLAY + " not found in " + rideDocId + ". Using client-side calc for display.");
-                            displayExtraChargeText = calculateClientSideExtraChargeForDisplayOnly(extraTimeSecondsRaw);
+                            Log.w(TAG, "Display: " + fStoreExtraChargeField + " not found in " + rideDocId + ". Using client-side calc for display.");
+                            displayExtraChargeText = calculateExtraChargeDisplay(extraTimeSecondsRaw);
                         }
 
-                        String totalAmountForPaymentGatewayStr = doc.getString(FIRESTORE_TOTAL_AMOUNT_FOR_PAYMENT_GATEWAY);
+                        String totalAmountForPaymentGatewayStr = doc.getString(fStoreTotalPayment);
                         String displayTotalDueText = "LKR 0.00";
                         boolean canPay = false;
 
@@ -134,20 +133,20 @@ public class ExtraCharges extends AppCompatActivity {
                                     displayTotalDueText = "LKR 0.00 (Total amount is zero or less)";
                                 }
                             } catch (NumberFormatException e) {
-                                Log.e(TAG, "Invalid number format for the total amount field '" + FIRESTORE_TOTAL_AMOUNT_FOR_PAYMENT_GATEWAY + "' in Firestore for ride " + rideDocId + ": " + totalAmountForPaymentGatewayStr);
+                                Log.e(TAG, "Invalid number format for the total amount field '" + fStoreTotalPayment + "' in Firestore for ride " + rideDocId + ": " + totalAmountForPaymentGatewayStr);
                                 displayTotalDueText = "LKR ---- (Error)";
                             }
                         } else {
-                            Log.w(TAG, "Total amount field '" + FIRESTORE_TOTAL_AMOUNT_FOR_PAYMENT_GATEWAY + "' is null or empty in Firestore for ride " + rideDocId);
+                            Log.w(TAG, "Total amount field '" + fStoreTotalPayment + "' is null or empty in Firestore for ride " + rideDocId);
                             displayTotalDueText = "LKR 0.00 (Total amount not found)";
                         }
 
                         updateDisplay(displayExtraTimeText, displayExtraChargeText, displayTotalDueText);
 
                         if (canPay) {
-                            btn_ProceedToPaymentGateway.setVisibility(View.VISIBLE);
+                            btn_ExtaPay.setVisibility(View.VISIBLE);
                         } else {
-                            btn_ProceedToPaymentGateway.setVisibility(View.INVISIBLE);
+                            btn_ExtaPay.setVisibility(View.INVISIBLE);
                             if (totalAmountForPaymentGatewayStr == null || totalAmountForPaymentGatewayStr.isEmpty() || Double.parseDouble(totalAmountForPaymentGatewayStr) <= 0 ) {
                                 Toast.makeText(ExtraCharges.this, "No amount due or amount not set for payment.", Toast.LENGTH_LONG).show();
                             }
@@ -155,35 +154,35 @@ public class ExtraCharges extends AppCompatActivity {
 
                     } else {
                         updateDisplay("No ride data found", "LKR 0.00", "LKR 0.00");
-                        btn_ProceedToPaymentGateway.setVisibility(View.INVISIBLE);
+                        btn_ExtaPay.setVisibility(View.INVISIBLE);
                         Toast.makeText(ExtraCharges.this, "No ride data found to display charges.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error fetching ride history for display", e);
                     updateDisplay("Error loading data", "LKR 0.00", "LKR 0.00");
-                    btn_ProceedToPaymentGateway.setVisibility(View.INVISIBLE);
+                    btn_ExtaPay.setVisibility(View.INVISIBLE);
                     Toast.makeText(ExtraCharges.this, "Failed to load ride details.", Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private String calculateClientSideExtraChargeForDisplayOnly(Long extraTimeSecondsRaw) {
+    private String calculateExtraChargeDisplay(Long extraTimeSecondsRaw) {
         if (extraTimeSecondsRaw == null) return "LKR 0.00 (Data N/A)";
         double calculatedCharge = 0.0;
-        long chargeableExtraSeconds = extraTimeSecondsRaw - GRACE_PERIOD_SECONDS;
+        long chargeableExtraSeconds = extraTimeSecondsRaw - gracePeriodSec;
         if (chargeableExtraSeconds > 0) {
             double chargeableExtraMinutes = chargeableExtraSeconds / 60.0;
-            calculatedCharge = chargeableExtraMinutes * CHARGE_PER_MINUTE_AFTER_GRACE;
-            if (calculatedCharge > 0 && calculatedCharge < FIXED_CHARGE_IF_ANY_PER_MINUTE_CHARGE_IS_LESS_THAN_THIS) {
-                calculatedCharge = FIXED_CHARGE_IF_ANY_PER_MINUTE_CHARGE_IS_LESS_THAN_THIS;
+            calculatedCharge = chargeableExtraMinutes * chargePerMin;
+            if (calculatedCharge > 0 && calculatedCharge < minimumCharge) {
+                calculatedCharge = minimumCharge;
             }
         }
         return String.format(Locale.getDefault(), "LKR %.2f", calculatedCharge);
     }
 
     private void updateDisplay(String extraTimeText, String extraChargeText, String totalDueText) {
-        txt_DisplayExtraTime.setText(extraTimeText);
-        txt_CalculatedExtraChargeDisplay.setText(extraChargeText);
-        txt_TotalDueDisplay.setText(totalDueText);
+        txt_ExtraTime.setText(extraTimeText);
+        txt_ExtraTimeCharge.setText(extraChargeText);
+        txt_TotalCharge.setText(totalDueText);
     }
 }
