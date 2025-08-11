@@ -22,14 +22,14 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
 
-            android:src="@drawable/backbutton"/>
+            android:src="@drawable/backbutton" />
 
         <ImageView
             android:layout_width="200dp"
             android:layout_height="73dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
             android:src="@drawable/logo" />
 
 
@@ -102,6 +102,7 @@
                     android:textColor="@color/ThemeColor"
                     android:textSize="25sp"
                     android:textStyle="bold" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -156,10 +157,10 @@
                     android:layout_width="200dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:visibility="visible"
                     android:backgroundTint="#7A3D79"
+                    android:text="Pay Now"
                     android:textStyle="bold"
-                    android:text="Pay Now"/>
+                    android:visibility="visible" />
 
             </LinearLayout>
 
@@ -170,9 +171,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
+            android:visibility="gone"
             app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="30dp"
-            android:visibility="gone">
+            app:cardCornerRadius="30dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
