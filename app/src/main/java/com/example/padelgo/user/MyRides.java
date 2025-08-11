@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MyRides extends AppCompatActivity {
     TextView txt_Bicycle, txt_Location, txt_Plan, txt_Amount, txt_Date, txt_Paid, txt_Timer, txt_wait,txt_ExtraTimer,txt_ExtraCharge;
-    Button btn_Cancel, btn_Pay, btn_Start, btn_End;
+    Button btn_Cancel, btn_Pay, btn_Start, btn_End, btn_ExtraPay;
     ImageView imgbtn_Back;
     CardView view_MyRide, view_NoRideData;
     private FirebaseAuth fAuth;
@@ -90,6 +90,7 @@ public class MyRides extends AppCompatActivity {
         imgbtn_Back = findViewById(R.id.IMGBTN_Back);
         txt_ExtraTimer = findViewById(R.id.TXT_ExtraTimer);
         txt_ExtraCharge = findViewById(R.id.TXT_ExtraCharge);
+        btn_ExtraPay = findViewById(R.id.BTN_ExtraPay);
 
         fAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -121,7 +122,7 @@ public class MyRides extends AppCompatActivity {
             showDeleteConfirmationDialog();
         });
 
-        btn_Pay.setOnClickListener(v -> {
+         btn_Pay.setOnClickListener(v -> {
             Log.d(TAG, "Pay button clicked");
             Intent intent = new Intent(MyRides.this, PaymentGateway.class);
             FirebaseUser user = fAuth.getCurrentUser();
@@ -161,6 +162,13 @@ public class MyRides extends AppCompatActivity {
         });
 
         loadRideInfo();
+
+        btn_ExtraPay.setOnClickListener(v -> {
+            Log.d(TAG, "Extra Pay button clicked");
+            Intent intent = new Intent(MyRides.this, ExtraCharges.class);
+            startActivity(intent);
+        });
+
     }
 
     @Override
@@ -265,15 +273,41 @@ public class MyRides extends AppCompatActivity {
                                 if (extraTimeFirestore != null && extraTimeFirestore > 0) {
                                     txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeFirestore));
                                     txt_ExtraTimer.setVisibility(View.VISIBLE);
-                                        txt_Paid.setVisibility(View.GONE);
-                                        txt_ExtraCharge.setVisibility(View.VISIBLE);
+                                    txt_Paid.setVisibility(View.GONE);
+                                    txt_ExtraCharge.setVisibility(View.VISIBLE); // Show "Extra Charges" text
+
+                                    String extraPayStatus = doc.getString("extraPay");
+
+                                    btn_ExtraPay.setVisibility(View.GONE);
+                                    txt_Amount.setVisibility(View.VISIBLE);
+
+                                    if ("Paid".equals(extraPayStatus)) {
+                                        btn_ExtraPay.setVisibility(View.GONE);
+                                        txt_ExtraCharge.setText("Extra Charges Paid");
+                                        txt_Amount.setVisibility(View.GONE);
+                                    } else {
+                                        btn_ExtraPay.setVisibility(View.VISIBLE);
+                                        txt_Amount.setVisibility(View.GONE);
+                                        txt_ExtraCharge.setText("Extra Charges Due");
+
+                                        if (!"Unpaid".equals(extraPayStatus)) {
+                                            updateExtraPayStatus(uid, firestoreRideDocId, "Unpaid");
+                                        }
+                                    }
+                                } else {
+                                    btn_ExtraPay.setVisibility(View.GONE);
+                                    txt_ExtraCharge.setVisibility(View.GONE);
                                 }
                             } else {
                                 txt_Timer.setText("Ride Completed (duration unavailable)");
+                                btn_ExtraPay.setVisibility(View.GONE);
+                                txt_ExtraCharge.setVisibility(View.GONE);
                             }
-                            if (!"Paid".equalsIgnoreCase(payStatus)) {
+                            if (!"Paid".equalsIgnoreCase(payStatus) && !"Completed".equalsIgnoreCase(rideStatus)) {
                                 btn_Cancel.setVisibility(View.VISIBLE);
+                            } else if (!"Paid".equalsIgnoreCase(payStatus) && "Completed".equalsIgnoreCase(rideStatus) && (doc.getString("extraPay") == null || !"Paid".equals(doc.getString("extraPay")))) {
                             }
+
                             view_MyRide.setVisibility(View.VISIBLE);
                             view_NoRideData.setVisibility(View.GONE);
                             return;
@@ -549,7 +583,7 @@ public class MyRides extends AppCompatActivity {
                                                                 txt_wait.setVisibility(View.VISIBLE);
                                                                 txt_Timer.setVisibility(View.GONE);
                                                                 txt_ExtraTimer.setVisibility(View.GONE);
-                                                                checkBicycleRelease(); // Start listening for bike release
+                                                                checkBicycleRelease();
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 Log.e(TAG, "startRideAction: Failed to update Realtime DB for user " + uid, e);
@@ -871,6 +905,8 @@ public class MyRides extends AppCompatActivity {
                         extraTimeSeconds = totalElapsedSeconds - planDurationSeconds;
                         txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeSeconds));
                         txt_ExtraTimer.setVisibility(View.VISIBLE);
+                        txt_Paid.setVisibility(View.GONE);
+                        txt_ExtraCharge.setVisibility(View.VISIBLE);
                     } else {
                         mainRideSeconds = totalElapsedSeconds;
                         txt_ExtraTimer.setVisibility(View.GONE);
@@ -1069,4 +1105,26 @@ public class MyRides extends AppCompatActivity {
             return String.format(Locale.getDefault(), "%02d sec", seconds);
         }
     }
+
+    private void updateExtraPayStatus(String userId, String rideDocumentId, String status) {
+        if (userId == null || rideDocumentId == null) {
+            Log.e(TAG, "Cannot update extraPay status: userId or rideDocumentId is null.");
+            return;
+        }
+
+        Map<String, Object> extraPayUpdate = new HashMap<>();
+        extraPayUpdate.put("extraPay", status);
+
+        db.collection("RideHistory").document(userId)
+                .collection("rides").document(rideDocumentId)
+                .update(extraPayUpdate)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "updated extraPay to " + status + " in RideHistory for " + rideDocumentId))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating extraPay in RideHistory for " + rideDocumentId, e));
+
+        db.collection("AllHistory").document(rideDocumentId)
+                .update(extraPayUpdate)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "updated extraPay to " + status + " in AllHistory for " + rideDocumentId))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating extraPay in AllHistory for " + rideDocumentId, e));
+    }
+
 }
