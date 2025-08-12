@@ -9,4 +9,5 @@
     <color name="primaryLightColor">#E8F9F8</color>
     <color name="errorColor">#FF6B6B</color>
     <color name="textPrimary">#333333</color>
+    <color name="ripple_light">#40FFFFFF</color>
 </resources>
