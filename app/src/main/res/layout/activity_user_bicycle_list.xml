@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:padding="4dp"
-            android:text="Select Your Bicycle Type and Ride at Your Own Risk 🚴‍♂️"
+            android:text="Select Your Bicycle Type  🚴‍♂️"
             android:gravity="center"
             android:textColor="@color/ThemeColor"
             android:textSize="14sp"
