@@ -23,6 +23,9 @@
         android:theme="@style/Theme.PadelGo"
         tools:replace="android:fullBackupContent">
         <activity
+            android:name=".user.HandOverBicycle"
+            android:exported="false" />
+        <activity
             android:name=".user.ExtraCharges"
             android:exported="false" />
         <activity
