@@ -1,11 +1,13 @@
 package com.example.padelgo.stationOfficer;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +44,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_release_bicycle);
+        setContentView(R.layout.activity_admin_release_bicycle);
 
         recyclerView = findViewById(R.id.recyclerRelease);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -97,7 +99,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
                                         ride.userNIC = userDocumentSnapshot.getString("NIC Number");
                                     } else {
                                         Log.w(TAG, "User document not found for userId: " + userId);
-                                        ride.userNIC = "N/A"; // Or some default
+                                        ride.userNIC = "N/A";
                                     }
                                     rideList.add(ride);
 
@@ -142,7 +144,14 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
             holder.txt_Plan.setText("Plan: " + ride.plan);
             holder.txt_BicycleType.setText("Bicycle Type: " + ride.bicycleType);
 
-            holder.btn_Release.setOnClickListener(v -> releaseBike(ride));
+            holder.updateReleaseButtonState();
+
+            holder.sw_CheckNIC.setOnCheckedChangeListener((buttonView, isChecked) -> holder.updateReleaseButtonState());
+            holder.sw_BicycleCheck.setOnCheckedChangeListener((buttonView, isChecked) -> holder.updateReleaseButtonState());
+
+            holder.btn_Release.setOnClickListener(v -> {
+                releaseBike(ride);
+            });
         }
 
         @Override
@@ -153,6 +162,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView txt_Name, txt_NIC,txt_Amount, txt_Location, txt_Plan, txt_BicycleType;
             Button btn_Release;
+            Switch sw_CheckNIC, sw_BicycleCheck;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -163,6 +173,19 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
                 txt_Plan = itemView.findViewById(R.id.TXT_Plan_RELEASE);
                 txt_BicycleType = itemView.findViewById(R.id.TXT_Type_RELEASE);
                 btn_Release = itemView.findViewById(R.id.BTN_ReleaseBicycle);
+                sw_CheckNIC = itemView.findViewById(R.id.SW_CheckNIC);
+                sw_BicycleCheck = itemView.findViewById(R.id.SW_BicycleCkeck);
+            }
+            void updateReleaseButtonState() {
+                boolean isEnabled = sw_CheckNIC.isChecked() && sw_BicycleCheck.isChecked();
+                btn_Release.setEnabled(isEnabled);
+                if (isEnabled) {
+                    btn_Release.setBackgroundColor(Color.parseColor("#7E206E"));
+                }
+                else {
+                    btn_Release.setBackgroundColor(Color.parseColor("#B6B1B6"));
+                }
+
             }
         }
     }
