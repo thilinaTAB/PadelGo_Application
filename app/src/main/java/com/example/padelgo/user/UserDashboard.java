@@ -53,7 +53,7 @@ public class UserDashboard extends AppCompatActivity {
         img_signOut = findViewById(R.id.IMG_signOut);
         txtBTN_signOut = findViewById(R.id.TXTBTN_signOut);
         img_bicycleCategory = findViewById(R.id.IMG_Packages);
-        txtBTN_bicycleCategory = findViewById(R.id.TXTBTN_Packages);
+        txtBTN_bicycleCategory = findViewById(R.id.TXTBTN_BicycleList);
         img_rent = findViewById(R.id.IMG_rent);
         txtBTN_rent = findViewById(R.id.TXTBTN_rent);
         img_profile = findViewById(R.id.IMG__UserProfile);
