@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -20,9 +21,9 @@ import com.example.padelgo.common.Settings;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminDash extends AppCompatActivity {
-    ImageView img_signOut, img_addAdmin, img_bicycleAvailability, img_settings, img_rents, img_profile,img_Release;
-    TextView txtBTN_signOut, txtBTN_addAdmin, txtBTN_bicycleAvailability, txtBTN_settings, txtBTN_rents, txtBTN_profile,txtBTN_Release;
     FirebaseAuth fauth;
+
+    CardView btn_rents, btn_addAdmin, btn_availability, btn_verifyUsers, btn_settings, btn_release, btn_signOut;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -38,74 +39,41 @@ public class AdminDash extends AppCompatActivity {
 
         fauth = FirebaseAuth.getInstance();
 
-        img_signOut = findViewById(R.id.IMG_signOut);
-        txtBTN_signOut = findViewById(R.id.TXTBTN_signOut);
-        img_addAdmin = findViewById(R.id.IMG_addAdmin);
-        txtBTN_addAdmin = findViewById(R.id.TXTBTN_addAdmin);
-        img_bicycleAvailability = findViewById(R.id.IMG_bicycleAvailability);
-        txtBTN_bicycleAvailability = findViewById(R.id.TXTBTN_bicycleAvailability);
-        img_settings = findViewById(R.id.IMG_settings);
-        txtBTN_settings = findViewById(R.id.TXTBTN_settings);
-        img_rents = findViewById(R.id.IMG_rents);
-        txtBTN_rents = findViewById(R.id.TXTBTN_rents);
-        img_profile = findViewById(R.id.IMG__UserProfile);
-        txtBTN_profile = findViewById(R.id.TXTBTN_UserProfile);
-        img_Release = findViewById(R.id.IMG_Release);
-        txtBTN_Release = findViewById(R.id.TXTBTN_Release);
+        btn_rents = findViewById(R.id.BTN_Rents);
+        btn_addAdmin = findViewById(R.id.BTN_AddAdmin);
+        btn_availability = findViewById(R.id.BTN_Availability);
+        btn_verifyUsers = findViewById(R.id.BTN_VerifyUsers);
+        btn_settings = findViewById(R.id.BTN_Settings);
+        btn_release = findViewById(R.id.BTN_Release);
+        btn_signOut = findViewById(R.id.BTN_SignOut);
 
         View.OnClickListener signOutClickListener = v -> showSignOutConfirmationDialog();
-        img_signOut.setOnClickListener(signOutClickListener);
-        txtBTN_signOut.setOnClickListener(signOutClickListener);
 
-        img_addAdmin.setOnClickListener(v -> {
-            Intent moveAdminRegister = new Intent(getApplicationContext(), AdminAccountCreate.class);
-            startActivity(moveAdminRegister);
-        });
-
-        txtBTN_addAdmin.setOnClickListener(v -> {
-            Intent moveAdminRegister = new Intent(getApplicationContext(), AdminAccountCreate.class);
-            startActivity(moveAdminRegister);
-        });
-        img_bicycleAvailability.setOnClickListener(v -> {
-            Intent movetoAvailability = new Intent(getApplicationContext(), AdminLocation.class);
-            startActivity(movetoAvailability);
-        });
-        txtBTN_bicycleAvailability.setOnClickListener(v -> {
-            Intent movetoAvailability = new Intent(getApplicationContext(), AdminLocation.class);
-            startActivity(movetoAvailability);
-        });
-        txtBTN_settings.setOnClickListener(v -> {
-            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
-            startActivity(moveToSettings);
-        });
-        img_settings.setOnClickListener(v -> {
-            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
-            startActivity(moveToSettings);
-        });
-        txtBTN_rents.setOnClickListener(v -> {
+        btn_rents.setOnClickListener(v -> {
             Intent moveToRents = new Intent(getApplicationContext(), AdminHistory.class);
             startActivity(moveToRents);
         });
-        img_rents.setOnClickListener(v -> {
-            Intent moveToRents = new Intent(getApplicationContext(), AdminHistory.class);
-            startActivity(moveToRents);
+        btn_addAdmin.setOnClickListener(v -> {
+            Intent moveAdminRegister = new Intent(getApplicationContext(), AdminAccountCreate.class);
+            startActivity(moveAdminRegister);
         });
-        txtBTN_profile.setOnClickListener(v -> {
+        btn_availability.setOnClickListener(v -> {
+            Intent movetoAvailability = new Intent(getApplicationContext(), AdminLocation.class);
+            startActivity(movetoAvailability);
+        });
+        btn_verifyUsers.setOnClickListener(v -> {
             Intent moveToProfile = new Intent(getApplicationContext(), AdminVerifyNIC.class);
             startActivity(moveToProfile);
         });
-        img_profile.setOnClickListener(v -> {
-            Intent moveToProfile = new Intent(getApplicationContext(), AdminVerifyNIC.class);
-            startActivity(moveToProfile);
+        btn_settings.setOnClickListener(v -> {
+            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
+            startActivity(moveToSettings);
         });
-        txtBTN_Release.setOnClickListener(v -> {
+        btn_release.setOnClickListener(v -> {
             Intent moveToRelease = new Intent(getApplicationContext(), ReleaseBicycleActivity.class);
             startActivity(moveToRelease);
         });
-        img_Release.setOnClickListener(v -> {
-            Intent moveToRelease = new Intent(getApplicationContext(), ReleaseBicycleActivity.class);
-            startActivity(moveToRelease);
-        });
+        btn_signOut.setOnClickListener(signOutClickListener);
 
     }
 
