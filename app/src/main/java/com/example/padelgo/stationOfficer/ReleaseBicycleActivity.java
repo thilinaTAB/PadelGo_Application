@@ -22,7 +22,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +43,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_release_bicycle);
+        setContentView(R.layout.activity_station_officer_release_bicycle);
 
         recyclerView = findViewById(R.id.recyclerRelease);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -130,7 +129,7 @@ public class ReleaseBicycleActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_release_bike, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_station_officer_release_bike, parent, false);
             return new ViewHolder(view);
         }
 

@@ -21,7 +21,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class AdminProfile extends AppCompatActivity {
+public class StationOfficerProfile extends AppCompatActivity {
     TextView txt_UserName, txt_UserEmail;
 
     ImageView imgbtn_Back;
@@ -35,7 +35,7 @@ public class AdminProfile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_admin_profile);
+        setContentView(R.layout.activity_station_officer_profile);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -49,7 +49,7 @@ public class AdminProfile extends AppCompatActivity {
         imgbtn_Back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AdminProfile.this, AdminDash.class);
+                Intent intent = new Intent(StationOfficerProfile.this, StationOfficerDashboard.class);
                 startActivity(intent);
                 finish();
             }
@@ -58,7 +58,7 @@ public class AdminProfile extends AppCompatActivity {
         btn_VerifyIDs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AdminProfile.this, AdminVerifyNIC.class);
+                Intent intent = new Intent(StationOfficerProfile.this, StationOfficerVerifyNIC.class);
                 startActivity(intent);
             }
         });

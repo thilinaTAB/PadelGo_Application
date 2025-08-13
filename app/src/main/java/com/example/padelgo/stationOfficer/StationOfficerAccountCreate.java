@@ -27,7 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AdminAccountCreate extends AppCompatActivity {
+public class StationOfficerAccountCreate extends AppCompatActivity {
     TextView txt_btnBack;
 
     EditText etxt_Name, etxt_Email, etxt_Password, etxt_RePassword;
@@ -44,7 +44,7 @@ public class AdminAccountCreate extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_admin_account_create);
+        setContentView(R.layout.activity_station_officer_account_create);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -66,7 +66,7 @@ public class AdminAccountCreate extends AppCompatActivity {
         txt_btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent moveBack = new Intent(getApplicationContext(), AdminDash.class);
+                Intent moveBack = new Intent(getApplicationContext(), StationOfficerDashboard.class);
                 startActivity(moveBack);
             }
         });
@@ -93,7 +93,7 @@ public class AdminAccountCreate extends AppCompatActivity {
                 if (allValid = nameValid && emailValid && passwordValid && rePasswordValid) {
                     allValid = true;
                 } else {
-                    Toast.makeText(AdminAccountCreate.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StationOfficerAccountCreate.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
                 }
 
                 if (!password.equals(confirmPassword)) {
@@ -107,7 +107,7 @@ public class AdminAccountCreate extends AppCompatActivity {
                         public void onSuccess(AuthResult authResult) {
                             FirebaseFirestore user = FirebaseFirestore.getInstance();
 
-                            Toast.makeText(AdminAccountCreate.this, "Account Created", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StationOfficerAccountCreate.this, "Account Created", Toast.LENGTH_SHORT).show();
                             DocumentReference df = fStore.collection("Users").document(fAuth.getCurrentUser().getUid());
                             Map<String, Object> userInfo = new HashMap<>();
                             userInfo.put("Full Name", name);
@@ -118,14 +118,14 @@ public class AdminAccountCreate extends AppCompatActivity {
 
                             df.set(userInfo);
 
-                            startActivity(new Intent(getApplicationContext(), AdminDash.class));
+                            startActivity(new Intent(getApplicationContext(), StationOfficerDashboard.class));
                             finish();
 
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(AdminAccountCreate.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StationOfficerAccountCreate.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
