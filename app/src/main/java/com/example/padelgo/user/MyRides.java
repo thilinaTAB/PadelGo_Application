@@ -565,7 +565,7 @@ public class MyRides extends AppCompatActivity {
                                                     } else {
                                                         Log.w(TAG, "startRideAction: bookingTimestamp is null in RideHistory doc (" + rideHistoryDocId + ").");
                                                     }
-                                                    // Update Realtime Database
+                                                    //Update Realtime Database
                                                     Map<String, Object> releaseData = new HashMap<>();
                                                     releaseData.put("rideStartRequest", true);
                                                     releaseData.put("bikeReleased", false);
@@ -1154,6 +1154,8 @@ public class MyRides extends AppCompatActivity {
                         if ("Completed".equalsIgnoreCase(rideStatus) && "Pending".equalsIgnoreCase(handOverStatus)) {
                             Log.i(TAG, "CheckHandOverBicycle: Handover status is Pending for a completed ride. Redirecting to HandOverBicycle activity.");
                             Intent intent = new Intent(MyRides.this, HandOverBicycle.class);
+                            intent.putExtra("rideId", rideDoc.getId());
+                            intent.putExtra("userId", uid);
                             startActivity(intent);
                             finish();
                         } else {
