@@ -117,6 +117,7 @@
                     android:layout_gravity="center"
                     android:backgroundTint="#7A3D79"
                     android:text="Hand Over"
+                    android:textColor="@color/white"
                     android:textStyle="bold"
                     android:visibility="visible" />
 
