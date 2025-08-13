@@ -24,7 +24,7 @@ public class ExtraCharges extends AppCompatActivity {
 
     private static final String TAG = "ExtraCharges";
     private static final int gracePeriodSec = 900;
-    private static final double chargePerMin = 0.25;
+    private static final double chargePerMin = 5;
     private static final double minimumCharge = 150.0;
 
     TextView txt_ExtraTime, txt_ExtraTimeCharge, txt_TotalCharge;

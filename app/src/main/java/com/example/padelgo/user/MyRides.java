@@ -68,6 +68,7 @@ public class MyRides extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            CheckHandOverBicycle();
             return insets;
         });
 
@@ -564,7 +565,7 @@ public class MyRides extends AppCompatActivity {
                                                     } else {
                                                         Log.w(TAG, "startRideAction: bookingTimestamp is null in RideHistory doc (" + rideHistoryDocId + ").");
                                                     }
-                                                    // Update Realtime Database
+                                                    //Update Realtime Database
                                                     Map<String, Object> releaseData = new HashMap<>();
                                                     releaseData.put("rideStartRequest", true);
                                                     releaseData.put("bikeReleased", false);
@@ -1018,6 +1019,7 @@ public class MyRides extends AppCompatActivity {
                         rideUpdates.put("extraTime", extraTimeForFirestore);
                         rideUpdates.put("rideStatus", "Completed");
                         rideUpdates.put("rideEndTime", rideEndTimeMillis);
+                        rideUpdates.put("handOverStatus", "Pending");
 
                         rideDoc.getReference().update(rideUpdates)
                                 .addOnSuccessListener(aVoid -> {
@@ -1029,6 +1031,7 @@ public class MyRides extends AppCompatActivity {
                                         allHistoryUpdates.put("elapsedTime", finalDurationForFirestore);
                                         allHistoryUpdates.put("extraTime", extraTimeForFirestore);
                                         allHistoryUpdates.put("rideStatus", "Completed");
+                                        allHistoryUpdates.put("handOverStatus", "Pending");
                                         allHistoryUpdates.put("rideEndTime", rideEndTimeMillis);
                                         db.collection("AllHistory")
                                                 .whereEqualTo("userId", uid)
@@ -1060,6 +1063,7 @@ public class MyRides extends AppCompatActivity {
                                     Toast.makeText(MyRides.this, durationMsg, Toast.LENGTH_LONG).show();
 
                                     rideStartTimeMillis = 0;
+                                    CheckHandOverBicycle();
                                     loadRideInfo();
                                 })
                                 .addOnFailureListener(e -> {
@@ -1126,5 +1130,46 @@ public class MyRides extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "updated extraPay to " + status + " in AllHistory for " + rideDocumentId))
                 .addOnFailureListener(e -> Log.e(TAG, "Error updating extraPay in AllHistory for " + rideDocumentId, e));
     }
+
+    private void CheckHandOverBicycle() {
+        FirebaseUser user = fAuth.getCurrentUser();
+        if (user == null) {
+            Log.w(TAG, "CheckHandOverBicycle: Current user is null. Cannot check handover status.");
+            return;
+        }
+        String uid = user.getUid();
+        Log.d(TAG, "CheckHandOverBicycle: Checking handover status for user " + uid);
+
+        db.collection("RideHistory").document(uid)
+                .collection("rides").orderBy("serverTimestamp", Query.Direction.DESCENDING)
+                .limit(1).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot rideDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        String handOverStatus = rideDoc.getString("handOverStatus");
+                        String rideStatus = rideDoc.getString("rideStatus"); // Also get rideStatus
+
+                        Log.d(TAG, "CheckHandOverBicycle: Latest ride found. RideStatus: " + rideStatus + ", HandOverStatus: " + handOverStatus);
+
+                        if ("Completed".equalsIgnoreCase(rideStatus) && "Pending".equalsIgnoreCase(handOverStatus)) {
+                            Log.i(TAG, "CheckHandOverBicycle: Handover status is Pending for a completed ride. Redirecting to HandOverBicycle activity.");
+                            Intent intent = new Intent(MyRides.this, HandOverBicycle.class);
+                            intent.putExtra("rideId", rideDoc.getId());
+                            intent.putExtra("userId", uid);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Log.d(TAG, "CheckHandOverBicycle: Handover status is not 'Pending' for a completed ride, or ride is not completed. No redirection needed.");
+                        }
+                    } else {
+                        Log.d(TAG, "CheckHandOverBicycle: No ride history found for user. No handover check needed.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "CheckHandOverBicycle: Error fetching ride document from Firestore.", e);
+                    Toast.makeText(MyRides.this, "Error checking bicycle handover status.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
 }
