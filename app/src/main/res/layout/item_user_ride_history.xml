@@ -3,12 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginEnd="8dp"
-    android:layout_marginBottom="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,65 +14,115 @@
         android:orientation="vertical"
         android:padding="12dp">
 
+        <!-- BIKE & LOCATION -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/bicycle_ico"
+                app:tint="@color/primaryColor" />
+
             <TextView
                 android:id="@+id/item_txt_bike_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
                 android:text="Bike Type"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textColor="@color/textPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" from "
-                android:textSize="16sp"/>
+                android:text=" • "
+                android:textColor="#888" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/location_ico"
+                app:tint="@color/ThemeColor" />
+
             <TextView
                 android:id="@+id/item_txt_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:text="Location"
-                android:textSize="16sp"/>
+                android:textColor="@color/textSecondary"
+                android:textSize="14sp" />
         </LinearLayout>
 
+        <!-- DATE -->
         <TextView
             android:id="@+id/item_txt_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="on Date"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="4dp"
+            android:text="On: Date"
+            android:textColor="@color/textSecondary"
+            android:textSize="13sp" />
 
+        <!-- PLAN & AMOUNT -->
         <TextView
             android:id="@+id/item_txt_plan_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="(For Plan, LKR Amount)"
-            android:layout_marginTop="4dp"/>
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/item_txt_payment"
+        <!-- PAYMENT STATUS -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="- Payment: Status -"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/money_ico"
+                app:tint="@color/primaryColor" />
+
+            <TextView
+                android:id="@+id/item_txt_payment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="- Payment: Status -"
+                android:textColor="@color/textSecondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- RIDE STARTED -->
         <TextView
             android:id="@+id/item_txt_ride_started"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="- Ride Started?: Status -"
-            android:layout_marginTop="4dp"/>
+            android:textColor="@color/textSecondary"
+            android:textSize="13sp" />
 
+        <!-- RIDE DURATION -->
         <TextView
             android:id="@+id/item_txt_ride_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Ride Time: -" />
-
-
+            android:text="Duration: -"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
