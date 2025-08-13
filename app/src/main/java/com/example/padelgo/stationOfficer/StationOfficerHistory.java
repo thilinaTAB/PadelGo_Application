@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class AdminHistory extends AppCompatActivity {
+public class StationOfficerHistory extends AppCompatActivity {
 
     private static final String TAG = "AdminHistory";
 
@@ -46,7 +46,7 @@ public class AdminHistory extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_history);
+        setContentView(R.layout.activity_station_officer_history);
 
         recyclerViewAdminHistory = findViewById(R.id.recycler_view_admin_history);
         txtAdminNoHistoryMessage = findViewById(R.id.txt_admin_no_history_message);
@@ -288,7 +288,7 @@ public class AdminHistory extends AppCompatActivity {
         @Override
         public RideViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_admin_ride_history, parent, false);
+                    .inflate(R.layout.item_station_officer_ride_history, parent, false);
             return new RideViewHolder(itemView);
         }
 

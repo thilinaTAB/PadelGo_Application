@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AdminVerifyNIC extends AppCompatActivity {
+public class StationOfficerVerifyNIC extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private NICAdapter adapter;
@@ -44,7 +44,7 @@ public class AdminVerifyNIC extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_verify_nic);
+        setContentView(R.layout.activity_station_officer_verify_nic);
 
         Log.d(TAG, "AdminVerifyNIC Activity opened");
 

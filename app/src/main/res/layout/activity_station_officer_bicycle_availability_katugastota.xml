@@ -5,31 +5,23 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
     android:fillViewport="true"
     android:orientation="horizontal"
-    tools:context=".stationOfficer.AdminBicycleAvailability_Peradeniya">
+    tools:context=".stationOfficer.StationOfficerBicycleAvailability_Katugastota">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/editTextText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text"
-            android:text="Name" />
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/dash_view"
-            android:text="Bicycles in Peradeniya"
+            android:text="Bicycles in Katugastota"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="30dp"
             android:textAlignment="center"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="36sp"
             android:textStyle="bold" />
 

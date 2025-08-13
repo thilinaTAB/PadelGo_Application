@@ -41,7 +41,7 @@
             android:name=".common.VerifyPassword"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminVerifyNIC"
+            android:name=".stationOfficer.StationOfficerVerifyNIC"
             android:exported="false" />
         <activity
             android:name=".user.VerifyNIC"
@@ -52,10 +52,10 @@
             android:value="AIzaSyDqR5FL8WK5YHTPAmjQZ1X_BXCQxWEock4" />
 
         <activity
-            android:name=".stationOfficer.AdminProfile"
+            android:name=".stationOfficer.StationOfficerProfile"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminHistory"
+            android:name=".stationOfficer.StationOfficerHistory"
             android:exported="false" />
         <activity
             android:name=".common.Settings"
@@ -73,16 +73,16 @@
             android:name=".user.RideConfirmation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailability_Peradeniya"
+            android:name=".stationOfficer.StationOfficerBicycleAvailability_Peradeniya"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminLocation"
+            android:name=".stationOfficer.StationOfficerLocation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailability_Katugastota"
+            android:name=".stationOfficer.StationOfficerBicycleAvailability_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailability_Kandy"
+            android:name=".stationOfficer.StationOfficerBicycleAvailability_Kandy"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Peradeniya"
@@ -100,7 +100,7 @@
             android:name=".user.BicycleList"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminAccountCreate"
+            android:name=".stationOfficer.StationOfficerAccountCreate"
             android:exported="false" />
         <activity
             android:name=".common.SplashActivityStart"
@@ -112,7 +112,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".stationOfficer.AdminDash"
+            android:name=".stationOfficer.StationOfficerDashboard"
             android:exported="false" />
         <activity
             android:name=".user.Register"

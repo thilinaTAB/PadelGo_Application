@@ -5,15 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".stationOfficer.AdminAccountCreate">
+    tools:context=".stationOfficer.StationOfficerAccountCreate">
 
     <ImageView
         android:layout_width="200dp"
         android:layout_height="73dp"
-        android:src="@drawable/logo">
+        android:src="@drawable/logo_new">
     </ImageView>
 
     <androidx.cardview.widget.CardView
@@ -34,7 +33,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Admin Registration"
+                android:text="Station Officer Registration"
                 android:textAlignment="center"
                 android:textColor="@color/ThemeColor"
                 android:textSize="30sp"
@@ -48,7 +47,7 @@
                 android:background="@drawable/reg_border"
                 android:drawableLeft="@drawable/reg_name"
                 android:drawablePadding="8dp"
-                android:hint="Admin Name"
+                android:hint="Officer Name"
                 android:textColorHint="#A3B4B2"
                 android:inputType="text"
                 android:padding="8dp"
@@ -102,7 +101,7 @@
                 android:layout_height="60dp"
                 android:layout_marginTop="30dp"
                 android:backgroundTint="@color/ThemeColor"
-                android:text="Create Admin Account"
+                android:text="Create Station Officer Account"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:cornerRadius="20dp"
@@ -114,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:padding="8dp"
-                android:text="Go Back to Admin Dashboard"
+                android:text="Go Back to Officer Dashboard"
                 android:textAlignment="center"
                 android:textColor="@color/ThemeColor"
                 android:textSize="15sp" />

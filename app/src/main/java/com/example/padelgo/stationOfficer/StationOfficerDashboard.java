@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -20,17 +18,17 @@ import com.example.padelgo.R;
 import com.example.padelgo.common.Settings;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class AdminDash extends AppCompatActivity {
+public class StationOfficerDashboard extends AppCompatActivity {
     FirebaseAuth fauth;
 
-    CardView btn_rents, btn_addAdmin, btn_availability, btn_verifyUsers, btn_settings, btn_release, btn_signOut;
+    CardView btn_rents, btn_addStationOfficer, btn_availability, btn_verifyUsers, btn_settings, btn_release, btn_signOut;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_admin_dash);
+        setContentView(R.layout.activity_station_officer_dashboard);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -40,7 +38,7 @@ public class AdminDash extends AppCompatActivity {
         fauth = FirebaseAuth.getInstance();
 
         btn_rents = findViewById(R.id.BTN_Rents);
-        btn_addAdmin = findViewById(R.id.BTN_AddAdmin);
+        btn_addStationOfficer = findViewById(R.id.BTN_AddStationOfficer);
         btn_availability = findViewById(R.id.BTN_Availability);
         btn_verifyUsers = findViewById(R.id.BTN_VerifyUsers);
         btn_settings = findViewById(R.id.BTN_Settings);
@@ -50,19 +48,19 @@ public class AdminDash extends AppCompatActivity {
         View.OnClickListener signOutClickListener = v -> showSignOutConfirmationDialog();
 
         btn_rents.setOnClickListener(v -> {
-            Intent moveToRents = new Intent(getApplicationContext(), AdminHistory.class);
+            Intent moveToRents = new Intent(getApplicationContext(), StationOfficerHistory.class);
             startActivity(moveToRents);
         });
-        btn_addAdmin.setOnClickListener(v -> {
-            Intent moveAdminRegister = new Intent(getApplicationContext(), AdminAccountCreate.class);
+        btn_addStationOfficer.setOnClickListener(v -> {
+            Intent moveAdminRegister = new Intent(getApplicationContext(), StationOfficerAccountCreate.class);
             startActivity(moveAdminRegister);
         });
         btn_availability.setOnClickListener(v -> {
-            Intent movetoAvailability = new Intent(getApplicationContext(), AdminLocation.class);
+            Intent movetoAvailability = new Intent(getApplicationContext(), StationOfficerLocation.class);
             startActivity(movetoAvailability);
         });
         btn_verifyUsers.setOnClickListener(v -> {
-            Intent moveToProfile = new Intent(getApplicationContext(), AdminVerifyNIC.class);
+            Intent moveToProfile = new Intent(getApplicationContext(), StationOfficerVerifyNIC.class);
             startActivity(moveToProfile);
         });
         btn_settings.setOnClickListener(v -> {

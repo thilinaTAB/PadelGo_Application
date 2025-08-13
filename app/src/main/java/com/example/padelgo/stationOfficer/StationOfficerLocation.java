@@ -36,7 +36,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class AdminLocation extends AppCompatActivity implements OnMapReadyCallback {
+public class StationOfficerLocation extends AppCompatActivity implements OnMapReadyCallback {
 
     Button btn_Kandy, btn_Katugastota, btn_Peradeniya;
     ImageButton ib_myLocation;
@@ -141,15 +141,15 @@ public class AdminLocation extends AppCompatActivity implements OnMapReadyCallba
 
         padelGoMap.setOnMarkerClickListener(marker -> {
             if (marker.equals(kandyMarker)) {
-                Intent moveToRent_Kandy = new Intent(getApplicationContext(), AdminBicycleAvailability_Kandy.class);
+                Intent moveToRent_Kandy = new Intent(getApplicationContext(), StationOfficerBicycleAvailability_Kandy.class);
                 startActivity(moveToRent_Kandy);
                 return true;
             } else if (marker.equals(katugastotaMarker)) {
-                Intent moveToRent_Katugastota = new Intent(getApplicationContext(), AdminBicycleAvailability_Katugastota.class);
+                Intent moveToRent_Katugastota = new Intent(getApplicationContext(), StationOfficerBicycleAvailability_Katugastota.class);
                 startActivity(moveToRent_Katugastota);
                 return true;
             } else if (marker.equals(peradeniyaMarker)) {
-                Intent moveToRent_Peradeniya = new Intent(getApplicationContext(), AdminBicycleAvailability_Peradeniya.class);
+                Intent moveToRent_Peradeniya = new Intent(getApplicationContext(), StationOfficerBicycleAvailability_Peradeniya.class);
                 startActivity(moveToRent_Peradeniya);
             }
             return false;

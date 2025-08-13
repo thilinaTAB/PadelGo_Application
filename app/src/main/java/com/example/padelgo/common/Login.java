@@ -16,7 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.R;
-import com.example.padelgo.stationOfficer.AdminDash;
+import com.example.padelgo.stationOfficer.StationOfficerDashboard;
 import com.example.padelgo.user.Register;
 import com.example.padelgo.user.UserDashboard;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -118,7 +118,7 @@ public class Login extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
 
                 if (documentSnapshot.getString("isAdmin") != null) {
-                    startActivity(new Intent(getApplicationContext(), AdminDash.class));
+                    startActivity(new Intent(getApplicationContext(), StationOfficerDashboard.class));
                     finish();
                 } else {
                     startActivity(new Intent(getApplicationContext(), UserDashboard.class));

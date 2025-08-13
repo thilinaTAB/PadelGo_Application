@@ -7,13 +7,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EDECED"
-    tools:context=".stationOfficer.AdminDash">
+    tools:context=".stationOfficer.StationOfficerDashboard">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Header -->
         <LinearLayout
             android:id="@+id/top_view"
             android:layout_width="match_parent"
@@ -26,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Admin Dashboard"
+                android:text="Station Officer Dashboard"
                 android:textColor="@color/white"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -34,13 +33,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Manage rentals, admins, and settings"
+                android:text="Manage rentals, officers, and settings"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
-        <!-- Main Grid -->
         <GridLayout
             android:id="@+id/gridLayout"
             android:layout_width="match_parent"
@@ -52,7 +50,6 @@
             android:columnCount="2"
             android:rowCount="4">
 
-            <!-- Rents -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/BTN_Rents"
                 android:layout_width="0dp"
@@ -89,9 +86,8 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Add Admin -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/BTN_AddAdmin"
+                android:id="@+id/BTN_AddStationOfficer"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_margin="8dp"
@@ -119,14 +115,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Add Admin"
+                        android:text="Add Officers"
                         android:textColor="@color/textPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Bicycle Availability -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/BTN_Availability"
                 android:layout_width="0dp"
@@ -163,7 +158,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Verify Users -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/BTN_VerifyUsers"
                 android:layout_width="0dp"
@@ -200,7 +194,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Settings -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/BTN_Settings"
                 android:layout_width="0dp"
@@ -237,7 +230,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Release -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/BTN_Release"
                 android:layout_width="0dp"
@@ -274,7 +266,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Sign Out -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/BTN_SignOut"
                 android:layout_width="0dp"
