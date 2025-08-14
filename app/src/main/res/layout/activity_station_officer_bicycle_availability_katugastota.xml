@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:orientation="horizontal"
+    android:background="@color/white"
     tools:context=".stationOfficer.StationOfficerBicycleAvailability_Katugastota">
 
     <LinearLayout
