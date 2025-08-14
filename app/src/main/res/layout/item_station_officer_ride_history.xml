@@ -14,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:background="#EBF2E0">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,12 +26,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="User: "
+                android:textColor="@color/black"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/item_txt_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textStyle="bold"
                 android:text="Loading user..." />
         </LinearLayout>
 
@@ -38,18 +42,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Bike: "
+                android:textColor="@color/black"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/item_txt_bike_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:text="Unknown Bike" />
         </LinearLayout>
 
@@ -58,6 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Location: Unknown Location" />
 
         <TextView
@@ -65,6 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Plan: Unknown Plan" />
 
         <TextView
@@ -72,6 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Amount: Unknown Amount" />
 
         <TextView
@@ -79,6 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Date/Time: Unknown" />
 
         <TextView
@@ -86,6 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Order Placed: Unknown" />
 
         <TextView
@@ -93,6 +105,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Payment: Unknown" />
 
         <TextView
@@ -100,6 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Ride Requested?: Not yet" />
 
         <TextView
@@ -107,6 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:text="Ride Time: -" />
 
     </LinearLayout>
