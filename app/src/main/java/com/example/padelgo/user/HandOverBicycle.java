@@ -239,6 +239,7 @@ public class HandOverBicycle extends AppCompatActivity {
         Map<String, Object> updates = new HashMap<>();
         updates.put("rideStatus", "Completed");
         updates.put("handOverStatus", "Completed");
+        updates.put("finalCalculation", "Pending");
         updates.put("handOverLocation", handoverLocationName);
         updates.put("handOverTimestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
 

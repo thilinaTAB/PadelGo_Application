@@ -249,6 +249,9 @@ public class MyRides extends AppCompatActivity {
                         Long elapsedTimeFirestore = doc.getLong("elapsedTime");
                         Long extraTimeFirestore = doc.getLong("extraTime");
 
+                        Long fineAmountLong = doc.getLong("fineAmount");
+                        long fineAmount = (fineAmountLong != null) ? fineAmountLong.longValue() : 0L;
+
                         Log.d(TAG, "loadRideInfo: payStatus=" + payStatus +
                                 ", rideStatus=" + rideStatus +
                                 ", rideStartRequestFirestore=" + rideStartRequestFirestore +
@@ -271,7 +274,7 @@ public class MyRides extends AppCompatActivity {
                             txt_Timer.setVisibility(View.VISIBLE);
                             if (elapsedTimeFirestore != null) {
                                 txt_Timer.setText("Ride Duration: " + formatSecondsToDisplay(elapsedTimeFirestore));
-                                if (extraTimeFirestore != null && extraTimeFirestore > 0) {
+                                if (extraTimeFirestore != null && extraTimeFirestore > 0 || fineAmount > 0) {
                                     txt_ExtraTimer.setText("Extra Time: " + formatSecondsToDisplay(extraTimeFirestore));
                                     txt_ExtraTimer.setVisibility(View.VISIBLE);
                                     txt_Paid.setVisibility(View.GONE);

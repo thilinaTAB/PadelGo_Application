@@ -13,15 +13,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
+import com.example.padelgo.common.Login;
 import com.example.padelgo.common.Settings;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class StationOfficerDashboard extends AppCompatActivity {
     FirebaseAuth fauth;
 
-    CardView btn_rents, btn_addStationOfficer, btn_availability, btn_verifyUsers, btn_settings, btn_release, btn_signOut;
+    CardView btn_rents, btn_addStationOfficer, btn_availability, btn_verifyUsers, btn_settings, btn_release, btn_signOut, btn_fine;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -44,6 +44,7 @@ public class StationOfficerDashboard extends AppCompatActivity {
         btn_settings = findViewById(R.id.BTN_Settings);
         btn_release = findViewById(R.id.BTN_Release);
         btn_signOut = findViewById(R.id.BTN_SignOut);
+        btn_fine = findViewById(R.id.BTN_Fine);
 
         View.OnClickListener signOutClickListener = v -> showSignOutConfirmationDialog();
 
@@ -73,6 +74,11 @@ public class StationOfficerDashboard extends AppCompatActivity {
         });
         btn_signOut.setOnClickListener(signOutClickListener);
 
+        btn_fine.setOnClickListener(v -> {
+            Intent moveToFine = new Intent(getApplicationContext(), FineCalculation.class);
+            startActivity(moveToFine);
+        });
+
     }
 
     private void showSignOutConfirmationDialog() {
@@ -80,7 +86,7 @@ public class StationOfficerDashboard extends AppCompatActivity {
                 .setTitle("Sign Out")
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Yes", (dialog, which) -> signOut())
-                .setNegativeButton("No", null) // Do nothing on "No"
+                .setNegativeButton("No", null)
                 .show();
     }
 
