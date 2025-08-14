@@ -66,7 +66,6 @@ public class ExtraCharges extends AppCompatActivity {
 
         btn_ExtaPay.setOnClickListener(v -> {
             Log.d(TAG, "Proceed to Payment Gateway button clicked.");
-            // TODO: Ensure you pass the FINAL total amount to PaymentGateway
             Intent paymentIntent = new Intent(ExtraCharges.this, PaymentGateway.class);
             startActivity(paymentIntent);
             finish();
