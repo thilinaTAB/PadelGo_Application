@@ -13,9 +13,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
-import com.example.padelgo.common.Settings;
+import com.example.padelgo.common.Login;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class StationOfficerDashboard extends AppCompatActivity {
@@ -64,7 +63,7 @@ public class StationOfficerDashboard extends AppCompatActivity {
             startActivity(moveToProfile);
         });
         btn_settings.setOnClickListener(v -> {
-            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
+            Intent moveToSettings = new Intent(getApplicationContext(), FineCalculation.class);
             startActivity(moveToSettings);
         });
         btn_release.setOnClickListener(v -> {
@@ -80,7 +79,7 @@ public class StationOfficerDashboard extends AppCompatActivity {
                 .setTitle("Sign Out")
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Yes", (dialog, which) -> signOut())
-                .setNegativeButton("No", null) // Do nothing on "No"
+                .setNegativeButton("No", null)
                 .show();
     }
 
