@@ -248,7 +248,9 @@ public class MyRides extends AppCompatActivity {
                         Boolean rideStartRequestFirestore = doc.getBoolean("rideStartRequest");
                         Long elapsedTimeFirestore = doc.getLong("elapsedTime");
                         Long extraTimeFirestore = doc.getLong("extraTime");
-                        long fineAmount = doc.getLong("fineAmount");
+
+                        Long fineAmountLong = doc.getLong("fineAmount");
+                        long fineAmount = (fineAmountLong != null) ? fineAmountLong.longValue() : 0L;
 
                         Log.d(TAG, "loadRideInfo: payStatus=" + payStatus +
                                 ", rideStatus=" + rideStatus +

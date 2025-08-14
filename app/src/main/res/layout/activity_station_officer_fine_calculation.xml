@@ -5,10 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="@color/white"
     tools:context=".stationOfficer.FineCalculation">
 
     <TextView
-        android:id="@+id/textViewTitle"
+        android:id="@+id/TXT_Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Process Pending Ride Fine"
@@ -23,14 +24,14 @@
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/textViewTitle"
+        app:layout_constraintTop_toBottomOf="@id/TXT_Title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp"
         android:visibility="gone"/>
 
     <TextView
-        android:id="@+id/textViewNoPendingRides"
+        android:id="@+id/TXT_NoPendingRides"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No rides currently pending final calculation."
@@ -45,8 +46,8 @@
         android:id="@+id/scrollViewDetails"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewTitle"
-        app:layout_constraintBottom_toTopOf="@id/buttonMarkAsProcessed"
+        app:layout_constraintTop_toBottomOf="@id/TXT_Title"
+        app:layout_constraintBottom_toTopOf="@id/BTN_MarkAsProcessed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
@@ -66,7 +67,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewFullName"
+                android:id="@+id/TXT_UserFullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -79,7 +80,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewBikeType"
+                android:id="@+id/TXT_RideBikeType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -93,7 +94,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewLocation"
+                android:id="@+id/TXT_StationLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -106,7 +107,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewHandOverLocation"
+                android:id="@+id/TXT_HandOverLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -120,7 +121,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewPlan"
+                android:id="@+id/TXT_RidePlan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -133,7 +134,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewRideEndTime"
+                android:id="@+id/TXT_RideEndTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -146,7 +147,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewHandOverTime"
+                android:id="@+id/TXT_HandOverTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -160,14 +161,14 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewExtraTime"
+                android:id="@+id/TXT_ExtraTimeUsed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 tools:text="120"/>
 
             <TextView
-                android:id="@+id/textViewExtraTimeFormatted"
+                android:id="@+id/TXT_ExtraTimeFormatted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -181,45 +182,36 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
             <TextView
-                android:id="@+id/textViewRideStatus"
+                android:id="@+id/TXT_RideStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 tools:text="Completed"/>
 
             <EditText
-                android:id="@+id/editTextFineAmount"
+                android:id="@+id/ETXT_FineAmount"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter Fine Amount (if any)"
+                android:layout_height="50dp"
+                android:hint="Enter Fine Amount"
                 android:inputType="numberDecimal"
                 android:layout_marginTop="16dp"/>
-
-            <EditText
-                android:id="@+id/editTextAdminNotes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Admin Notes (Optional)"
-                android:inputType="textMultiLine"
-                android:minLines="2"
-                android:layout_marginTop="8dp"/>
 
         </LinearLayout>
     </ScrollView>
 
     <Button
-        android:id="@+id/buttonMarkAsProcessed"
+        android:id="@+id/BTN_MarkAsProcessed"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Mark as Processed &amp; Apply Fine"
-        app:layout_constraintBottom_toTopOf="@id/buttonSkipRide"
+        app:layout_constraintBottom_toTopOf="@id/BTN_SkipRide"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="8dp"
         android:visibility="gone"/>
 
     <Button
-        android:id="@+id/buttonSkipRide"
+        android:id="@+id/BTN_SkipRide"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Skip / No Fine Needed"

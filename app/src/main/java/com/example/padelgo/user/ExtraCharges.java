@@ -39,6 +39,7 @@ public class ExtraCharges extends AppCompatActivity {
     private static final String fStoreExtraTime = "extraTime";
     private static final String fStoreInitialTotalAmount = "amount";
     private static final String fStoreFineAmount = "fineAmount";
+    private String currentRideDocId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,18 @@ public class ExtraCharges extends AppCompatActivity {
         btn_ExtaPay.setOnClickListener(v -> {
             Log.d(TAG, "Proceed to Payment Gateway button clicked.");
             Intent paymentIntent = new Intent(ExtraCharges.this, PaymentGateway.class);
+            String totalChargeString = txt_TotalCharge.getText().toString().replace("LKR ", "").trim();
+            try {
+                double amountToPay = Double.parseDouble(totalChargeString);
+                paymentIntent.putExtra("TOTAL_AMOUNT", amountToPay);
+                if (currentRideDocId != null) {
+                    paymentIntent.putExtra("RIDE_DOC_ID", currentRideDocId);
+                }
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "Could not parse total charge for Payment Gateway: " + totalChargeString, e);
+                Toast.makeText(this, "Error processing payment amount.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             startActivity(paymentIntent);
             finish();
         });
@@ -83,7 +96,6 @@ public class ExtraCharges extends AppCompatActivity {
         }
 
         String userId = currentUser.getUid();
-        // Assuming you are fetching the latest ride for the user
         db.collection("RideHistory").document(userId)
                 .collection("rides").orderBy("serverTimestamp", Query.Direction.DESCENDING)
                 .limit(1).get()
@@ -96,10 +108,9 @@ public class ExtraCharges extends AppCompatActivity {
                     }
 
                     DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
-                    String rideDocId = doc.getId();
-                    Log.d(TAG, "Processing ride document: " + rideDocId);
+                    currentRideDocId = doc.getId();
+                    Log.d(TAG, "Processing ride document: " + currentRideDocId);
 
-                    //Extra Time Display
                     Long extraTimeSecondsRaw = doc.getLong(fStoreExtraTime);
                     String displayExtraTimeText = "No extra time recorded";
                     if (extraTimeSecondsRaw != null && extraTimeSecondsRaw > 0) {
@@ -113,8 +124,6 @@ public class ExtraCharges extends AppCompatActivity {
                     }
                     txt_ExtraTime.setText(displayExtraTimeText);
 
-
-                    //Calculated Extra Time Charge
                     double calculatedAutomatedExtraCharge = 0.0;
                     if (doc.contains(fStoreExtraChargeField)) {
                         String extraChargeAmountLKRString = doc.getString(fStoreExtraChargeField);
@@ -122,17 +131,14 @@ public class ExtraCharges extends AppCompatActivity {
                             try {
                                 calculatedAutomatedExtraCharge = Double.parseDouble(extraChargeAmountLKRString);
                             } catch (NumberFormatException e) {
-                                Log.w(TAG, "Invalid format for " + fStoreExtraChargeField + " in " + rideDocId + ": " + extraChargeAmountLKRString);
+                                Log.w(TAG, "Invalid format for " + fStoreExtraChargeField + " in " + currentRideDocId + ": " + extraChargeAmountLKRString);
                             }
                         }
                     } else if (extraTimeSecondsRaw != null) {
                         calculatedAutomatedExtraCharge = calculateAutomatedExtraChargeValue(extraTimeSecondsRaw);
                     }
-                    String displayExtraChargeText = String.format(Locale.getDefault(), "LKR %.2f", calculatedAutomatedExtraCharge);
-                    txt_ExtraTimeCharge.setText(displayExtraChargeText);
+                    txt_ExtraTimeCharge.setText(String.format(Locale.getDefault(), "LKR %.2f", calculatedAutomatedExtraCharge));
 
-
-                    //Station Officer Applied Fine
                     double AppliedFine = 0.0;
                     if (doc.contains(fStoreFineAmount)) {
                         Object fineAmountObj = doc.get(fStoreFineAmount);
@@ -147,41 +153,27 @@ public class ExtraCharges extends AppCompatActivity {
                         }
                         Log.d(TAG, "Retrieved fineAmount: " + AppliedFine);
                     } else {
-                        Log.d(TAG, fStoreFineAmount + " field not found in document " + rideDocId);
+                        Log.d(TAG, fStoreFineAmount + " field not found in document " + currentRideDocId);
                     }
-                    String displayOtherChargeText = String.format(Locale.getDefault(), "LKR %.2f", AppliedFine);
-                    txt_OtherCharge.setText(displayOtherChargeText);
+                    txt_OtherCharge.setText(String.format(Locale.getDefault(), "LKR %.2f", AppliedFine));
 
+                    double sumOfAllExtraCharges = calculatedAutomatedExtraCharge + AppliedFine;
+                    double finalTotalDue = 0.0;
 
-                    //Total Amount
-                    double initialTotalAmount = 0.0;
-                    if (doc.contains(fStoreInitialTotalAmount)) {
-                        Object initialAmountObj = doc.get(fStoreInitialTotalAmount);
-                        if (initialAmountObj instanceof String) {
-                            try {
-                                initialTotalAmount = Double.parseDouble((String) initialAmountObj);
-                            } catch (NumberFormatException e) {
-                                Log.e(TAG, "Invalid number format for '" + fStoreInitialTotalAmount + "': " + initialAmountObj);
-                            }
-                        } else if (initialAmountObj instanceof Number) {
-                            initialTotalAmount = ((Number) initialAmountObj).doubleValue();
+                    if (sumOfAllExtraCharges > 0) {
+                        if (sumOfAllExtraCharges < minimumCharge) {
+                            finalTotalDue = minimumCharge;
+                        } else {
+                            finalTotalDue = sumOfAllExtraCharges;
                         }
                     } else {
-                        Log.w(TAG, "'" + fStoreInitialTotalAmount + "' field not found. Assuming 0 for initial amount.");
+                        finalTotalDue = 0.0;
                     }
 
+                    Log.d(TAG, "Calculated Auto Extra: " + calculatedAutomatedExtraCharge + ", Applied Fine: " + AppliedFine + ", Sum of All Extras (before min rule): " + sumOfAllExtraCharges + ", Final Total Due (for extras, after min rule): " + finalTotalDue);
 
-                    //Calculate Final Total Due
-                    double finalTotalDue = initialTotalAmount + calculatedAutomatedExtraCharge + AppliedFine;
+                    txt_TotalCharge.setText(String.format(Locale.getDefault(), "LKR %.2f", finalTotalDue));
 
-                    if (finalTotalDue > 150) {
-                        finalTotalDue = calculatedAutomatedExtraCharge + AppliedFine;
-                    }
-                    String displayTotalDueText = String.format(Locale.getDefault(), "LKR %.2f", finalTotalDue);
-                    txt_TotalCharge.setText(displayTotalDueText);
-
-
-                    //Payment Button Visibility
                     if (finalTotalDue > 0) {
                         btn_ExtaPay.setVisibility(View.VISIBLE);
                     } else {
@@ -205,6 +197,7 @@ public class ExtraCharges extends AppCompatActivity {
         if (chargeableExtraSeconds > 0) {
             double chargeableExtraMinutes = chargeableExtraSeconds / 60.0;
             calculatedCharge = chargeableExtraMinutes * chargePerMin;
+
             if (calculatedCharge > 0 && calculatedCharge < minimumCharge) {
                 calculatedCharge = minimumCharge;
             }

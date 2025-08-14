@@ -35,10 +35,10 @@ public class FineCalculation extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private ScrollView scrollViewDetails;
-    private TextView textViewNoPendingRides;
-    private TextView textViewFullName, textViewBikeType, textViewLocation, textViewHandOverLocation, textViewPlan, textViewRideEndTime, textViewHandOverTime, textViewExtraTime, textViewExtraTimeFormatted, textViewRideStatus;
-    private EditText editTextFineAmount, editTextAdminNotes;
-    private Button buttonMarkAsProcessed, buttonSkipRide;
+    private TextView txt_NoPendingRides;
+    private TextView txt_userFullName, txt_RideBikeType, txt_StationLocation, txt_HandOverLocation, txt_RidePlan, txt_RideEndTime, txt_HandOverTime, txt_ExtraTime, txt_ExtraTimeFormatted, txt_RideStatus;
+    private EditText etxt_FineAmount;
+    private Button btn_MarkAsProcessed, btn_SkipRide;
 
     private FirebaseFirestore db;
     private DocumentSnapshot currentAllHistoryDoc;
@@ -58,25 +58,24 @@ public class FineCalculation extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         scrollViewDetails = findViewById(R.id.scrollViewDetails);
-        textViewNoPendingRides = findViewById(R.id.textViewNoPendingRides);
-        textViewFullName = findViewById(R.id.textViewFullName);
-        textViewBikeType = findViewById(R.id.textViewBikeType);
-        textViewLocation = findViewById(R.id.textViewLocation);
-        textViewHandOverLocation = findViewById(R.id.textViewHandOverLocation);
-        textViewPlan = findViewById(R.id.textViewPlan);
-        textViewRideEndTime = findViewById(R.id.textViewRideEndTime);
-        textViewHandOverTime = findViewById(R.id.textViewHandOverTime);
-        textViewExtraTime = findViewById(R.id.textViewExtraTime);
-        textViewExtraTimeFormatted = findViewById(R.id.textViewExtraTimeFormatted);
-        textViewRideStatus = findViewById(R.id.textViewRideStatus);
+        txt_NoPendingRides = findViewById(R.id.TXT_NoPendingRides);
+        txt_userFullName = findViewById(R.id.TXT_UserFullName);
+        txt_RideBikeType = findViewById(R.id.TXT_RideBikeType);
+        txt_StationLocation = findViewById(R.id.TXT_StationLocation);
+        txt_HandOverLocation = findViewById(R.id.TXT_HandOverLocation);
+        txt_RidePlan = findViewById(R.id.TXT_RidePlan);
+        txt_RideEndTime = findViewById(R.id.TXT_RideEndTime);
+        txt_HandOverTime = findViewById(R.id.TXT_HandOverTime);
+        txt_ExtraTime = findViewById(R.id.TXT_ExtraTimeUsed);
+        txt_ExtraTimeFormatted = findViewById(R.id.TXT_ExtraTimeFormatted);
+        txt_RideStatus = findViewById(R.id.TXT_RideStatus);
 
-        editTextFineAmount = findViewById(R.id.editTextFineAmount);
-        editTextAdminNotes = findViewById(R.id.editTextAdminNotes);
-        buttonMarkAsProcessed = findViewById(R.id.buttonMarkAsProcessed);
-        buttonSkipRide = findViewById(R.id.buttonSkipRide);
+        etxt_FineAmount = findViewById(R.id.ETXT_FineAmount);
+        btn_MarkAsProcessed = findViewById(R.id.BTN_MarkAsProcessed);
+        btn_SkipRide = findViewById(R.id.BTN_SkipRide);
 
-        buttonMarkAsProcessed.setOnClickListener(v -> processRide(true));
-        buttonSkipRide.setOnClickListener(v -> processRide(false));
+        btn_MarkAsProcessed.setOnClickListener(v -> processRide(true));
+        btn_SkipRide.setOnClickListener(v -> processRide(false));
 
         fetchNextPendingRide();
     }
@@ -87,9 +86,9 @@ public class FineCalculation extends AppCompatActivity {
         if (!show) {
         } else {
             scrollViewDetails.setVisibility(View.GONE);
-            buttonMarkAsProcessed.setVisibility(View.GONE);
-            buttonSkipRide.setVisibility(View.GONE);
-            textViewNoPendingRides.setVisibility(View.GONE);
+            btn_MarkAsProcessed.setVisibility(View.GONE);
+            btn_SkipRide.setVisibility(View.GONE);
+            txt_NoPendingRides.setVisibility(View.GONE);
         }
     }
 
@@ -115,18 +114,18 @@ public class FineCalculation extends AppCompatActivity {
                     populateRideDetails(currentAllHistoryDoc);
                 }
             } else {
-                textViewNoPendingRides.setVisibility(View.VISIBLE);
+                txt_NoPendingRides.setVisibility(View.VISIBLE);
                 scrollViewDetails.setVisibility(View.GONE);
-                buttonMarkAsProcessed.setVisibility(View.GONE);
-                buttonSkipRide.setVisibility(View.GONE);
+                btn_MarkAsProcessed.setVisibility(View.GONE);
+                btn_SkipRide.setVisibility(View.GONE);
                 Toast.makeText(this, "No rides pending final calculation.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
             showLoading(false);
             Log.e(TAG, "Error fetching pending rides: ", e);
             Toast.makeText(FineCalculation.this, "Error fetching rides: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            textViewNoPendingRides.setText("Error fetching rides. Please check connection and Firestore indexes.");
-            textViewNoPendingRides.setVisibility(View.VISIBLE);
+            txt_NoPendingRides.setText("Error fetching rides. Please check connection and Firestore indexes.");
+            txt_NoPendingRides.setVisibility(View.VISIBLE);
         });
     }
 
@@ -152,29 +151,28 @@ public class FineCalculation extends AppCompatActivity {
 
     private void clearRideDetailsUi() {
 
-        textViewFullName.setText("N/A");
-        textViewBikeType.setText("N/A");
-        textViewLocation.setText("N/A");
-        textViewHandOverLocation.setText("N/A");
-        textViewPlan.setText("N/A");
-        textViewRideEndTime.setText("N/A");
-        textViewHandOverTime.setText("N/A");
-        textViewExtraTime.setText("N/A");
-        textViewExtraTimeFormatted.setText("");
-        textViewRideStatus.setText("N/A");
-        editTextFineAmount.setText("");
-        editTextAdminNotes.setText("");
+        txt_userFullName.setText("N/A");
+        txt_RideBikeType.setText("N/A");
+        txt_StationLocation.setText("N/A");
+        txt_HandOverLocation.setText("N/A");
+        txt_RidePlan.setText("N/A");
+        txt_RideEndTime.setText("N/A");
+        txt_HandOverTime.setText("N/A");
+        txt_ExtraTime.setText("N/A");
+        txt_ExtraTimeFormatted.setText("");
+        txt_RideStatus.setText("N/A");
+        etxt_FineAmount.setText("");
     }
 
     private void populateRideDetails(DocumentSnapshot doc) {
         if (doc == null) {
             Log.e(TAG, "populateRideDetails: DocumentSnapshot is null!");
             showLoading(false);
-            textViewNoPendingRides.setText("Error displaying ride details.");
-            textViewNoPendingRides.setVisibility(View.VISIBLE);
+            txt_NoPendingRides.setText("Error displaying ride details.");
+            txt_NoPendingRides.setVisibility(View.VISIBLE);
             scrollViewDetails.setVisibility(View.GONE);
-            buttonMarkAsProcessed.setVisibility(View.GONE);
-            buttonSkipRide.setVisibility(View.GONE);
+            btn_MarkAsProcessed.setVisibility(View.GONE);
+            btn_SkipRide.setVisibility(View.GONE);
             return;
         }
 
@@ -183,38 +181,38 @@ public class FineCalculation extends AppCompatActivity {
         if (currentRideUserId != null) {
             db.collection("Users").document(currentRideUserId).get().addOnSuccessListener(userDoc -> {
                 if (userDoc.exists()) {
-                    textViewFullName.setText(userDoc.getString("Full Name"));
+                    txt_userFullName.setText(userDoc.getString("Full Name"));
                 } else {
-                    textViewFullName.setText("User details not found");
+                    txt_userFullName.setText("User details not found");
                 }
-            }).addOnFailureListener(e -> textViewFullName.setText("Error fetching name"));
+            }).addOnFailureListener(e -> txt_userFullName.setText("Error fetching name"));
         } else {
-            textViewFullName.setText("User ID missing in ride doc");
+            txt_userFullName.setText("User ID missing in ride doc");
         }
 
-        textViewBikeType.setText(doc.getString("bikeType"));
-        textViewLocation.setText(doc.getString("location"));
-        textViewHandOverLocation.setText(doc.getString("handOverLocation"));
-        textViewPlan.setText(doc.getString("plan"));
-        textViewRideStatus.setText(doc.getString("rideStatus"));
-        textViewRideEndTime.setText(getFormattedDateFromField(doc, "rideEndTime", "Ride End Time N/A"));
-        textViewHandOverTime.setText(getFormattedDateFromField(doc, "handOverTimestamp", "Handover Time N/A"));
+        txt_RideBikeType.setText(doc.getString("bikeType"));
+        txt_StationLocation.setText(doc.getString("location"));
+        txt_HandOverLocation.setText(doc.getString("handOverLocation"));
+        txt_RidePlan.setText(doc.getString("plan"));
+        txt_RideStatus.setText(doc.getString("rideStatus"));
+        txt_RideEndTime.setText(getFormattedDateFromField(doc, "rideEndTime", "Ride End Time N/A"));
+        txt_HandOverTime.setText(getFormattedDateFromField(doc, "handOverTimestamp", "Handover Time N/A"));
 
 
         Long extraTimeSeconds = doc.getLong("extraTime");
         if (extraTimeSeconds != null) {
-            textViewExtraTime.setText(String.valueOf(extraTimeSeconds));
-            textViewExtraTimeFormatted.setText(String.format(Locale.getDefault(), "(%s)", formatSecondsToDisplay(extraTimeSeconds)));
-            textViewExtraTimeFormatted.setVisibility(View.VISIBLE);
+            txt_ExtraTime.setText(String.valueOf(extraTimeSeconds));
+            txt_ExtraTimeFormatted.setText(String.format(Locale.getDefault(), "(%s)", formatSecondsToDisplay(extraTimeSeconds)));
+            txt_ExtraTimeFormatted.setVisibility(View.VISIBLE);
         } else {
-            textViewExtraTime.setText("0");
-            textViewExtraTimeFormatted.setVisibility(View.GONE);
+            txt_ExtraTime.setText("0");
+            txt_ExtraTimeFormatted.setVisibility(View.GONE);
         }
 
         scrollViewDetails.setVisibility(View.VISIBLE);
-        buttonMarkAsProcessed.setVisibility(View.VISIBLE);
-        buttonSkipRide.setVisibility(View.VISIBLE);
-        textViewNoPendingRides.setVisibility(View.GONE);
+        btn_MarkAsProcessed.setVisibility(View.VISIBLE);
+        btn_SkipRide.setVisibility(View.VISIBLE);
+        txt_NoPendingRides.setVisibility(View.GONE);
     }
 
     private String getFormattedDateFromField(DocumentSnapshot doc, String fieldName, String defaultText) {
@@ -272,26 +270,25 @@ public class FineCalculation extends AppCompatActivity {
             return;
         }
 
-        String fineAmountStr = editTextFineAmount.getText().toString().trim();
-        String adminNotes = editTextAdminNotes.getText().toString().trim();
+        String fineAmountStr = etxt_FineAmount.getText().toString().trim();
         double fineAmount = 0;
 
         if (applyFine) {
             if (TextUtils.isEmpty(fineAmountStr)) {
-                editTextFineAmount.setError("Fine amount required or skip.");
-                editTextFineAmount.requestFocus();
+                etxt_FineAmount.setError("Fine amount required or skip.");
+                etxt_FineAmount.requestFocus();
                 return;
             }
             try {
                 fineAmount = Double.parseDouble(fineAmountStr);
                 if (fineAmount < 0) {
-                    editTextFineAmount.setError("Fine cannot be negative.");
-                    editTextFineAmount.requestFocus();
+                    etxt_FineAmount.setError("Fine cannot be negative.");
+                    etxt_FineAmount.requestFocus();
                     return;
                 }
             } catch (NumberFormatException e) {
-                editTextFineAmount.setError("Invalid fine amount.");
-                editTextFineAmount.requestFocus();
+                etxt_FineAmount.setError("Invalid fine amount.");
+                etxt_FineAmount.requestFocus();
                 return;
             }
         }
@@ -303,7 +300,6 @@ public class FineCalculation extends AppCompatActivity {
         Map<String, Object> allHistoryUpdates = new HashMap<>();
         allHistoryUpdates.put("finalCalculation", applyFine ? "FineApplied" : "NoFine");
         allHistoryUpdates.put("fineAmount", fineAmount);
-        allHistoryUpdates.put("adminNotes", adminNotes);
 
 
         batch.update(currentAllHistoryDoc.getReference(), allHistoryUpdates);
@@ -331,7 +327,7 @@ public class FineCalculation extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (currentAllHistoryDoc == null && progressBar.getVisibility() == View.GONE && (textViewNoPendingRides.getVisibility() == View.VISIBLE || scrollViewDetails.getVisibility() == View.GONE)) {
+        if (currentAllHistoryDoc == null && progressBar.getVisibility() == View.GONE && (txt_NoPendingRides.getVisibility() == View.VISIBLE || scrollViewDetails.getVisibility() == View.GONE)) {
             Log.d(TAG, "onResume: No ride data, attempting to fetch next pending ride.");
             fetchNextPendingRide();
         }
