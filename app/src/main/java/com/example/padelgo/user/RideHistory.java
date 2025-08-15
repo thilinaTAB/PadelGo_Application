@@ -134,6 +134,8 @@ public class RideHistory extends AppCompatActivity {
         String rideStartRequestText;
         String formattedRideDuration;
         String documentId;
+        String returned;
+        String fine;
 
         public RideHistoryItem(QueryDocumentSnapshot document) {
             this.documentId = document.getId();
@@ -143,6 +145,18 @@ public class RideHistory extends AppCompatActivity {
             this.amount = document.getString("amount");
             this.date = document.getString("dateAndTime");
             this.payment = document.getString("payment");
+            this.returned = document.getString("handOverLocation");
+            Object fineAmountObj = document.get("fineAmount");
+            if (fineAmountObj instanceof Number) {
+                this.fine = String.valueOf(fineAmountObj);
+            } else if (fineAmountObj instanceof String) {
+                this.fine = (String) fineAmountObj;
+            } else if (fineAmountObj == null) {
+                this.fine = "0";
+            } else {
+                this.fine = String.valueOf(fineAmountObj);
+                Log.w(RideHistory.TAG, "Document " + document.getId() + ": fineAmount field was of an unexpected type: " + fineAmountObj.getClass().getName() + ", value: " + fineAmountObj);
+            }
 
             Boolean rideStartRequestBool = document.getBoolean("rideStartRequest");
             if (Boolean.TRUE.equals(rideStartRequestBool)) {
@@ -213,6 +227,8 @@ public class RideHistory extends AppCompatActivity {
         public String getPayment() { return payment != null ? payment : "N/A"; }
         public String getRideStartRequestText() { return rideStartRequestText; }
         public String getFormattedRideDuration() { return formattedRideDuration != null ? formattedRideDuration : "N/A"; }
+        public String getReturned() { return returned != null ? returned : "N/A"; }
+        public String getFine() { return fine != null ? fine : "N/A"; }
 
 
         @Override
@@ -256,7 +272,11 @@ public class RideHistory extends AppCompatActivity {
             holder.txtPayment.setText("- Payment: " + currentItem.getPayment());
             holder.txtRideStarted.setText("- Ride Started?: " + currentItem.getRideStartRequestText());
             holder.txtRideTime.setText("- Duration: " + currentItem.getFormattedRideDuration());
+            holder.txtReturnBike.setText("- Returned Station: " + currentItem.getReturned());
+            holder.txtFine.setText("- Fine or other charges: " + currentItem.getFine());
+
             holder.txtRideTime.setVisibility(View.VISIBLE);
+
         }
 
         @Override
@@ -265,7 +285,7 @@ public class RideHistory extends AppCompatActivity {
         }
 
         class RideViewHolder extends RecyclerView.ViewHolder {
-            TextView txtBikeType, txtLocation, txtDate, txtPlanAmount, txtPayment, txtRideStarted, txtRideTime;
+            TextView txtBikeType, txtLocation, txtDate, txtPlanAmount, txtPayment, txtRideStarted, txtRideTime,txtReturnBike,txtFine;
 
             public RideViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -276,6 +296,8 @@ public class RideHistory extends AppCompatActivity {
                 txtPayment = itemView.findViewById(R.id.item_txt_payment);
                 txtRideStarted = itemView.findViewById(R.id.item_txt_ride_started);
                 txtRideTime = itemView.findViewById(R.id.item_txt_ride_time);
+                txtReturnBike = itemView.findViewById(R.id.item_txt_ReturnBike);
+                txtFine = itemView.findViewById(R.id.item_txt_Fine);
             }
         }
     }

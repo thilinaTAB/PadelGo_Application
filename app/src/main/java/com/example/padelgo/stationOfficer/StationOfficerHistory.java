@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.padelgo.R;
+import com.example.padelgo.user.RideHistory;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -160,6 +161,8 @@ public class StationOfficerHistory extends AppCompatActivity {
         String orderPlacedTimestamp;
         String formattedRideDuration;
         Timestamp serverTimestamp;
+        String returned;
+        String fine;
 
         public RideItem(Map<String, Object> data) {
             this.userId = (String) data.get("userId");
@@ -169,6 +172,17 @@ public class StationOfficerHistory extends AppCompatActivity {
             this.amount = data.get("amount") != null ? data.get("amount").toString() : "N/A";
             this.paymentStatus = data.get("payment") != null ? data.get("payment").toString() : "N/A";
             this.dateAndTime = data.get("dateAndTime") != null ? data.get("dateAndTime").toString() : "N/A";
+            this.returned = data.get("handOverLocation") != null ? data.get("handOverLocation").toString(): "N/A";
+            Object fineAmountObj = data.get("fineAmount");
+            if (fineAmountObj instanceof Number) {
+                this.fine = String.valueOf(fineAmountObj);
+            } else if (fineAmountObj instanceof String) {
+                this.fine = (String) fineAmountObj;
+            } else if (fineAmountObj == null) {
+                this.fine = "0";
+            } else {
+                this.fine = String.valueOf(fineAmountObj);
+            }
 
             Boolean rideStartRequestBool = null;
             Object rideStartRequestObj = data.get("rideStartRequest");
@@ -257,7 +271,9 @@ public class StationOfficerHistory extends AppCompatActivity {
         public String getRideRequestedStatus() { return rideRequestedStatus; }
         public String getDateAndTime() { return dateAndTime; }
         public String getOrderPlacedTimestamp() { return orderPlacedTimestamp; }
-        public String getFormattedRideDuration() { return formattedRideDuration; } // Getter for duration
+        public String getFormattedRideDuration() { return formattedRideDuration; }
+        public String getReturned() { return returned; }
+        public String getFine() { return fine; }
 
         public void setUserName(String userName) { this.userName = userName; }
 
@@ -304,7 +320,9 @@ public class StationOfficerHistory extends AppCompatActivity {
             holder.txtOrderPlaced.setText("Order Placed: " + currentRide.getOrderPlacedTimestamp());
             holder.txtPaymentStatus.setText("Payment: " + currentRide.getPaymentStatus());
             holder.txtRideRequested.setText("Ride Requested?: " + currentRide.getRideRequestedStatus());
-            holder.txtRideTime.setText("Ride Duration: " + currentRide.getFormattedRideDuration()); // Use formatted duration
+            holder.txtRideTime.setText("Ride Duration: " + currentRide.getFormattedRideDuration());
+            holder.txtReturnBike.setText("Returned to: " + currentRide.getReturned());
+            holder.txtFine.setText("Fine or other charges: " + currentRide.getFine());
         }
 
         @Override
@@ -314,7 +332,7 @@ public class StationOfficerHistory extends AppCompatActivity {
 
         class RideViewHolder extends RecyclerView.ViewHolder {
             TextView txtUserName, txtBikeType, txtLocation, txtPlan, txtAmount,
-                    txtDateTime, txtOrderPlaced, txtPaymentStatus, txtRideRequested, txtRideTime;
+                    txtDateTime, txtOrderPlaced, txtPaymentStatus, txtRideRequested, txtRideTime, txtReturnBike,txtFine;
             public RideViewHolder(@NonNull View itemView) {
                 super(itemView);
                 txtUserName = itemView.findViewById(R.id.item_txt_user_name);
@@ -327,6 +345,8 @@ public class StationOfficerHistory extends AppCompatActivity {
                 txtPaymentStatus = itemView.findViewById(R.id.item_txt_payment_status);
                 txtRideRequested = itemView.findViewById(R.id.item_txt_ride_requested);
                 txtRideTime = itemView.findViewById(R.id.item_txt_ride_time);
+                txtReturnBike = itemView.findViewById(R.id.item_txt_ReturnBike);
+                txtFine = itemView.findViewById(R.id.item_txt_Fine);
             }
         }
     }
