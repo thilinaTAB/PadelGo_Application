@@ -104,6 +104,7 @@
                 android:backgroundTint="@color/ThemeColor"
                 android:text="Create Account"
                 android:textSize="18sp"
+                android:textColor="@color/white"
                 android:textStyle="bold"
                 app:cornerRadius="20dp"
                 tools:visibility="visible" />
