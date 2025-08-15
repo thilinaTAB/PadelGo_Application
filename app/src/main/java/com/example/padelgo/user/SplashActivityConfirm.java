@@ -18,57 +18,19 @@ import java.util.Map;
 
 public class SplashActivityConfirm extends AppCompatActivity {
 
-    String BicycleType, Location, Plan, Amount, Date;
-    private FirebaseFirestore db;
-    private FirebaseAuth fAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_confirm_splash);
 
-        fAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-
-        BicycleType = getIntent().getStringExtra("BicycleType");
-        Location = getIntent().getStringExtra("Location");
-        Plan = getIntent().getStringExtra("Plan");
-        Amount = getIntent().getStringExtra("Amount");
-        Date = getIntent().getStringExtra("Date");
 
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                saveRideInfo();
+                Intent splash = new Intent(SplashActivityConfirm.this, MyRides.class);
+                startActivity(splash);
+                finish();
             }
         }, 3000); // 4 seconds = 4000 milliseconds
-    }
-
-    private void saveRideInfo() {
-        FirebaseUser currentUser = fAuth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            Map<String, Object> rideInfo = new HashMap<>();
-            rideInfo.put("bicycleType", BicycleType);
-            rideInfo.put("location", Location);
-            rideInfo.put("plan", Plan);
-            rideInfo.put("amount", Amount);
-            rideInfo.put("date", Date);
-            rideInfo.put("timestamp", System.currentTimeMillis());
-            rideInfo.put("payment", "Pending");
-
-            db.collection("RideHistory")
-                    .document(userId)
-                    .collection("rides")
-                    .add(rideInfo)
-                    .addOnSuccessListener(documentReference -> {
-                        Intent splash = new Intent(SplashActivityConfirm.this, UserProfile.class);
-                        startActivity(splash);
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "ERROR. Try later", Toast.LENGTH_SHORT).show();
-                    });
-        }
     }
 }

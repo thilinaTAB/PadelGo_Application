@@ -19,12 +19,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.padelgo.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -118,7 +121,7 @@ public class RideConfirmation extends AppCompatActivity {
 
         btn_confirm.setOnClickListener(v -> {
             if (validateFields() && isSelectedDateTimeValid()) {
-                saveRideDetailsToFirestore();
+                saveRideDetailsToAllHistory();
             } else if (!validateFields()) {
                 Toast.makeText(RideConfirmation.this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             }
@@ -251,6 +254,10 @@ public class RideConfirmation extends AppCompatActivity {
 
         int totalPrice = basePrice * multiplier;
 
+        if (totalPrice < 150 && totalPrice > 0) {
+            totalPrice = 150;
+        }
+
         if (basePrice != -1) {
             totalPayment = ""+totalPrice;
             txt_amount.setText("LKR"+ totalPrice+".00");
@@ -313,8 +320,8 @@ public class RideConfirmation extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-    private void saveRideDetailsToFirestore() {
+    //Save to AllHistory Document
+    private void saveRideDetailsToAllHistory() {
         if (fAuth.getCurrentUser() == null) {
             Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
             return;
@@ -325,49 +332,130 @@ public class RideConfirmation extends AppCompatActivity {
         }
 
         String userId = fAuth.getCurrentUser().getUid();
-        String userName = fAuth.getCurrentUser().getDisplayName();
-        if (userName == null || userName.isEmpty()) {
-            userName = "N/A";
-        }
-        String bikeType = txt_bikeType.getText().toString();
-        String location = txt_location.getText().toString();
-        String plan = etxt_numPlan.getText().toString() + " " + txt_plan.getText().toString();
-        String amount = totalPayment;
-        String dateAndTime = etxt_date.getText().toString() + " " + etxt_time.getText().toString();
 
-        Map<String, Object> rideDetails = new HashMap<>();
-        rideDetails.put("userId", userId);
-        rideDetails.put("Full Name", userName);
-        rideDetails.put("bikeType", bikeType);
-        rideDetails.put("location", location);
-        rideDetails.put("plan", plan);
-        rideDetails.put("amount", amount);
-        rideDetails.put("dateAndTime", dateAndTime);
-        rideDetails.put("bookingTimestamp", calendar.getTimeInMillis());
-        rideDetails.put("serverTimestamp", FieldValue.serverTimestamp());
-        rideDetails.put("payment", "pending");
+        DocumentReference userRef = db.collection("Users").document(userId);
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                String userName = "N/A";
 
+                if (document != null && document.exists()) {
+                    String fullName = document.getString("FullName");
+                    if (fullName == null) {
+                        fullName = document.getString("Full Name");
+                    }
+                    if (fullName != null && !fullName.isEmpty()) {
+                        userName = fullName;
+                    } else {
+                        Log.w(TAG, "User's full name not found in Firestore. Using default.");
+                    }
+                } else {
+                    Log.w(TAG, "User document does not exist in Firestore. Using default name.");
+                }
+                String bikeType = txt_bikeType.getText().toString();
+                String location = txt_location.getText().toString();
+                String plan = etxt_numPlan.getText().toString() + " " + txt_plan.getText().toString();
+                String amount = totalPayment;
+                String dateAndTime = etxt_date.getText().toString() + " " + etxt_time.getText().toString();
 
-        CollectionReference allHistoryRef = db.collection("AllHistory");
+                Map<String, Object> rideDetails = new HashMap<>();
+                rideDetails.put("userId", userId);
+                rideDetails.put("Full Name", userName);
+                rideDetails.put("bikeType", bikeType);
+                rideDetails.put("location", location);
+                rideDetails.put("plan", plan);
+                rideDetails.put("amount", amount);
+                rideDetails.put("dateAndTime", dateAndTime);
+                rideDetails.put("bookingTimestamp", calendar.getTimeInMillis());
+                rideDetails.put("serverTimestamp", FieldValue.serverTimestamp());
+                rideDetails.put("payment", "pending");
+                rideDetails.put("rideStatus", "ongoing");
 
-        allHistoryRef.add(rideDetails)
-                .addOnSuccessListener(documentReference -> {
+                CollectionReference allHistoryRef = db.collection("AllHistory");
+
+                allHistoryRef.add(rideDetails).addOnSuccessListener(documentReference -> {
                     Log.d(TAG, "Ride details added to AllHistory with ID: " + documentReference.getId());
                     Toast.makeText(RideConfirmation.this, "Ride confirmed and details saved!", Toast.LENGTH_SHORT).show();
                     Intent goConfirm = new Intent(RideConfirmation.this, SplashActivityConfirm.class);
-                    goConfirm.putExtra("BicycleType", bikeType);
-                    goConfirm.putExtra("Location", location);
-                    goConfirm.putExtra("Plan", plan);
-                    goConfirm.putExtra("Amount", amount);
-                    goConfirm.putExtra("Date", dateAndTime);
+                    saveRideDetailsToRideHistory();
                     startActivity(goConfirm);
                     finish();
-                })
-                .addOnFailureListener(e -> {
+                }).addOnFailureListener(e -> {
                     Log.e(TAG, "Error adding ride details to AllHistory: ", e);
                     Toast.makeText(RideConfirmation.this, "Error confirming ride. Please try again.", Toast.LENGTH_SHORT).show();
                     incrementBikeCountAndGoToMain();
                 });
+
+            } else {
+                Log.e(TAG, "Error fetching user profile: ", task.getException());
+                Toast.makeText(RideConfirmation.this, "Could not fetch user profile. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+//Save to RideHistory Document
+    private void saveRideDetailsToRideHistory() {
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String userId = currentUser.getUid();
+
+        DocumentReference userRef = db.collection("Users").document(userId);
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                String userName = "N/A";
+
+                if (document != null && document.exists()) {
+                    String fullName = document.getString("FullName");
+                    if (fullName == null) {
+                        fullName = document.getString("Full Name");
+                    }
+                    if (fullName != null && !fullName.isEmpty()) {
+                        userName = fullName;
+                    } else {
+                        Log.w(TAG, "User's full name not found in Firestore. Using default.");
+                    }
+                } else {
+                    Log.w(TAG, "User document does not exist in Firestore. Using default name.");
+                }
+
+
+                String bikeType = txt_bikeType.getText().toString();
+                String location = txt_location.getText().toString();
+                String plan = etxt_numPlan.getText().toString() + " " + txt_plan.getText().toString();
+                String amount = totalPayment;
+                String dateAndTime = etxt_date.getText().toString() + " " + etxt_time.getText().toString();
+
+
+                Map<String, Object> rideInfo = new HashMap<>();
+
+                rideInfo.put("userId", userId);
+                rideInfo.put("Full Name", userName);
+                rideInfo.put("bikeType", bikeType);
+                rideInfo.put("location", location);
+                rideInfo.put("plan", plan);
+                rideInfo.put("amount", amount);
+                rideInfo.put("dateAndTime", dateAndTime);
+                rideInfo.put("bookingTimestamp", calendar.getTimeInMillis());
+                rideInfo.put("serverTimestamp", FieldValue.serverTimestamp());
+                rideInfo.put("payment", "pending");
+                rideInfo.put("rideStatus", "ongoing");
+
+                db.collection("RideHistory").document(userId).collection("rides").add(rideInfo).addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "Ride details added to user's RideHistory/rides with ID: " + documentReference.getId());
+                    Toast.makeText(RideConfirmation.this, "Ride confirmed and details saved to your history!", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    Log.e(TAG, "Error adding ride details to user's RideHistory: ", e);
+                    Toast.makeText(RideConfirmation.this, "Error saving ride to your history. Please try again.", Toast.LENGTH_SHORT).show();
+                });
+
+            } else {
+                Log.e(TAG, "Error fetching user profile: ", task.getException());
+                Toast.makeText(RideConfirmation.this, "Could not fetch user profile. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showCancelConfirmation() {

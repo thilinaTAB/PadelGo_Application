@@ -9,26 +9,40 @@
 
     <TextView
         android:layout_width="match_parent"
+        android:background="#DEDBDE"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:layout_height="50dp"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:text="Please Upload Your NIC images"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:textStyle="bold"
+        android:paddingTop="10dp"
         android:layout_height="40dp"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:text="Please Upload Front image"/>
+        android:text="Upload NIC Front image"/>
 
     <ImageView
         android:id="@+id/imageViewFrontNIC"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginTop="16dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_foreground"
         android:contentDescription="Front NIC"
         android:background="@color/TransparentBG"/>
 
     <TextView
+        android:paddingTop="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="30dp"
         android:textAlignment="center"
-        android:text="Please Upload Back image"/>
+        android:text="Upload NIC Back image"/>
 
     <ImageView
         android:id="@+id/imageViewBackNIC"
@@ -42,6 +56,7 @@
         android:contentDescription="Back NIC" />
 
     <ProgressBar
+        android:background="@color/black"
         android:id="@+id/progressBarUpload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

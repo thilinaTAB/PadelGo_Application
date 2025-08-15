@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@color/white"
+    android:layout_marginBottom="8dp">
+
+    <TextView android:id="@+id/TXT_Name_RELEASE"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Amount:" />
+
+    <TextView android:id="@+id/TXT_NIC_RELEASE"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Amount:" />
+
+    <TextView android:id="@+id/TXT_Amount_RELEASE"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Amount:" />
+
+    <TextView android:id="@+id/TXT_Location_RELEASE"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Location:" />
+
+    <TextView android:id="@+id/TXT_Plan_RELEASE"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Plan:" />
+
+    <TextView android:id="@+id/TXT_Type_RELEASE"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bicycle Type:" />
+
+    <Switch
+        android:id="@+id/SW_CheckNIC"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="User NIC checked"
+        android:textColor="#E20C0C"
+        android:textStyle="bold"/>
+
+    <Switch
+        android:id="@+id/SW_BicycleCkeck"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="Bicicle and equipments checked"
+        android:textColor="#E20C0C"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/BTN_ReleaseBicycle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Release Bicycle"
+        android:backgroundTint="#B6B1B6"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

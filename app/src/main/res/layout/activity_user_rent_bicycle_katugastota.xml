@@ -19,11 +19,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/dash_view"
             android:text="Katugastota"
             android:paddingTop="10dp"
             android:textAlignment="center"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="36sp"
             android:textStyle="bold" />
 
@@ -68,7 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@drawable/login_border"
-                    android:text="  Hourly : LKR 70.00 "
+                    android:text="  Hourly : LKR 100.00 "
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:padding="8dp"

@@ -23,13 +23,34 @@
         android:theme="@style/Theme.PadelGo"
         tools:replace="android:fullBackupContent">
         <activity
+            android:name=".user.TermsConditions"
+            android:exported="false" />
+        <activity
+            android:name=".common.AboutUs"
+            android:exported="false" />
+        <activity
+            android:name=".stationOfficer.FineCalculation"
+            android:exported="false" />
+        <activity
+            android:name=".user.HandOverBicycle"
+            android:exported="false" />
+        <activity
+            android:name=".user.ExtraCharges"
+            android:exported="false" />
+        <activity
+            android:name=".user.UserNewProfile"
+            android:exported="false" />
+        <activity
+            android:name=".stationOfficer.ReleaseBicycleActivity"
+            android:exported="false" />
+        <activity
             android:name=".user.PaymentGateway"
             android:exported="false" />
         <activity
             android:name=".common.VerifyPassword"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminVerifyNIC"
+            android:name=".stationOfficer.StationOfficerVerifyNIC"
             android:exported="false" />
         <activity
             android:name=".user.VerifyNIC"
@@ -40,19 +61,19 @@
             android:value="AIzaSyDqR5FL8WK5YHTPAmjQZ1X_BXCQxWEock4" />
 
         <activity
-            android:name=".stationOfficer.AdminProfile"
+            android:name=".stationOfficer.StationOfficerProfile"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminRents"
+            android:name=".stationOfficer.StationOfficerHistory"
             android:exported="false" />
         <activity
-            android:name=".common.Settings"
+            android:name=".common.PasswordChange"
             android:exported="false" />
         <activity
             android:name=".user.RideHistory"
             android:exported="false" />
         <activity
-            android:name=".user.UserProfile"
+            android:name=".user.MyRides"
             android:exported="false" />
         <activity
             android:name=".user.SplashActivityConfirm"
@@ -61,16 +82,16 @@
             android:name=".user.RideConfirmation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailability_Peradeniya"
+            android:name=".stationOfficer.StationOfficerBicycleAvailability_Peradeniya"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminLocation"
+            android:name=".stationOfficer.StationOfficerLocation"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailability_Katugastota"
+            android:name=".stationOfficer.StationOfficerBicycleAvailability_Katugastota"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminBicycleAvailability_Kandy"
+            android:name=".stationOfficer.StationOfficerBicycleAvailability_Kandy"
             android:exported="false" />
         <activity
             android:name=".user.RentBicycle_Peradeniya"
@@ -88,11 +109,15 @@
             android:name=".user.BicycleList"
             android:exported="false" />
         <activity
-            android:name=".stationOfficer.AdminAccountCreate"
+            android:name=".stationOfficer.StationOfficerAccountCreate"
+            android:exported="false" />
+        <activity
+            android:name=".user.UserSettings"
             android:exported="false" />
         <activity
             android:name=".common.SplashActivityStart"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -100,7 +125,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".stationOfficer.AdminDash"
+            android:name=".stationOfficer.StationOfficerDashboard"
             android:exported="false" />
         <activity
             android:name=".user.Register"
