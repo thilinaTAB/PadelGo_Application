@@ -23,6 +23,12 @@
         android:theme="@style/Theme.PadelGo"
         tools:replace="android:fullBackupContent">
         <activity
+            android:name=".user.TermsConditions"
+            android:exported="false" />
+        <activity
+            android:name=".common.AboutUs"
+            android:exported="false" />
+        <activity
             android:name=".stationOfficer.FineCalculation"
             android:exported="false" />
         <activity
@@ -61,7 +67,7 @@
             android:name=".stationOfficer.StationOfficerHistory"
             android:exported="false" />
         <activity
-            android:name=".common.Settings"
+            android:name=".common.PasswordChange"
             android:exported="false" />
         <activity
             android:name=".user.RideHistory"
@@ -106,8 +112,12 @@
             android:name=".stationOfficer.StationOfficerAccountCreate"
             android:exported="false" />
         <activity
+            android:name=".user.UserSettings"
+            android:exported="false" />
+        <activity
             android:name=".common.SplashActivityStart"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

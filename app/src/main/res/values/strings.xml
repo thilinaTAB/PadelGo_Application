@@ -4,4 +4,87 @@
     <string name="no">No</string>
     <string name="extra_time_format" />
     <string name="currency_format" />
+    <string name="terms_conditions_text">
+<b>PadelGo – Terms &amp; Conditions</b>\n
+Last updated: 15 August 2025\n\n
+<b>1. Eligibility</b>\n\n
+
+You must be at least 18 years old to create an account.\n
+
+You must provide accurate and complete registration details.\n
+
+You are responsible for keeping your account credentials secure.\n\n
+
+<b>2. Account Registration</b>\n\n
+
+By registering, you consent to PadelGo processing your personal data in accordance with our Privacy Policy.\n
+
+You agree not to create multiple accounts for the purpose of misusing promotions, discounts, or offers.\n\n
+
+<b>3. Payments &amp; Fees</b>\n\n
+
+All payments are processed via Stripe or other approved payment gateways.\n
+
+Rental fees are charged before ride start. Additional charges may apply for late returns or damages.\n
+
+All prices are shown in Sri Lankan Rupees (LKR) unless otherwise stated.\n
+
+Payments are non-refundable except where required by law or explicitly approved by PadelGo.\n\n
+
+<b>4. Ride Rules</b>\n\n
+
+You may only start a ride after your payment is confirmed and a station officer releases your bike.\n
+
+You must follow traffic laws and safety guidelines during your ride.\n
+
+The bike must be returned to the designated PadelGo station in good condition.\n
+
+You are responsible for any damages, theft, or loss of the bike during your rental period.\n\n
+
+<b>5. User Responsibilities</b>\n\n
+
+Ensure the bike is safe and functional before starting your ride.\n
+
+Do not share your account or allow others to ride on your booking.\n
+
+Do not use the bike for illegal activities or off-road riding.\n\n
+
+<b>6. Liability &amp; Disclaimers</b>\n\n
+
+PadelGo is not responsible for any injuries, damages, or losses arising from your use of the bike or Services.\n
+
+You ride at your own risk.\n
+
+We provide the Services “as is” and make no warranties about uninterrupted or error-free operation.\n\n
+
+<b>7. Suspension &amp; Termination</b>\n\n
+
+We may suspend or terminate your account if you breach these Terms, damage property, or engage in unsafe or unlawful activities.\n\n
+
+<b>8. Changes to Terms</b>\n\n
+
+PadelGo may update these Terms at any time. We will notify you through the app or email.\n
+
+Continued use of the Services after changes take effect means you accept the updated Terms.\n\n
+
+<b>9. Governing Law</b>\n\n
+
+These Terms are governed by the laws of Sri Lanka.\n
+
+Any disputes shall be resolved in the courts of Sri Lanka.\n\n
+
+By registering, you confirm that you have read, understood, and agree to these Terms &amp; Conditions.
+</string>
+
+    <string name="about_us_text">
+PadelGo is a modern bicycle rental platform designed to make eco-friendly travel simple, affordable, and fun.
+With just a few taps, you can book, pay, and ride — all through our mobile app.\n\n
+
+Our mission is to reduce traffic congestion and carbon emissions while giving people a healthy, convenient way to get around.\n\n
+
+PadelGo partners with trusted station officers who ensure every bike is safe, clean, and ready for your journey.\n\n
+
+Whether you’re commuting, exercising, or exploring, PadelGo is here to make your ride easy and enjoyable.
+</string>
+
 </resources>

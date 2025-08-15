@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -132,44 +134,64 @@ public class Register extends AppCompatActivity {
                 }
 
                 if (allValid) {
-                    fAuth.createUserWithEmailAndPassword(emailAddress, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                        @Override
-                        public void onSuccess(AuthResult authResult) {
-                            FirebaseFirestore user = FirebaseFirestore.getInstance();
+                    showTermsDialog(name, emailAddress, password, nic, mobile);
 
-                            Toast.makeText(Register.this, "Account Created", Toast.LENGTH_SHORT).show();
-                            DocumentReference df = fStore.collection("Users").document(fAuth.getCurrentUser().getUid());
-                            Map<String, Object> userInfo = new HashMap<>();
-                            userInfo.put("Full Name", name);
-                            userInfo.put("Email Address", emailAddress);
-                            userInfo.put("NIC Number", nic);
-                            userInfo.put("Mobile Number", mobile);
-                            userInfo.put("verificationStatus", "not_verified");
-                            userInfo.put("Password", password);
-//                            userInfo.put("isAdmin", "1");
-
-                            df.set(userInfo);
-
-                            startActivity(new Intent(getApplicationContext(), Login.class));
-                            finish();
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            if (e instanceof FirebaseAuthUserCollisionException) {
-                                // This specific exception means the email already exists
-                                etxt_Email.setError("Email address already in use.");
-                                Toast.makeText(Register.this, "This email address is already registered. Please login or use a different email.", Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
                 }
             }
         });
     }
+
+    private void showTermsDialog(String name, String emailAddress, String password, String nic, String mobile) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.terms_conditions, null);
+
+        CheckBox cbAgree = view.findViewById(R.id.cbAgree);
+        Button btnAccept = view.findViewById(R.id.btnAccept);
+
+        cbAgree.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            btnAccept.setEnabled(isChecked);
+        });
+
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+
+        btnAccept.setOnClickListener(v -> {
+            dialog.dismiss();
+            createUserInFirebase(name, emailAddress, password, nic, mobile);
+        });
+
+        dialog.show();
+    }
+
+    private void createUserInFirebase(String name, String emailAddress, String password, String nic, String mobile) {
+        fAuth.createUserWithEmailAndPassword(emailAddress, password)
+                .addOnSuccessListener(authResult -> {
+                    DocumentReference df = fStore.collection("Users")
+                            .document(fAuth.getCurrentUser().getUid());
+
+                    Map<String, Object> userInfo = new HashMap<>();
+                    userInfo.put("Full Name", name);
+                    userInfo.put("Email Address", emailAddress);
+                    userInfo.put("NIC Number", nic);
+                    userInfo.put("Mobile Number", mobile);
+                    userInfo.put("verificationStatus", "not_verified");
+                    userInfo.put("Password", password);
+
+                    df.set(userInfo);
+                    Toast.makeText(Register.this, "Account Created", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getApplicationContext(), Login.class));
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    if (e instanceof FirebaseAuthUserCollisionException) {
+                        etxt_Email.setError("Email address already in use.");
+                        Toast.makeText(Register.this, "This email address is already registered. Please login or use a different email.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(Register.this, "Failed to create an account", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 
     public boolean checkField(EditText ex) {
         if (ex.getText().toString().trim().isEmpty()) {
