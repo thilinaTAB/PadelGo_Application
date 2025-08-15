@@ -175,6 +175,7 @@
                     android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:visibility="visible"
+                    android:textColor="@color/white"
                     android:backgroundTint="#7A3D79"
                     android:textStyle="bold"
                     android:text="Pay Now"/>
@@ -285,6 +286,7 @@
                     android:layout_gravity="center"
                     android:visibility="gone"
                     android:backgroundTint="#7A3D79"
+                    android:textColor="@color/white"
                     android:textStyle="bold"
                     android:text="Pay Extra"/>
 

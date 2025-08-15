@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:alpha="40"
 
     android:gravity="center"
@@ -206,6 +207,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:visibility="visible"
+                android:textColor="@color/white"
                 app:cornerRadius="20dp"
                 tools:visibility="visible" />
 
