@@ -18,7 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.padelgo.common.Login;
 import com.example.padelgo.R;
-import com.example.padelgo.common.Settings;
+import com.example.padelgo.common.PasswordChange;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -149,15 +149,15 @@ public class UserDashboard extends AppCompatActivity {
         });
 
         img_settings.setOnClickListener(v -> {
-            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
+            Intent moveToSettings = new Intent(getApplicationContext(), UserSettings.class);
             startActivity(moveToSettings);
         });
         txtBTN_settings.setOnClickListener(v -> {
-            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
+            Intent moveToSettings = new Intent(getApplicationContext(), UserSettings.class);
             startActivity(moveToSettings);
         });
         cv_Settings.setOnClickListener(v -> {
-            Intent moveToSettings = new Intent(getApplicationContext(), Settings.class);
+            Intent moveToSettings = new Intent(getApplicationContext(), UserSettings.class);
             startActivity(moveToSettings);
         });
 

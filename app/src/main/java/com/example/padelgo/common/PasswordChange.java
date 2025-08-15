@@ -13,7 +13,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.AuthCredential;
 
-public class Settings extends AppCompatActivity {
+public class PasswordChange extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private EditText currentPasswordEditText;
@@ -24,7 +24,7 @@ public class Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_common_settings);
+        setContentView(R.layout.activity_common_password_change);
 
         auth = FirebaseAuth.getInstance();
 
